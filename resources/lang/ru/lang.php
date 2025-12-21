@@ -3,6 +3,11 @@
 
 
 return [
+    'eskiz_setting' => 'Настройки eskiz',
+    'eskiz_port' => 'Порт eskiz',
+    'eskiz_user_name' => 'Имя пользователя eskiz',
+    'eskiz_password' => 'Пароль eskiz',
+    'eskiz_url' => 'URL eskiz',
 
     //---------------------------------------AAAA---------------------------------------
 
@@ -798,7 +803,7 @@ return [
 
 'section_image_help' => 'Загрузите изображение в формате SVG',
 
-    ''section_name' => 'Название',
+    'section_name' => 'Название',
 
 'section_name_help' => 'Введите название',
 

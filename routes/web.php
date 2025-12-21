@@ -328,6 +328,7 @@ Route::prefix('settings')->group(function () {
     });
     Route::get('mobile/globals', [App\Http\Controllers\SettingsController::class, 'mobileGlobals'])->name('settings.mobile.globals');
     Route::middleware(['permission:payment-method,payment-method'])->group(function () {
+        Route::get('payment/payme', [App\Http\Controllers\SettingsController::class, 'payme'])->name('payment.payme');
         Route::get('payment/stripe', [App\Http\Controllers\SettingsController::class, 'stripe'])->name('payment.stripe');
         Route::get('payment/razorpay', [App\Http\Controllers\SettingsController::class, 'razorpay'])->name('payment.razorpay');
         Route::get('payment/cod', [App\Http\Controllers\SettingsController::class, 'cod'])->name('payment.cod');

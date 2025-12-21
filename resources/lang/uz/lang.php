@@ -4,6 +4,11 @@
 
 return [
 
+    'eskiz_setting' => 'Eskiz sozlamalari',
+    'eskiz_host' => 'Xost eskiz',
+    'eskiz_user_name' => 'Foydalanuvchi nomi eskiz',
+    'eskiz_password' => 'Parol eskiz',
+     'eskiz_url' => 'URL eskiz',
     //---------------------------------------AAAA---------------------------------------
 
     'actions' => 'Amallar',

@@ -26,6 +26,11 @@ class SettingsController extends Controller
         return view('settings.app.cod');
     }
 
+    public function payme()
+    {
+        return view('settings.app.payme');
+    }
+
     public function stripe()
     {
         return view('settings.app.stripe');

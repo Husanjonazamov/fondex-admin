@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'eskiz_setting' => 'Eskiz Settings',
+    'eskiz_user_name' => 'Username (eskiz)',
+    'eskiz_password' => 'Password (eskiz)',
+     'eskiz_url' => 'URL (eskiz)',
     //---------------------------------------AAAA---------------------------------------
     'actions' => 'Actions',
     'active' => 'Active',

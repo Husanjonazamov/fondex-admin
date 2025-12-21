@@ -23,6 +23,12 @@
                     </a>
 
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link payme_active_label" href="{!! url('settings/payment/payme') !!}">
+                        <i class="fa fa-credit-card mr-2"></i>Payme<span class="badge ml-2"></span>
+                    </a>
+                </li>
+
 
                 <li class="nav-item">
 

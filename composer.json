@@ -12,6 +12,7 @@
     "braintree/braintree_php": "^6.7",
     "google/apiclient": "^2.16",
     "guzzlehttp/guzzle": "^7.2",
+    "jscorptech/payme": "^0.5.0",
     "laravel/framework": "^10.0",
     "laravel/sanctum": "^3.3",
     "laravel/tinker": "^2.8",

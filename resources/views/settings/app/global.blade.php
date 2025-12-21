@@ -637,6 +637,33 @@
 
                     </fieldset>
 
+                    <!-- eskiz -->
+                  <fieldset>
+                    <legend><i class="mr-3 fa fa-envelope text-white"></i> {{ trans('lang.eskiz_setting') }}</legend>
+
+                    <div class="form-group row width-50">
+                        <label class="col-3 control-label"> {{ trans('lang.eskiz_url') }}</label>
+                        <div class="col-7">
+                            <input type="text" class="form-control eskiz_url" placeholder="{{ trans('lang.eskiz_url') }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group row width-50">
+                        <label class="col-3 control-label">{{ trans('lang.eskiz_user_name') }}</label>
+                        <div class="col-7">
+                            <input type="text" class="form-control eskiz_user_name" placeholder="{{ trans('lang.eskiz_user_name') }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group row width-50">
+                        <label class="col-3 control-label">{{ trans('lang.eskiz_password') }}</label>
+                        <div class="col-7">
+                            <input type="password" class="form-control eskiz_password" placeholder="{{ trans('lang.eskiz_password') }}">
+                        </div>
+                    </div>
+                </fieldset>
+
+
                     <fieldset>
 
                         <legend><i class="mr-3 mdi mdi-comment-alert"></i>{{ trans('lang.notification_setting') }}</legend>
@@ -756,6 +783,8 @@
     </div>
 @endsection
 
+
+
 @section('scripts')
     <script type="text/javascript">
         var database = firebase.firestore();
@@ -783,6 +812,8 @@
         var refCurrency = database.collection('currencies').where('isActive', '==', true);
 
         var refEmailSetting = database.collection('settings').doc("emailSetting");
+        var refEskizSetting = database.collection('settings').doc('eskizSetting');
+
 
         var refNotificationSetting = database.collection('settings').doc("notification_setting");
 
@@ -1402,385 +1433,224 @@ if (globalSettings.defaultCountryCode) {
 
             });
 
+            refEskizSetting.get().then(async function(snapshots) {
+                var eskizData = snapshots.data();
 
-
-            $(".edit-setting-btn").click(async function() {
-
-
-
-                var website_color = $("#website_color").val();
-
-                var admin_color = $("#admin_color").val();
-
-                var store_color = $("#store_color").val();
-
-                var googleApiKey = $("#map_key").val();
-
-                var contact_us_address = $('.contact_us_address').val();
-
-                var contact_us_email = $('.contact_us_email').val();
-
-                var contact_us_phone = $('.contact_us_phone').val();
-               
-               var defaultCountryCode = $('.defaultCountryCode').find(':selected').data('phonecode'); // Gets phoneCode
-
-                var app_version = $('.app_version').val();
-
-                var web_version = $('#web_version').val();
-
-                var website_url = $('#website_url').val();
-
-                var store_url = $('#store_url').val();
-
-                var provider_url = $('#provider_url').val();
-
-                var auto_approve_vendor = $("#auto_approve_vendor").is(":checked");
-
-                var auto_approve_provider = $("#auto_approve_provider").is(":checked");
-
-                var restaurant_can_upload_story = $("#restaurant_can_upload_story").is(":checked");
-
-                var story_upload_time = parseInt($('#story_upload_time').val());
-
-                var minimumDepositToRideAccept = $(".minimum_deposit_amount").val();
-
-                var ownerMinimumDepositToRideAccept = $(".minimum_deposit_amount_owner").val();
-
-                var minimumAmountToWithdrawal = $(".minimum_withdrawal_amount").val();
-
-                var fileSize = $(".fileSize").val();
-
-                var fromName = $('.from_name').val();
-
-                var host = $('.host').val();
-
-                var port = $('.port').val();
-
-                var userName = $('.user_name').val();
-
-                var password = $('.password').val();
-
-                var customer_app_color = $("#customer_app_color").val();
-
-                var driver_app_color = $("#driver_app_color").val();
-
-                var store_app_color = $("#store_app_color").val();
-
-                var provider_app_color = $("#provider_app_color").val();
-
-                var worker_app_color = $("#worker_app_color").val();
-
-                var provider_panel_color = $("#provider_panel_color").val();
-
-                var senderId = $("#sender_id").val();
-
-                var enable_adv_feature = $("#enable_adv_feature").is(":checked");
-                var enable_self_delivery = $("#enable_self_delivery").is(":checked");
-
-                if (admin_color != null) {
-
-                    setCookie('admin_panel_color', admin_color, 365);
-
+                if (eskizData == undefined) {
+                    database.collection('settings').doc('eskizSetting').set({});
                 }
 
-
-
-                var applicationName = $(".application_name").val();
-
-                var selectedMapType = $("#selectedMapType").val();
-
-                var driver_location_update = $('#driver_location_update').val();
-                var single_order_receive = $("#single_order_receive").is(":checked");
-                var map_type = $('#map_type').val();
-
-
-                if (applicationName == '') {
-
-                    alert("Please enter application name");
-
-                } else if (minimumDepositToRideAccept == '' || ownerMinimumDepositToRideAccept == '') {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.enter_minimum_deposit_amount_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                } else if (minimumAmountToWithdrawal == '') {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.enter_minimum_withdrawal_amount_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                } else if (fileSize == '') {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.enter_digital_product_filesize_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                    window.scrollTo(0, 0);
-
-                } else if (host == "") {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.host_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                } else if (port == "") {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.port_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                } else if (userName == "") {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.username_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                } else if (password == "") {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.password_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                } else if (senderId == '') {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.notification_sender_id_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                } else if (serviceJsonFile == '') {
-
-                    $(".error_top").show();
-
-                    $(".error_top").html("");
-
-                    $(".error_top").append("<p>{{ trans('lang.notification_service_json_error') }}</p>");
-
-                    window.scrollTo(0, 0);
-
-                } else if (defaultCountryCode == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>Please enter default country</p>");
-                    window.scrollTo(0, 0);
-                } else {
-
-
-
-                    jQuery("#data-table_processing").show();
-
-
-                    await storeRingtone().then(ringtone => {
-                        database.collection('settings').doc("globalSettings").update({
-
-                            'website_color': website_color,
-
-                            'admin_panel_color': admin_color,
-
-                            'store_panel_color': store_color,
-
-                            'applicationName': applicationName,
-
-                            'appLogo': photo,
-
-                            'app_customer_color': customer_app_color,
-
-                            'app_driver_color': driver_app_color,
-
-                            'app_store_color': store_app_color,
-
-                            'provider_app_color': provider_app_color,
-
-                            'worker_app_color': worker_app_color,
-
-                            'provider_panel_color': provider_panel_color,
-
-                            'workerLogo': workerLogo,
-
-                            'providerLogo': providerLogo,
-                            'isEnableAdsFeature': enable_adv_feature,
-                            'isSelfDelivery': enable_self_delivery,
-                            'order_ringtone_url': ringtone,
-                           
-                            'defaultCountryCode': defaultCountryCode // Add this line
-
-                        });
-                    }).catch(err => {
-                        jQuery("#data-table_processing").hide();
-                        $(".error_top").show();
-                        $(".error_top").html("");
-                        $(".error_top").append("<p>" + err + "</p>");
-                        window.scrollTo(0, 0);
-                    });
-
-
-                    database.collection('settings').doc('placeHolderImage').update({
-
-                        'image': placeholderphoto
-
-                    });
-
-
-
-                    database.collection('settings').doc("ContactUs").update({
-
-                        'Address': contact_us_address,
-
-                        'Email': contact_us_email,
-
-                        'Phone': contact_us_phone
-                        
-
-                    });
-
-
-
-                    database.collection('settings').doc("vendor").update({
-
-                        'auto_approve_vendor': auto_approve_vendor,
-
-                    });
-
-
-
-                    database.collection('settings').doc("provider").update({
-
-                        'auto_approve_provider': auto_approve_provider,
-
-                    });
-
-
-
-                    database.collection('settings').doc("story").update({
-
-                        'isEnabled': restaurant_can_upload_story,
-
-                        'videoDuration': story_upload_time,
-
-                    });
-
-
-
-                    database.collection('settings').doc("Version").update({
-
-                        'app_version': app_version,
-
-                        'web_version': web_version,
-
-                        'websiteUrl': website_url,
-
-                        'storeUrl': store_url,
-
-                        'providerUrl': provider_url,
-
-                    });
-
-
-
-                    database.collection('settings').doc("googleMapKey").update({
-
-                        'key': googleApiKey,
-
-                    });
-
-
-
-                    database.collection('settings').doc("DriverNearBy").update({
-
-                        'minimumDepositToRideAccept': minimumDepositToRideAccept,
-
-                        'ownerMinimumDepositToRideAccept': ownerMinimumDepositToRideAccept,
-
-                        'minimumAmountToWithdrawal': minimumAmountToWithdrawal,
-
-                        'selectedMapType': selectedMapType,
-
-                        'driverLocationUpdate': driver_location_update,
-
-                        'singleOrderReceive': single_order_receive,
-
-                        'mapType': map_type,
-
-                    });
-
-
-
-                    database.collection('settings').doc("digitalProduct").update({
-
-                        'fileSize': fileSize,
-
-                    });
-
-
-
-                    database.collection('settings').doc("notification_setting").update({
-
-                        'senderId': senderId,
-
-                        'serviceJson': serviceJsonFile,
-
-                    });
-
-
-
-                    database.collection('settings').doc("emailSetting").update({
-
-                        'fromName': fromName,
-
-                        'host': host,
-
-                        'port': port,
-
-                        'userName': userName,
-
-                        'password': password,
-
-                        'mailMethod': "smtp",
-
-                        'mailEncryptionType': "ssl",
-
-                    }).then(function(result) {
-
-                        window.location.href = '{{ url('settings/app/globals') }}';
-
-                    });
-
+                try {
+                    if (eskizData.url) {
+                        $('.eskiz_url').val(eskizData.url);
+                    }
+                    if (eskizData.userName) {
+                        $('.eskiz_user_name').val(eskizData.userName);
+                    }
+                    if (eskizData.password) {
+                        $('.eskiz_password').val(eskizData.password);
+                    }
+                } catch (error) {
+                    console.error(error);
                 }
+            });
 
-            })
 
+
+
+        $(".edit-setting-btn").click(async function() {
+
+            // --- INPUTLARNI OQISH ---
+            var website_color = $("#website_color").val();
+            var admin_color = $("#admin_color").val();
+            var store_color = $("#store_color").val();
+            var googleApiKey = $("#map_key").val();
+            var contact_us_address = $('.contact_us_address').val();
+            var contact_us_email = $('.contact_us_email').val();
+            var contact_us_phone = $('.contact_us_phone').val();
+            var defaultCountryCode = $('.defaultCountryCode').find(':selected').data('phonecode');
+            var app_version = $('.app_version').val();
+            var web_version = $('#web_version').val();
+            var website_url = $('#website_url').val();
+            var store_url = $('#store_url').val();
+            var provider_url = $('#provider_url').val();
+            var auto_approve_vendor = $("#auto_approve_vendor").is(":checked");
+            var auto_approve_provider = $("#auto_approve_provider").is(":checked");
+            var restaurant_can_upload_story = $("#restaurant_can_upload_story").is(":checked");
+            var story_upload_time = parseInt($('#story_upload_time').val());
+            var minimumDepositToRideAccept = $(".minimum_deposit_amount").val();
+            var ownerMinimumDepositToRideAccept = $(".minimum_deposit_amount_owner").val();
+            var minimumAmountToWithdrawal = $(".minimum_withdrawal_amount").val();
+            var fileSize = $(".fileSize").val();
+            var fromName = $('.from_name').val();
+            var host = $('.host').val();
+            var port = $('.port').val();
+            var userName = $('.user_name').val();
+            var password = $('.password').val();
+            var customer_app_color = $("#customer_app_color").val();
+            var driver_app_color = $("#driver_app_color").val();
+            var store_app_color = $("#store_app_color").val();
+            var provider_app_color = $("#provider_app_color").val();
+            var worker_app_color = $("#worker_app_color").val();
+            var provider_panel_color = $("#provider_panel_color").val();
+            var senderId = $("#sender_id").val();
+            var enable_adv_feature = $("#enable_adv_feature").is(":checked");
+            var enable_self_delivery = $("#enable_self_delivery").is(":checked");
+
+            // --- ESKIZ INPUTLARI ---
+            var eskiz_url = $('.eskiz_url').val();
+            var eskiz_user_name = $('.eskiz_user_name').val();
+            var eskiz_password = $('.eskiz_password').val();
+
+            var applicationName = $(".application_name").val();
+            var selectedMapType = $("#selectedMapType").val();
+            var driver_location_update = $('#driver_location_update').val();
+            var single_order_receive = $("#single_order_receive").is(":checked");
+            var map_type = $('#map_type').val();
+
+            // --- VALIDATION ---
+            if (applicationName == '') {
+                alert("Please enter application name");
+                return;
+            }
+            if (minimumDepositToRideAccept == '' || ownerMinimumDepositToRideAccept == '') {
+                $(".error_top").show().html("<p>{{ trans('lang.enter_minimum_deposit_amount_error') }}</p>");
+                window.scrollTo(0, 0);
+                return;
+            }
+            if (minimumAmountToWithdrawal == '') {
+                $(".error_top").show().html("<p>{{ trans('lang.enter_minimum_withdrawal_amount_error') }}</p>");
+                window.scrollTo(0, 0);
+                return;
+            }
+            if (fileSize == '') {
+                $(".error_top").show().html("<p>{{ trans('lang.enter_digital_product_filesize_error') }}</p>");
+                window.scrollTo(0, 0);
+                return;
+            }
+            if (host == "" || port == "" || userName == "" || password == "") {
+                $(".error_top").show().html("<p>{{ trans('lang.smtp_fields_error') }}</p>");
+                window.scrollTo(0, 0);
+                return;
+            }
+            if (senderId == '' || serviceJsonFile == '') {
+                $(".error_top").show().html("<p>{{ trans('lang.notification_fields_error') }}</p>");
+                window.scrollTo(0, 0);
+                return;
+            }
+            if (defaultCountryCode == '') {
+                $(".error_top").show().html("<p>Please enter default country</p>");
+                window.scrollTo(0, 0);
+                return;
+            }
+
+            jQuery("#data-table_processing").show();
+
+            try {
+                // --- GLOBAL SETTINGS ---
+                await storeRingtone().then(ringtone => {
+                    database.collection('settings').doc("globalSettings").update({
+                        'website_color': website_color,
+                        'admin_panel_color': admin_color,
+                        'store_panel_color': store_color,
+                        'applicationName': applicationName,
+                        'appLogo': photo,
+                        'app_customer_color': customer_app_color,
+                        'app_driver_color': driver_app_color,
+                        'app_store_color': store_app_color,
+                        'provider_app_color': provider_app_color,
+                        'worker_app_color': worker_app_color,
+                        'provider_panel_color': provider_panel_color,
+                        'workerLogo': workerLogo,
+                        'providerLogo': providerLogo,
+                        'isEnableAdsFeature': enable_adv_feature,
+                        'isSelfDelivery': enable_self_delivery,
+                        'order_ringtone_url': ringtone,
+                        'defaultCountryCode': defaultCountryCode
+                    });
+                });
+
+                // --- PLACEHOLDER IMAGE ---
+                database.collection('settings').doc('placeHolderImage').update({ 'image': placeholderphoto });
+
+                // --- CONTACT US ---
+                database.collection('settings').doc("ContactUs").update({
+                    'Address': contact_us_address,
+                    'Email': contact_us_email,
+                    'Phone': contact_us_phone
+                });
+
+                // --- VENDOR / PROVIDER ---
+                database.collection('settings').doc("vendor").update({ 'auto_approve_vendor': auto_approve_vendor });
+                database.collection('settings').doc("provider").update({ 'auto_approve_provider': auto_approve_provider });
+
+                // --- STORY SETTINGS ---
+                database.collection('settings').doc("story").update({
+                    'isEnabled': restaurant_can_upload_story,
+                    'videoDuration': story_upload_time
+                });
+
+                // --- VERSION SETTINGS ---
+                database.collection('settings').doc("Version").update({
+                    'app_version': app_version,
+                    'web_version': web_version,
+                    'websiteUrl': website_url,
+                    'storeUrl': store_url,
+                    'providerUrl': provider_url
+                });
+
+                // --- GOOGLE MAP KEY ---
+                database.collection('settings').doc("googleMapKey").update({ 'key': googleApiKey });
+
+                // --- DRIVER SETTINGS ---
+                database.collection('settings').doc("DriverNearBy").update({
+                    'minimumDepositToRideAccept': minimumDepositToRideAccept,
+                    'ownerMinimumDepositToRideAccept': ownerMinimumDepositToRideAccept,
+                    'minimumAmountToWithdrawal': minimumAmountToWithdrawal,
+                    'selectedMapType': selectedMapType,
+                    'driverLocationUpdate': driver_location_update,
+                    'singleOrderReceive': single_order_receive,
+                    'mapType': map_type
+                });
+
+                // --- DIGITAL PRODUCT ---
+                database.collection('settings').doc("digitalProduct").update({ 'fileSize': fileSize });
+
+                // --- NOTIFICATION SETTINGS ---
+                database.collection('settings').doc("notification_setting").update({
+                    'senderId': senderId,
+                    'serviceJson': serviceJsonFile
+                });
+
+                // --- EMAIL SETTINGS ---
+                await database.collection('settings').doc("emailSetting").update({
+                    'fromName': fromName,
+                    'host': host,
+                    'port': port,
+                    'userName': userName,
+                    'password': password,
+                    'mailMethod': "smtp",
+                    'mailEncryptionType': "ssl",
+                });
+
+                // --- ESKIZ SETTINGS ---
+                await database.collection('settings').doc("eskizSetting").update({
+                    'url': eskiz_url,
+                    'userName': eskiz_user_name,
+                    'password': eskiz_password
+                });
+
+                // --- REDIRECT ---
+                window.location.href = '{{ url('settings/app/globals') }}';
+
+            } catch (error) {
+                jQuery("#data-table_processing").hide();
+                $(".error_top").show().html("<p>" + error + "</p>");
+                window.scrollTo(0, 0);
+            }
+
+        });
+        
         })
 
         $("#restaurant_can_upload_story").click(function() {
