@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Payment_Methods\PaymeMerchantApiView;
 
 
 /*
@@ -19,5 +18,4 @@ use App\Http\Controllers\Payment_Methods\PaymeMerchantApiView;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::post("payment/payme/callback/", PaymeMerchantApiView::class)->name("payme:merchant");
 

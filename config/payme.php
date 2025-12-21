@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 
 use Illuminate\Support\Env;
 use JscorpTech\Payme\Models\Order;
@@ -17,4 +17,4 @@ return [
     "one_time_payment" => Env::get("PAYME_ONE_TIME_PAYMENT", true),
     "success_callback" => [PaymeHandler::class, "success"],
     "cancel_callback" => [PaymeHandler::class, "cancel"],
-];
+]; -->
