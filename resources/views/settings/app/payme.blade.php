@@ -171,7 +171,7 @@
                         <div class="form-group row width-100">
                             <label class="col-3 control-label">Payme ID</label>
                             <div class="col-7">
-                                <input type="text" class="form-control payme__id">
+                                <input type="text" class="form-control payme_id">
                                 <div class="form-text text-muted">
                                     Enter your Payme ID
                                 </div>
@@ -199,7 +199,7 @@
         </div>
 
         <div class="form-group col-12 text-center btm-btn" style="margin-bottom:inherit;">
-            <button type="button" class="btn btn-primary edit-payme-btn"><i class="fa fa-save"></i> Save</button>
+            <button type="button" class="btn btn-primary edit-setting-btn"><i class="fa fa-save"></i> Save</button>
             <a href="{{ url('/dashboard') }}" class="btn btn-default"><i class="fa fa-undo"></i> Cancel</a>
         </div>
     </div>
@@ -207,42 +207,244 @@
 
 @endsection
 @section('scripts')
+
 <script type="text/javascript">
+
 var database = firebase.firestore();
+
+var ref = database.collection('settings').doc('stripeSettings');
+
+var codData = database.collection('settings').doc('CODSettings');
+
+var razorpayData = database.collection('settings').doc('razorpaySettings');
+
+var paypalData = database.collection('settings').doc('paypalSettings');
+
+var walletData = database.collection('settings').doc('walletSettings');
+
+var payFastSettings = database.collection('settings').doc('payFastSettings');
+
+var payStackSettings = database.collection('settings').doc('payStack');
+
+var flutterWaveSettings = database.collection('settings').doc('flutterWave');
+
+var MercadopagoSettings = database.collection('settings').doc('MercadoPago');
+
+var orangePay = database.collection('settings').doc('orange_money_settings');
+
+var xenditSettings = database.collection('settings').doc('xendit_settings');
+
+var midTrans = database.collection('settings').doc('midtrans_settings');
+
 var paymeSettings = database.collection('settings').doc('paymeSettings');
+
+
 
 $(document).ready(function() {
 
-    // Firebase dan o'qish
-    paymeSettings.get().then(function(snapshot) {
+    jQuery("#data-table_processing").show();
+
+    paymeSettings.get().then(async function(snapshot) {
         var payme = snapshot.data();
-        if(payme) {
-            $(".payme_id").val(payme.merchant_id);
-            $(".payme_key").val(payme.secret_key);
-            if(payme.isEnabled) {
-                $(".enable_payme").prop('checked', true);
-                $(".payme_active_label span").addClass('badge-success').text('Active');
-            }
+
+        if(payme && payme.enable){
+            $(".enable_payme").prop('checked', true);
+            jQuery(".payme_active_label span").addClass('badge-success').text('Active');
         }
+
+        $(".payme_id").val(payme ? payme.PAYME_ID : '');
+        $(".payme_key").val(payme ? payme.PAYME_KEY : '');
     });
 
-    // Saqlash
-    $(".edit-payme-btn").click(function() {
-        var merchantId = $(".payme_id").val();
-        var secretKey = $(".payme_key").val();
+
+
+        razorpayData.get().then(async function(razorpaySnapshots) {
+
+            var razorPay = razorpaySnapshots.data();
+
+            if (razorPay.isEnabled) {
+
+                jQuery(".razorpay_active_label span").addClass('badge-success');
+
+                jQuery(".razorpay_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+        paypalData.get().then(async function(paypalSnapshots) {
+
+            var paypal = paypalSnapshots.data();
+
+            if (paypal.isEnabled) {
+
+                jQuery(".paypal_active_label span").addClass('badge-success');
+
+                jQuery(".paypal_active_label span").text('Active');
+
+            }
+
+        })
+      
+
+
+        walletData.get().then(async function(walletSnapshots) {
+
+            var wallet = walletSnapshots.data();
+
+            if (wallet.isEnabled) {
+
+                jQuery(".wallet_active_label span").addClass('badge-success');
+
+                jQuery(".wallet_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+        payFastSettings.get().then(async function(payFastSnaShots) {
+
+            var payFast = payFastSnaShots.data();
+
+            if (payFast.isEnable) {
+
+                jQuery(".payfast_active_label span").addClass('badge-success');
+
+                jQuery(".payfast_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+        payStackSettings.get().then(async function(payStackSnapShots) {
+
+            var payStack = payStackSnapShots.data();
+
+
+
+            if (payStack.isEnable) {
+
+                jQuery(".paystack_active_label span").addClass('badge-success');
+
+                jQuery(".paystack_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+
+
+        flutterWaveSettings.get().then(async function(flutterWaveSnapShots) {
+
+            var flutterWave = flutterWaveSnapShots.data();
+
+            if (flutterWave.isEnable) {
+
+                jQuery(".flutterWave_active_label span").addClass('badge-success');
+
+                jQuery(".flutterWave_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+        MercadopagoSettings.get().then(async function(mercadopagoSnapshots) {
+
+            var mercadopago = mercadopagoSnapshots.data();
+
+            if (mercadopago.isEnabled) {
+
+                jQuery(".mercadopago_active_label span").addClass('badge-success');
+
+                jQuery(".mercadopago_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+        orangePay.get().then(async function(orangePay) {
+
+            var orangePay = orangePay.data();
+
+            if (orangePay.enable) {
+
+                jQuery(".orangePay_active_label span").addClass('badge-success');
+
+                jQuery(".orangePay_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+        xenditSettings.get().then(async function(xenditSettings) {
+
+            var xenditSettings = xenditSettings.data();
+
+            if (xenditSettings.enable) {
+
+                jQuery(".xendit_active_label span").addClass('badge-success');
+
+                jQuery(".xendit_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+        midTrans.get().then(async function(midTrans) {
+
+            var midTrans = midTrans.data();
+
+            if (midTrans.enable) {
+
+                jQuery(".midTrans_active_label span").addClass('badge-success');
+
+                jQuery(".midTrans_active_label span").text('Active');
+
+            }
+
+        })
+
+
+
+        jQuery("#data-table_processing").hide();
+
+
+
+    });
+
+    $(".edit-setting-btn").click(function() {
+        var payme_id = $(".payme_id").val();
+        var payme_key = $(".payme_key").val();
         var isEnabled = $(".enable_payme").is(":checked");
 
-        paymeSettings.update({
-            'merchant_id': merchantId,
-            'secret_key': secretKey,
-            'isEnabled': isEnabled
-        }).then(function(result) {
+        paymeSettings.set({
+            merchant_id: payme_id,
+            secret_key: payme_key,
+            enable: isEnabled
+        }, { merge: true }) 
+        .then(function() {
+            alert("Payme settings saqlandi!");
             window.location.href = '{{ url("settings/payment/payme") }}';
-        }).catch(function(err){
+        })
+        .catch(function(err){
             alert("Error saving Payme settings: " + err);
         });
     });
-
-});
 </script>
 @endsection

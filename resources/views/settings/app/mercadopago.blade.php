@@ -319,6 +319,8 @@ var orangePay = database.collection('settings').doc('orange_money_settings');
 var xenditSettings = database.collection('settings').doc('xendit_settings');
 
 var midTrans = database.collection('settings').doc('midtrans_settings');
+var paymeSettings = database.collection('settings').doc('paymeSettings');
+
 
 
 
@@ -407,6 +409,17 @@ $(document).ready(function() {
                 }
 
             })
+
+            paymeSettings.get().then(async function(paymeSnapshots) {
+                var payme = paymeSnapshots.data();
+
+                if (payme.enable) {
+                    $(".enable_payme").prop('checked', true);
+                }
+
+                $(".payme_id").val(payme.PAYME_ID);
+                $(".payme_key").val(payme.PAYME_KEY);
+            });
 
 
 
