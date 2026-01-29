@@ -252,11 +252,27 @@ $(document).ready(function() {
             jQuery(".payme_active_label span").addClass('badge-success').text('Active');
         }
 
-        $(".payme_id").val(payme ? payme.PAYME_ID : '');
-        $(".payme_key").val(payme ? payme.PAYME_KEY : '');
+        $(".payme_id").val(payme ? payme.merchant_id : '');
+        $(".payme_key").val(payme ? payme.secret_key : '');
     });
 
+        ref.get().then(async function(stripeSnapshots) {
+            var stripe = stripeSnapshots.data();
 
+            if (stripe.isEnabled) {
+                jQuery(".stripe_active_label span").addClass('badge-success');
+                jQuery(".stripe_active_label span").text('Active');
+            }
+        })
+
+        codData.get().then(async function(codSnapshots) {
+            var cod = codSnapshots.data();
+
+            if (cod.isEnabled) {
+                jQuery(".cod_active_label span").addClass('badge-success');
+                jQuery(".cod_active_label span").text('Active');
+            }
+        })
 
         razorpayData.get().then(async function(razorpaySnapshots) {
 

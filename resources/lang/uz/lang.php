@@ -49,15 +49,15 @@ return [
 
 'app_setting_apple_pay_secret_help' => 'Apple Pay Maxfiy kalitni kiriting',
 
-'app_setting_cod_short' => "Naqd to‘lov (COD)",
+'app_setting_cod_short' => "Naqt pul",
 
 'app_setting_enable_apple_pay' => "Apple Pay-ni yoqish",
 
 'app_settings_enable_apple_pay_help' => "Apple Pay to‘lov usulini yoqish uchun belgilash",
 
-'app_setting_enable_cod' => 'Naqd to‘lovni yoqish',
+'app_setting_enable_cod' => 'Naqt pulni yoqish',
 
-'app_settings_enable_cod_help' => 'Naqd to‘lov (COD) usulini yoqish uchun belgilash',
+'app_settings_enable_cod_help' => 'Naqt pul to‘lov usulini yoqish uchun belgilash',
 
 'app_setting_enable_google' => 'Google bilan kirishni yoqish',
 
@@ -1165,7 +1165,7 @@ return [
 
 'wallet_transaction_plural' => 'Hamyon tranzaksiyalari',
 
-'cash_on_delivery' => 'Naqd to‘lov',
+'cash_on_delivery' => 'Naqt pul',
 
 'paypal' => 'Paypal',
 

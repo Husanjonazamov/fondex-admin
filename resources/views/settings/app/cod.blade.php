@@ -263,6 +263,8 @@ var xenditSettings = database.collection('settings').doc('xendit_settings');
 
 var midTrans = database.collection('settings').doc('midtrans_settings');
 
+var paymeSettings = database.collection('settings').doc('paymeSettings');
+
 
 
 $(document).ready(function () {
@@ -462,6 +464,15 @@ $(document).ready(function () {
 
         })
 
+        paymeSettings.get().then(async function(paymeSnapshot) {
+            var payme = paymeSnapshot.data();
+
+            if (payme && payme.enable) {
+                jQuery(".payme_active_label span").addClass('badge-success');
+                jQuery(".payme_active_label span").text('Active');
+            }
+        })
+
 
 
         jQuery("#data-table_processing").hide();
@@ -476,7 +487,7 @@ $(document).ready(function () {
 
         var isCODEnabled = $(".enable_cod").is(":checked");
 
-        database.collection('settings').doc("CODSettings").update({'isEnabled': isCODEnabled}).then(function (result) {
+        database.collection('settings').doc("CODSettings").update({'isEnabled': isCODEnabled, 'name': 'Naqt pul'}).then(function (result) {
 
 
 

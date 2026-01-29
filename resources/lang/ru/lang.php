@@ -49,15 +49,15 @@ return [
 
 'app_setting_apple_pay_secret_help' => 'Введите секретный ключ Apple Pay',
 
-'app_setting_cod_short' => "Наложенный платеж",
+'app_setting_cod_short' => "Naqt pul",
 
 'app_setting_enable_apple_pay' => "Включить Apple Pay",
 
 'app_settings_enable_apple_pay_help' => "Отметьте, чтобы включить метод оплаты Apple Pay",
 
-'app_setting_enable_cod' => 'Включить наложенный платеж',
+'app_setting_enable_cod' => 'Включить Naqt pul',
 
-'app_settings_enable_cod_help' => 'Отметьте, чтобы включить оплату наложенным платежом',
+'app_settings_enable_cod_help' => 'Отметьте, чтобы включить оплату Naqt pul',
 
 'app_setting_enable_google' => 'Включить Google',
 
@@ -1165,7 +1165,7 @@ return [
 
 'wallet_transaction_plural' => 'Транзакции кошелька',
 
-'cash_on_delivery' => 'Оплата при доставке',
+'cash_on_delivery' => 'Naqt pul',
 
 'paypal' => 'Paypal',
 

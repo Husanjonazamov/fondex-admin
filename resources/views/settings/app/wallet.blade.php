@@ -290,12 +290,10 @@ $(document).ready(function() {
         paymeSettings.get().then(async function(paymeSnapshots) {
             var payme = paymeSnapshots.data();
 
-            if (payme.enable) {
-                $(".enable_payme").prop('checked', true);
+            if (payme && payme.enable) {
+                jQuery(".payme_active_label span").addClass('badge-success');
+                jQuery(".payme_active_label span").text('Active');
             }
-
-            $(".payme_id").val(payme.PAYME_ID);
-            $(".payme_key").val(payme.PAYME_KEY);
         });
 
 

@@ -467,7 +467,7 @@
                     image = '{{asset("images/payment/orangepay.png")}}';
                     payment_method = '<img alt="image" src="' + image + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'" width="30%" height="30%">';
 
-                } else if (order.payment_method == "cod") {
+                } else if (order.payment_method == "cod" || order.payment_method == "Naqt pul") {
                     image = '{{asset("images/payment/cashondelivery.png")}}';
                     payment_method = '<img alt="image" src="' + image + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'"  width="30%" height="30%">';
 
@@ -617,7 +617,7 @@
                             },
                             success: function(data) {
 
-                                if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderTakeAwayOption == false) {
+                                if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderPaymentMethod != 'Naqt pul' && orderTakeAwayOption == false) {
                                     if (orderStatus == 'Order Rejected' || orderStatus == 'Driver Rejected') {
 
                                     } else {
@@ -644,7 +644,7 @@
                             },
                             success: function(data) {
 
-                                if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderTakeAwayOption == false) {
+                                if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderPaymentMethod != 'Naqt pul' && orderTakeAwayOption == false) {
                                     if (orderStatus == 'Order Rejected' || orderStatus == 'Driver Rejected') {
                                         var walletId = "<?php echo uniqid(); ?>";
                                         var canceldateNew = new Date();

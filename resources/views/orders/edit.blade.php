@@ -931,7 +931,7 @@
                         image = '{{ asset('images/payment/orangepay.png') }}';
                         payment_method = '<img alt="image" src="' + image + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'"  width="30%" height="30%">';
 
-                    } else if (order.payment_method == "cod") {
+                    } else if (order.payment_method == "cod" || order.payment_method == "Naqt pul") {
                         image = '{{ asset('images/payment/cashondelivery.png') }}';
                         payment_method = '<img alt="image" src="' + image + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'" width="30%" height="30%">';
 
@@ -1692,13 +1692,13 @@
                                                     driverWallet = driverdata.wallet_amount;
                                                 }
                                                 if (service_type != undefined && service_type != '' && service_type == "ecommerce-service") {
-                                                    if (orderPaymentMethod == 'cod') {
+                                                    if (orderPaymentMethod == 'cod' || orderPaymentMethod == 'Naqt pul') {
                                                         driverWallet = parseFloat(driverWallet) - parseFloat(total_price);
                                                     } else {
                                                         driverWallet = parseFloat(driverWallet) + parseFloat(driverAmount);
                                                     }
                                                 } else {
-                                                    if (orderPaymentMethod == 'cod' && orderTakeAwayOption == true) {
+                                                    if ((orderPaymentMethod == 'cod' || orderPaymentMethod == 'Naqt pul') && orderTakeAwayOption == true) {
                                                         driverWallet = parseFloat(driverWallet) - parseFloat(total_price);
                                                     } else {
                                                         driverWallet = parseFloat(driverWallet) + parseFloat(driverAmount);
@@ -1766,7 +1766,7 @@
                                     },
                                     success: function(data) {
 
-                                        if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderTakeAwayOption == false) {
+                                        if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderPaymentMethod != 'Naqt pul' && orderTakeAwayOption == false) {
                                             if (orderStatus == 'Order Rejected' || orderStatus == 'Driver Rejected') {
                                                 var walletId = "<?php echo uniqid(); ?>";
                                                 var canceldateNew = new Date();
@@ -1842,7 +1842,7 @@
                                     },
                                     success: function(data) {
 
-                                        if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderTakeAwayOption == false) {
+                                        if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderPaymentMethod != 'Naqt pul' && orderTakeAwayOption == false) {
 
                                             if (orderStatus == 'Order Rejected' || orderStatus == 'Driver Rejected') {
 
@@ -2565,7 +2565,7 @@
 
                     }
 
-                    if (orderData.payment_method !== 'cod') {
+                    if (orderData.payment_method !== 'cod' && orderData.payment_method !== 'Naqt pul') {
                         deliveryCharge = parseFloat(orderData.deliveryCharge || 0);
                         tipAmount = parseFloat(orderData.tip_amount || 0);
                         customerAmount = deliveryCharge + tipAmount + vendorAmount + adminCommission;

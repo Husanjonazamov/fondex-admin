@@ -300,7 +300,7 @@
 
             if (order.payment_method) {
 
-                if (order.payment_method == 'cod') {
+                if (order.payment_method == 'cod' || order.payment_method == 'Naqt pul') {
                     $('#payment_method').text('{{trans("lang.cash_on_delivery")}}');
                 } else if (order.payment_method == 'paypal') {
                     $('#payment_method').text('{{trans("lang.paypal")}}');

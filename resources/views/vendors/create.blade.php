@@ -560,7 +560,7 @@ foreach ($countries as $keycountry => $valuecountry) {
             'expiry_date': historyData.expire_date,
             'createdAt': createdAt,
             'subscription_plan': historyData.subscriptionData,
-            'payment_type': 'cod'
+            'payment_type': 'Naqt pul'
         })
     }
 

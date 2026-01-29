@@ -864,7 +864,7 @@
                         image = '{{asset("images/payment/orangepay.png")}}';
                         payment_method = '<img alt="image" src="' + image + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'"  width="30%" height="30%">';
 
-                    } else if (order.payment_method == "cod") {
+                    } else if (order.payment_method == "cod" || order.payment_method == "Naqt pul") {
                     image = '{{asset("images/payment/cashondelivery.png")}}';
                     payment_method = '<img alt="image" src="' + image + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'" width="30%" style="height: auto;">';
 
@@ -1216,7 +1216,7 @@
             'user_id': providerAuthor,
             'serviceType': 'ondemand-service',
         }).then(async function (result) {
-            if (paymentMethod != 'cod') {
+            if (paymentMethod != 'cod' && paymentMethod != 'Naqt pul') {
                 var wId = database.collection('temp').doc().id;
                 database.collection('wallet').doc(wId).set({
                     'amount': parseFloat(orderPayableAmount),
@@ -1366,7 +1366,7 @@
     async function refundAmount() {
         var date = firebase.firestore.FieldValue.serverTimestamp();
         var wId = database.collection('temp').doc().id;
-        if (paymentMethod != 'cod') {
+        if (paymentMethod != 'cod' && paymentMethod != 'Naqt pul') {
             database.collection('wallet').doc(wId).set({
                 'amount': parseFloat(orderPayableAmount),
                 'date': date,

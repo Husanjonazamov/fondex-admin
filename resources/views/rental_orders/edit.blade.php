@@ -550,7 +550,7 @@
                             '" onerror="this.onerror=null;this.src=\'' + place_image +
                             '\'" width="30%" height="30%">';
 
-                    } else if (order.paymentMethod == "cod") {
+                    } else if (order.paymentMethod == "cod" || order.paymentMethod == "Naqt pul") {
                         image = '{{ asset('images/payment/cashondelivery.png') }}';
                         payment_method = '<img alt="image" src="' + image +
                             '" onerror="this.onerror=null;this.src=\'' + place_image +

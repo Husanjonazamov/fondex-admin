@@ -459,7 +459,7 @@ $("#billing_line2").text(localityText);
                     image = '{{asset("images/payment/stripe.png")}}';
                     paymentMethod = '<img alt="image" src="' + image + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'" width="30%" height="30%">';
 
-                } else if (ride.paymentMethod == "cod") {
+                } else if (ride.paymentMethod == "cod" || ride.paymentMethod == "Naqt pul") {
                     image = '{{asset("images/payment/cashondelivery.png")}}';
                     paymentMethod = '<img alt="image" src="' + image + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'" width="30%" height="30%">';
 
@@ -746,7 +746,7 @@ $("#billing_line2").text(localityText);
                                         } else {
                                             driverWallet = driverdata.wallet_amount;
                                         }
-                                        if (orderPaymentMethod == 'cod' && orderTakeAwayOption == true) {
+                                        if ((orderPaymentMethod == 'cod' || orderPaymentMethod == 'Naqt pul') && orderTakeAwayOption == true) {
                                             driverWallet = driverWallet - parseFloat(total_price) - parseFloat(driverAmount);
                                         } else {
                                             driverWallet = driverWallet + driverAmount;
@@ -776,7 +776,7 @@ $("#billing_line2").text(localityText);
                             },
                             success: function (data) {
 
-                                if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderTakeAwayOption == false) {
+                                if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderPaymentMethod != 'Naqt pul' && orderTakeAwayOption == false) {
                                     if (orderStatus == 'Order Rejected' || orderStatus == 'Driver Rejected') {
                                         var walletId = "<?php echo uniqid(); ?>";
                                         var canceldateNew = new Date();
