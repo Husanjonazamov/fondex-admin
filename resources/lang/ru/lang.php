@@ -156,6 +156,9 @@ return [
 "google_map_api_key_title" => "Ключ API Google Maps",
 
 'app_setting_google_maps_key_help' => 'Введите ключ Google Maps ( <a href="https://console.developers.google.com/apis/dashboard">https://console.developers.google.com/apis/dashboard</a> )',
+'yandex_maps' => 'Яндекс Карты',
+'yandex_map_note' => 'Яндекс Карты предоставляют точные данные, специально для стран СНГ.',
+'yandex_map_api_key' => 'API ключ Яндекс Карт',
 
 'app_setting_mobile' => 'Настройки мобильного приложения',
 
@@ -3061,9 +3064,9 @@ return [
 
 'mapswithme_map' => 'Приложение MapsWithMe',
 
-'vandexnavi_map' => 'Приложение VandexNavi',
+'vandexnavi_map' => 'Приложение YandexNavi',
 
-'vandex_map' => 'Приложение Vandex Maps',
+'vandex_map' => 'Приложение Yandex Maps',
 
 'inapp_map' => 'Встроенная карта в приложении',
 

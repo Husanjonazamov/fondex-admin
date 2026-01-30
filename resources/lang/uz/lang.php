@@ -156,6 +156,9 @@ return [
 "google_map_api_key_title" => "Google Map API kaliti",
 
 'app_setting_google_maps_key_help' => 'Google maps kalitini kiriting ( <a href="https://console.developers.google.com/apis/dashboard">https://console.developers.google.com/apis/dashboard</a> )',
+'yandex_maps' => 'Yandex Maps',
+'yandex_map_note' => 'Yandex Xaritalar MDH mamlakatlari uchun aniq ma’lumotlarni taqdim etadi.',
+'yandex_map_api_key' => 'Yandex Map API kaliti',
 
 'app_setting_mobile' => 'Mobil ilova sozlamalari',
 
@@ -3061,9 +3064,9 @@ return [
 
 'mapswithme_map' => 'MapsWithMe xaritasi ilovasi',
 
-'vandexnavi_map' => 'VandexNavi xaritasi ilovasi',
+'vandexnavi_map' => 'YandexNavi xaritasi ilovasi',
 
-'vandex_map' => 'Vandex xaritasi ilovasi',
+'vandex_map' => 'Yandex xaritasi ilovasi',
 
 'inapp_map' => 'Ilova ichidagi xarita',
 

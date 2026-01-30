@@ -209,6 +209,7 @@
 
                     </fieldset>
 
+
                     <fieldset>
 
                         <legend><i class="mr-3 fa fa-solid fa-address-book"></i> {{ trans('lang.contact_us') }}</legend>
@@ -344,7 +345,21 @@
 
                                     <option value="osm">{{ trans('lang.open_street_map') }}</option>
 
+                                    <option value="yandex">{{ trans('lang.yandex_maps') }}</option>
+
                                 </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row width-100">
+
+                            <label class="col-4 control-label">{{ trans('lang.yandex_map_api_key') }}</label>
+
+                            <div class="col-7">
+
+                                <input type="password" class="form-control" name="yandex_map_key" id="yandex_map_key">
 
                             </div>
 
@@ -355,6 +370,8 @@
                                     {{ trans('lang.google_map_note') }}<br>
 
                                     {{ trans('lang.open_street_map_note') }}<br>
+
+                                    {{ trans('lang.yandex_map_note') }}<br>
 
                                     <strong>{{ trans('lang.recommended_note') }}</strong>
 
@@ -792,6 +809,7 @@
         var ref = database.collection('settings').doc("globalSettings");
 
         var mapKey = database.collection('settings').doc("googleMapKey");
+        var yandexMapKey = database.collection('settings').doc("yandexMapKey");
 
         var refPlaceholderImage = database.collection('settings').doc("placeHolderImage");
 
@@ -1219,33 +1237,25 @@ if (globalSettings.defaultCountryCode) {
 
 
             mapKey.get().then(async function(snapshots) {
-
                 var key = snapshots.data();
-
-
-
                 if (key == undefined) {
-
                     database.collection('settings').doc('googleMapKey').set({});
-
                 }
-
                 try {
-
-
-
                     $('#map_key').val(key.key);
-
-
-
                 } catch (error) {
-
-
-
                 }
+            });
 
-
-
+            yandexMapKey.get().then(async function(snapshots) {
+                var key = snapshots.data();
+                if (key == undefined) {
+                    database.collection('settings').doc('yandexMapKey').set({});
+                }
+                try {
+                    $('#yandex_map_key').val(key.key);
+                } catch (error) {
+                }
             });
 
 
@@ -1465,6 +1475,7 @@ if (globalSettings.defaultCountryCode) {
             var admin_color = $("#admin_color").val();
             var store_color = $("#store_color").val();
             var googleApiKey = $("#map_key").val();
+            var yandexApiKey = $("#yandex_map_key").val();
             var contact_us_address = $('.contact_us_address').val();
             var contact_us_email = $('.contact_us_email').val();
             var contact_us_phone = $('.contact_us_phone').val();
@@ -1601,6 +1612,7 @@ if (globalSettings.defaultCountryCode) {
 
                 // --- GOOGLE MAP KEY ---
                 database.collection('settings').doc("googleMapKey").update({ 'key': googleApiKey });
+                database.collection('settings').doc("yandexMapKey").set({ 'key': yandexApiKey });
 
                 // --- DRIVER SETTINGS ---
                 database.collection('settings').doc("DriverNearBy").update({
