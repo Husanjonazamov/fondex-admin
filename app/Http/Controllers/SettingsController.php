@@ -31,26 +31,6 @@ class SettingsController extends Controller
         return view('settings.app.payme');
     }
 
-    public function stripe()
-    {
-        return view('settings.app.stripe');
-    }
-
-    public function mobileGlobals()
-    {
-        return view('settings.mobile.globals');
-    }
-
-    public function razorpay()
-    {
-        return view('settings.app.razorpay');
-    }
-
-    public function paypal()
-    {
-        return view('settings.app.paypal');
-    }
-
     public function radiosConfiguration()
     {
         return view("settings.app.radiosConfiguration");
@@ -61,41 +41,6 @@ class SettingsController extends Controller
         return view('settings.app.wallet');
     }
 
-
-    public function payfast()
-    {
-        return view('settings.app.payfast');
-    }
-
-    public function paystack()
-    {
-        return view('settings.app.paystack');
-    }
-
-    public function mercadopago()
-    {
-        return view('settings.app.mercadopago');
-    }
-
-    public function flutterwave()
-    {
-        return view('settings.app.flutterwave');
-    }
-
-    public function xendit()
-    {
-        return view('settings.app.xendit');
-    }
-
-    public function midTrans()
-    {
-        return view('settings.app.midTrans');
-    }
-
-    public function orangePay()
-    {
-        return view('settings.app.orangePay');
-    }
 
     public function deliveryCharge()
     {

@@ -53,7 +53,7 @@ Route::middleware(['permission:pending_vendors,pending.vendors.list'])->group(fu
     Route::get('/vendors/pending', [App\Http\Controllers\VendorController::class, 'index'])->name('vendors.pending');
 });
 Route::middleware(['permission:vendors,vendors.create'])->group(function () {
-    Route::get('/vendors/create', [App\Http\Controllers\VendorController::class, 'create'])->name('vendors.create'); 
+    Route::get('/vendors/create', [App\Http\Controllers\VendorController::class, 'create'])->name('vendors.create');
 });
 Route::middleware(['permission:vendors,vendors.edit'])->group(function () {
     Route::get('/vendor/edit/{id}', [App\Http\Controllers\VendorController::class, 'edit'])->name('vendors.edit');
@@ -69,7 +69,7 @@ Route::middleware(['permission:vendors-document,vendor.document.edit'])->group(f
 Route::middleware(['permission:stores,stores'])->group(function () {
     Route::get('/stores', [App\Http\Controllers\StoreController::class, 'index'])->name('stores');
 });
-Route::middleware(['permission:stores,stores.create'])->group(function () { 
+Route::middleware(['permission:stores,stores.create'])->group(function () {
     Route::get('/stores/create', [App\Http\Controllers\StoreController::class, 'create'])->name('stores.create');
 });
 Route::middleware(['permission:stores,stores.edit'])->group(function () {
@@ -269,7 +269,7 @@ Route::middleware(['permission:drivers-payout,drivers.payout.create'])->group(fu
 });
 Route::middleware(['permission:drivers-payout,drivers.payout'])->group(function () {
     Route::get('driversPayouts', [App\Http\Controllers\DriversPayoutController::class, 'index'])->name('driversPayouts');
-}); 
+});
 Route::middleware(['permission:drivers-payout,drivers.payout'])->group(function () {
     Route::get('driversPayouts/{id}', [App\Http\Controllers\DriversPayoutController::class, 'index'])->name('driver.payouts');
 });
@@ -329,18 +329,8 @@ Route::prefix('settings')->group(function () {
     Route::get('mobile/globals', [App\Http\Controllers\SettingsController::class, 'mobileGlobals'])->name('settings.mobile.globals');
     Route::middleware(['permission:payment-method,payment-method'])->group(function () {
         Route::get('payment/payme', [App\Http\Controllers\SettingsController::class, 'payme'])->name('payment.payme');
-        Route::get('payment/stripe', [App\Http\Controllers\SettingsController::class, 'stripe'])->name('payment.stripe');
-        Route::get('payment/razorpay', [App\Http\Controllers\SettingsController::class, 'razorpay'])->name('payment.razorpay');
         Route::get('payment/cod', [App\Http\Controllers\SettingsController::class, 'cod'])->name('payment.cod');
-        Route::get('payment/paypal', [App\Http\Controllers\SettingsController::class, 'paypal'])->name('payment.paypal');
         Route::get('payment/wallet', [App\Http\Controllers\SettingsController::class, 'wallet'])->name('payment.wallet');
-        Route::get('payment/payfast', [App\Http\Controllers\SettingsController::class, 'payfast'])->name('payment.payfast');
-        Route::get('payment/paystack', [App\Http\Controllers\SettingsController::class, 'paystack'])->name('payment.paystack');
-        Route::get('payment/flutterwave', [App\Http\Controllers\SettingsController::class, 'flutterwave'])->name('payment.flutterwave');
-        Route::get('payment/mercadopago', [App\Http\Controllers\SettingsController::class, 'mercadopago'])->name('payment.mercadopago');
-        Route::get('payment/xendit', [App\Http\Controllers\SettingsController::class, 'xendit'])->name('payment.xendit');
-        Route::get('payment/midtrans', [App\Http\Controllers\SettingsController::class, 'midTrans'])->name('payment.midTrans');
-        Route::get('payment/orangepay', [App\Http\Controllers\SettingsController::class, 'orangePay'])->name('payment.orangePay');
     });
     Route::middleware(['permission:delivery-charge,settings.app.deliveryCharge'])->group(function () {
         Route::get('app/deliveryCharge', [App\Http\Controllers\SettingsController::class, 'deliveryCharge'])->name('settings.app.deliveryCharge');
@@ -494,13 +484,13 @@ Route::middleware(['permission:payout-request-vendor,payout-request.vendor'])->g
 });
 
 Route::middleware(['permission:payout-request-vendor,payout-request.vendor'])->group(function () {
-    Route::get('/disbursements/vendor', [App\Http\Controllers\PayoutRequestController::class, 'vendorDisbursements'])->name('payoutRequests.vendor.disbursement');   
+    Route::get('/disbursements/vendor', [App\Http\Controllers\PayoutRequestController::class, 'vendorDisbursements'])->name('payoutRequests.vendor.disbursement');
 });
 Route::middleware(['permission:payout-request-driver,payout-request.driver'])->group(function () {
-    Route::get('/disbursements/drivers', [App\Http\Controllers\PayoutRequestController::class, 'driverDisbursements'])->name('payoutRequests.driver.disbursement');   
+    Route::get('/disbursements/drivers', [App\Http\Controllers\PayoutRequestController::class, 'driverDisbursements'])->name('payoutRequests.driver.disbursement');
 });
 Route::middleware(['permission:payout-request-owner,payout-request.owner'])->group(function () {
-    Route::get('/disbursements/owners', [App\Http\Controllers\PayoutRequestController::class, 'ownerDisbursements'])->name('payoutRequests.owner.disbursement');   
+    Route::get('/disbursements/owners', [App\Http\Controllers\PayoutRequestController::class, 'ownerDisbursements'])->name('payoutRequests.owner.disbursement');
 });
 Route::middleware(['permission:payout-request-provider,payout-request.provider'])->group(function () {
     Route::get('/disbursements/providers', [App\Http\Controllers\PayoutRequestController::class, 'providerDisbursements'])->name('payoutRequests.providers.disbursement');
@@ -542,13 +532,13 @@ Route::middleware(['permission:rental-discount,rental-discount.create'])->group(
 
 Route::middleware(['permission:rental-package,rental-package'])->group(function () {
     Route::get('rental-package', [App\Http\Controllers\RentalController::class, 'rentalPackage'])->name('rental-package');
-});    
+});
 Route::middleware(['permission:rental-package,rental-package.create'])->group(function () {
     Route::get('rental-package/create', [App\Http\Controllers\RentalController::class, 'rentalPackageCreate'])->name('rental-package.create');
-});    
+});
 Route::middleware(['permission:rental-package,rental-package.edit'])->group(function () {
     Route::get('rental-package/edit/{id}', [App\Http\Controllers\RentalController::class, 'rentalPackageEdit'])->name('rental-package.edit');
-});    
+});
 
 Route::middleware(['permission:rental-orders,rental-orders'])->group(function () {
     Route::get('/rental_orders', [App\Http\Controllers\RentalController::class, 'rentalOrders'])->name('rental_orders');
@@ -745,15 +735,15 @@ Route::middleware(['permission:payout-request-provider,payout-request.provider']
     Route::get('/payoutRequests/providers/{id?}', [App\Http\Controllers\PayoutRequestController::class, 'provider'])->name('payoutRequests.providers');
 });
 
-Route::post('store-firebase-service', [App\Http\Controllers\HomeController::class,'storeFirebaseService'])->name('store-firebase-service');
-Route::post('pay-to-user', [App\Http\Controllers\UserController::class,'payToUser'])->name('pay.user');
-Route::post('check-payout-status', [App\Http\Controllers\UserController::class,'checkPayoutStatus'])->name('check.payout.status');
+Route::post('store-firebase-service', [App\Http\Controllers\HomeController::class, 'storeFirebaseService'])->name('store-firebase-service');
+Route::post('pay-to-user', [App\Http\Controllers\UserController::class, 'payToUser'])->name('pay.user');
+Route::post('check-payout-status', [App\Http\Controllers\UserController::class, 'checkPayoutStatus'])->name('check.payout.status');
 
 Route::middleware(['permission:subscription-plans,subscription-plans'])->group(function () {
     Route::get('/subscription-plans', [App\Http\Controllers\SubscriptionPlanController::class, 'index'])->name('subscription-plans.index');
     Route::get('/current-subscriber/{id}', [App\Http\Controllers\SubscriptionPlanController::class, 'currentSubscriberList'])->name('current-subscriber.list');
 });
-Route::middleware(['permission:subscription-plans,subscription-plans.'.((str_contains(Request::url(), 'save')) ? (explode("save", Request::url())[1] ? "edit" : "create") : Request::url())])->group(function () {
+Route::middleware(['permission:subscription-plans,subscription-plans.' . ((str_contains(Request::url(), 'save')) ? (explode("save", Request::url())[1] ? "edit" : "create") : Request::url())])->group(function () {
     Route::get('/subscription-plans/save/{id?}', [App\Http\Controllers\SubscriptionPlanController::class, 'save'])->name('subscription-plans.save');
 });
 Route::middleware(['permission:subscription-history,subscription.history'])->group(function () {
