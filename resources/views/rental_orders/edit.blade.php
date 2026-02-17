@@ -197,7 +197,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                          <div class="resturant-detail mt-4">
+                                        <div class="resturant-detail mt-4">
                                             <div class="card">
                                                 <div class="card-header">
                                                     <h4 class="card-header-title">{{ trans('lang.driver_detail') }}</h4>
@@ -206,8 +206,8 @@
                                                 <div class="card-body">
                                                     <a href="" class="row redirecttopage" id="resturant-view">
                                                         <div class="col-4">
-                                                            <img src="" class="resturant-img rounded-circle"
-                                                                alt="driver" width="70px" height="70px">
+                                                            <img src="" class="resturant-img rounded-circle" alt="driver"
+                                                                width="70px" height="70px">
                                                         </div>
                                                         <div class="col-8">
                                                             <h4 class="vendor-title"></h4>
@@ -220,7 +220,7 @@
                                                         <span id="vendor_phone"></span>
                                                     </p>
                                                     <h5 class="contact-info">{{ trans('lang.car_info') }}:</h5>
-                                               
+
                                                     <br>
                                                     <p><strong id="driver_carName1"
                                                             style="width:auto !important;">{{ trans('lang.car_name') }}:</strong>
@@ -275,7 +275,7 @@
 
 
                                     <div class="col-md-4 order-deta-btm-right driver_details_hide">
-                                      
+
 
                                     </div>
                                 </div>
@@ -312,6 +312,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.15.0/printThis.js"></script>
 
     <script type="text/javascript">
+        function roundToNearestThousand(amount) {
+            let num = parseFloat(amount);
+            if (isNaN(num)) return amount;
+            let remainder = num % 1000;
+            if (remainder >= 500) {
+                return Math.ceil(num / 1000) * 1000;
+            } else {
+                return Math.floor(num / 1000) * 1000;
+            }
+        }
         var id_rendom = "<?php echo uniqid(); ?>";
         var adminCommission = 0;
         var id = "<?php echo $id; ?>";
@@ -345,7 +355,7 @@
         var page_size = 5;
         var refUserReview = database.collection('items_review').where('orderid', '==', id);
 
-        refCurrency.get().then(async function(snapshots) {
+        refCurrency.get().then(async function (snapshots) {
             var currencyData = snapshots.docs[0].data();
             currentCurrency = currencyData.symbol;
             currencyAtRight = currencyData.symbolAtRight;
@@ -367,13 +377,13 @@
         var geoFirestore = new GeoFirestore(database);
         var place_image = '';
         var ref_place = database.collection('settings').doc("placeHolderImage");
-        ref_place.get().then(async function(snapshots) {
+        ref_place.get().then(async function (snapshots) {
             var placeHolderImage = snapshots.data();
             place_image = placeHolderImage.image;
         });
 
 
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             //hide this status for admin
             $('#order_placed').hide();
@@ -388,340 +398,340 @@
                 id_rendom = alovelaceDocumentRef.id;
             }
 
-            $(document.body).on('click', '.redirecttopage', function() {
+            $(document.body).on('click', '.redirecttopage', function () {
                 var url = $(this).attr('data-url');
                 window.location.href = url;
             });
 
             jQuery("#data-table_processing").show();
 
-            ref.get().then(async function(snapshots) {
+            ref.get().then(async function (snapshots) {
                 var order = snapshots.docs[0].data();
-                getUserReview(order);
-                console.log(order);
-                append_procucts_total = document.getElementById('order_products_total');
-                append_procucts_total.innerHTML = '';
+            getUserReview(order);
+            console.log(order);
+            append_procucts_total = document.getElementById('order_products_total');
+            append_procucts_total.innerHTML = '';
 
-                $('.resturant-img').attr('src', place_image);
-                $('.car-img').attr('src', place_image);
+            $('.resturant-img').attr('src', place_image);
+            $('.car-img').attr('src', place_image);
 
-                if (order.driver.id) {
-                    var driver = database.collection('users').where("id", "==", order.driver.id);
+            if (order.driver.id) {
+                var driver = database.collection('users').where("id", "==", order.driver.id);
 
-                    driver.get().then(async function(snapshotsnew) {
-                        if (!snapshotsnew.empty) {
-                            var driverdata = snapshotsnew.docs[0].data();
-
-
-                            if (driverdata.id) {
-                                var route_view = '{{ route('drivers.view', ':id') }}';
-                                route_view = route_view.replace(':id', driverdata.id);
-
-                                $('#resturant-view').attr('data-url', route_view);
-                            }
-                            if (driverdata.profilePictureURL) {
-                                $('.resturant-img').attr('src', driverdata
-                                    .profilePictureURL);
-                            } else {
-                                $('.resturant-img').attr('src', place_image);
-                            }
-                            if (driverdata.firstName) {
-                                $('.vendor-title').html(driverdata.firstName + ' ' +
-                                    driverdata.lastName);
-                            }
-
-                            if (driverdata.email) {
-                                $('#vendor_email').html(shortEmail(driverdata.email));
-                            }
-                            if (driverdata.phoneNumber) {
-                                if (driverdata.phoneNumber.includes('+')) {
-                                    $('#vendor_phone').text('+' + EditPhoneNumber(driverdata
-                                        .phoneNumber.slice(1)));
-                                } else {
-                                    $('#vendor_phone').text(EditPhoneNumber(driverdata
-                                        .phoneNumber));
-                                }
-                            }
-                            if (driverdata.id) {
-                                var route_view = '{{ route('drivers.view', ':id') }}';
-                                route_view = route_view.replace(':id', driverdata.id);
-
-                                $('#resturant-car').attr('data-url', route_view);
-                            }
-                            // if (driverdata.carPictureURL) {
-                            //     $('.car-img').attr('src', driverdata.carPictureURL);
-                            // } else {
-                            //     $('.car-img').attr('src', place_image);
-                            // }
-                            if (driverdata.carName) {
-                                $('#driver_carName').html(driverdata.carName);
-                            }
-
-                            if (driverdata.carNumber) {
-                                $('#driver_carNumber').html(driverdata.carNumber);
-                            }
-                            if (driverdata.carMakes) {
-                                $('#driver_car_make').text(driverdata.carMakes);
-                            }
-                            if (driverdata.vehicleType) {
-                                $('#driver_car_type').text(driverdata.vehicleType);
-
-                            }
-                        } else {
+                driver.get().then(async function (snapshotsnew) {
+                    if (!snapshotsnew.empty) {
+                        var driverdata = snapshotsnew.docs[0].data();
 
 
-                            $('.resturant-img').hide();
-                            $('.vendor-title').text('Driver deleted');
-                            $('#vendor_email').hide();
-                            $('#vendor_phone').hide();
+                        if (driverdata.id) {
+                            var route_view = '{{ route('drivers.view', ':id') }}';
+                            route_view = route_view.replace(':id', driverdata.id);
 
-                            $('#resturant-car').hide();
-                            // $('.car-img').hide();
-                            $('#driver_carName').hide();
-                            $('#driver_carNumber').hide();
-                            $('#driver_car_make').hide();
-                            $('#driver_car_type').hide();
-
-                            $('#vendor_phone1').hide();
-
-
-                            $('#driver_carName1').hide();
-                            $('#driver_carNumber1').hide();
-                            $('#driver_car_make1').hide();
-                            $('#driver_car_type1').hide();
-
-                            $('.contact-info').hide();
+                            $('#resturant-view').attr('data-url', route_view);
                         }
-                    });
+                        if (driverdata.profilePictureURL) {
+                            $('.resturant-img').attr('src', driverdata
+                                .profilePictureURL);
+                        } else {
+                            $('.resturant-img').attr('src', place_image);
+                        }
+                        if (driverdata.firstName) {
+                            $('.vendor-title').html(driverdata.firstName + ' ' +
+                                driverdata.lastName);
+                        }
 
-                }
-
-
-                if (order.bookingDateTime) {
-                    var date1 = order.bookingDateTime.toDate().toDateString();
-                    var date = new Date(date1);
-                    var dd = String(date.getDate()).padStart(2, '0');
-                    var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    var yyyy = date.getFullYear();
-                    var pickUpTimeVal = yyyy + '-' + mm + '-' + dd;
-                    var time = order.bookingDateTime.toDate().toLocaleTimeString('en-US');
-
-                    $('#pickUpTime').text(pickUpTimeVal + ' ' + time);
-                }
-
-
-                $("#pickUpAddress").text(order.sourceLocationName);
-                if (order.createdAt) {
-                    var date1 = order.createdAt.toDate().toDateString();
-                    var date = new Date(date1);
-                    var dd = String(date.getDate()).padStart(2, '0');
-                    var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    var yyyy = date.getFullYear();
-                    var createdAt_val = yyyy + '-' + mm + '-' + dd;
-                    var time = order.createdAt.toDate().toLocaleTimeString('en-US');
-
-                    $('#createdAt').text(createdAt_val + ' ' + time);
-                }
-
-                var payment_method = '';
-                if (order.paymentMethod) {
-
-                    if (order.paymentMethod == "stripe") {
-                        image = '{{ asset('images/payment/stripe.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "xendit") {
-                        image = '{{ asset('images/payment/xendit.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'"  width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "midtrans") {
-                        image = '{{ asset('images/payment/midtrans.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "orangepay") {
-                        image = '{{ asset('images/payment/orangepay.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "cod" || order.paymentMethod == "Naqt pul") {
-                        image = '{{ asset('images/payment/cashondelivery.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "razorpay") {
-                        image = '{{ asset('images/payment/razorepay.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "paypal") {
-                        image = '{{ asset('images/payment/paypal.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "payfast") {
-                        image = '{{ asset('images/payfast.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '"onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'"  width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "paystack") {
-                        image = '{{ asset('images/payment/paystack.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "flutterwave") {
-                        image = '{{ asset('images/payment/flutter_wave.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "mercadoPago" || order.paymentMethod ==
-                        "mercado pago" || order.paymentMethod == "mercadopago") {
-                        image = '{{ asset('images/payment/marcado_pago.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "wallet") {
-                        image = '{{ asset('images/payment/emart_wallet.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%" >';
-
-                    } else if (order.paymentMethod == "paytm") {
-                        image = '{{ asset('images/payment/paytm.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '"onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'"  width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "cancelled order payment") {
-                        image = '{{ asset('images/payment/cancel_order.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-
-                    } else if (order.paymentMethod == "refund amount") {
-                        image = '{{ asset('images/payment/refund_amount.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'"  width="30%" height="30%">';
-                    } else if (order.paymentMethod == "referral amount") {
-                        image = '{{ asset('images/payment/reffral_amount.png') }}';
-                        payment_method = '<img alt="image" src="' + image +
-                            '" onerror="this.onerror=null;this.src=\'' + place_image +
-                            '\'" width="30%" height="30%">';
-                    } else {
-                        payment_method = order.paymentMethod;
-                    }
-                }
-                $('#payment_method').html(payment_method);
-
-
-
-                $('#user_email').html('<a href="mailto:' + order.author.email + '">' + shortEmail(order
-                    .author.email) + '</a>');
-                $('#user_firstName').text(order.author.firstName);
-                $('#user_lastName').text(order.author.lastName);
-
-                if (order.author.phoneNumber.includes('+')) {
-                    $('#user_phone').text('+' + EditPhoneNumber(order.author.phoneNumber.slice(1)));
-                } else {
-                    $('#user_phone').text(EditPhoneNumber(order.author.phoneNumber));
-                }
-
-                if (order.driverID != '' && order.driverID != undefined) {
-                    driverId = order.driverID;
-                }
-
-                if (order.rentalPackageModel && order.rentalPackageModel != '' && order
-                    .rentalPackageModel != undefined) {
-                    $('#rental_pack_name').text(order.rentalPackageModel.name);
-                    let baseFare = 0;
-                    if (currencyAtRight) {
-                        baseFare = parseFloat(order.rentalPackageModel.baseFare).toFixed(
-                            decimal_degits) + "" + currentCurrency;
-                    } else {
-                        baseFare = currentCurrency + "" + parseFloat(order.rentalPackageModel.baseFare)
-                            .toFixed(decimal_degits);
-                    }
-                    $('#rental_pack_price').text(baseFare);
-                    $('#rental_pack_hours').text(order.rentalPackageModel.includedHours + ' ' + 'Hr');
-                    $('#rental_pack_km').text(order.rentalPackageModel.includedDistance + ' ' + 'Km');
-                }
-
-                fcmToken = order.author.fcmToken;
-
-                customername = order.author.firstName;
-
-                old_order_status = order.status;
-                if (order.payment_shared != undefined) {
-                    payment_shared = order.payment_shared;
-                }
-                var productsListHTML = buildHTMLParcelList(order);
-                var productstotalHTML = buildParcelTotal(order);
-
-                if (productstotalHTML != '') {
-                    append_procucts_total.innerHTML = productstotalHTML;
-                }
-
-
-                orderPreviousStatus = order.status;
-                if (order.hasOwnProperty('payment_method')) {
-                    orderPaymentMethod = order.paymentMethod;
-                }
-
-                $("#order_status option[value='" + order.status + "']").attr("selected", "selected");
-                if (order.status == "Order Rejected" || order.status == "Driver Rejected") {
-                    $("#order_status").prop("disabled", true);
-                }
-                var price = 0;
-
-                jQuery("#data-table_processing").hide();
-            })
-
-            $(".edit-form-btn").click(async function() {
-
-                var orderStatus = $("#order_status").val();
-                if (old_order_status != orderStatus) {
-
-                    database.collection('rental_orders').doc(id).update({
-                        'status': orderStatus
-                    }).then(async function(result) {
-                        if (orderStatus != orderPreviousStatus && payment_shared == false) {
-                            if (orderStatus == 'Order Completed') {
-
-                                await database.collection('rental_orders').doc(id).update({
-                                    'payment_shared': true
-                                }).then(async function(result) {
-                                    window.location.href =
-                                        '{{ route('rental_orders') }}';
-                                });
+                        if (driverdata.email) {
+                            $('#vendor_email').html(shortEmail(driverdata.email));
+                        }
+                        if (driverdata.phoneNumber) {
+                            if (driverdata.phoneNumber.includes('+')) {
+                                $('#vendor_phone').text('+' + EditPhoneNumber(driverdata
+                                    .phoneNumber.slice(1)));
                             } else {
-                                window.location.href = '{{ route('rental_orders') }}';
+                                $('#vendor_phone').text(EditPhoneNumber(driverdata
+                                    .phoneNumber));
                             }
+                        }
+                        if (driverdata.id) {
+                            var route_view = '{{ route('drivers.view', ':id') }}';
+                            route_view = route_view.replace(':id', driverdata.id);
 
+                            $('#resturant-car').attr('data-url', route_view);
+                        }
+                        // if (driverdata.carPictureURL) {
+                        //     $('.car-img').attr('src', driverdata.carPictureURL);
+                        // } else {
+                        //     $('.car-img').attr('src', place_image);
+                        // }
+                        if (driverdata.carName) {
+                            $('#driver_carName').html(driverdata.carName);
+                        }
+
+                        if (driverdata.carNumber) {
+                            $('#driver_carNumber').html(driverdata.carNumber);
+                        }
+                        if (driverdata.carMakes) {
+                            $('#driver_car_make').text(driverdata.carMakes);
+                        }
+                        if (driverdata.vehicleType) {
+                            $('#driver_car_type').text(driverdata.vehicleType);
+
+                        }
+                    } else {
+
+
+                        $('.resturant-img').hide();
+                        $('.vendor-title').text('Driver deleted');
+                        $('#vendor_email').hide();
+                        $('#vendor_phone').hide();
+
+                        $('#resturant-car').hide();
+                        // $('.car-img').hide();
+                        $('#driver_carName').hide();
+                        $('#driver_carNumber').hide();
+                        $('#driver_car_make').hide();
+                        $('#driver_car_type').hide();
+
+                        $('#vendor_phone1').hide();
+
+
+                        $('#driver_carName1').hide();
+                        $('#driver_carNumber1').hide();
+                        $('#driver_car_make1').hide();
+                        $('#driver_car_type1').hide();
+
+                        $('.contact-info').hide();
+                    }
+                });
+
+            }
+
+
+            if (order.bookingDateTime) {
+                var date1 = order.bookingDateTime.toDate().toDateString();
+                var date = new Date(date1);
+                var dd = String(date.getDate()).padStart(2, '0');
+                var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var yyyy = date.getFullYear();
+                var pickUpTimeVal = yyyy + '-' + mm + '-' + dd;
+                var time = order.bookingDateTime.toDate().toLocaleTimeString('en-US');
+
+                $('#pickUpTime').text(pickUpTimeVal + ' ' + time);
+            }
+
+
+            $("#pickUpAddress").text(order.sourceLocationName);
+            if (order.createdAt) {
+                var date1 = order.createdAt.toDate().toDateString();
+                var date = new Date(date1);
+                var dd = String(date.getDate()).padStart(2, '0');
+                var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var yyyy = date.getFullYear();
+                var createdAt_val = yyyy + '-' + mm + '-' + dd;
+                var time = order.createdAt.toDate().toLocaleTimeString('en-US');
+
+                $('#createdAt').text(createdAt_val + ' ' + time);
+            }
+
+            var payment_method = '';
+            if (order.paymentMethod) {
+
+                if (order.paymentMethod == "stripe") {
+                    image = '{{ asset('images/payment/stripe.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "xendit") {
+                    image = '{{ asset('images/payment/xendit.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'"  width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "midtrans") {
+                    image = '{{ asset('images/payment/midtrans.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "orangepay") {
+                    image = '{{ asset('images/payment/orangepay.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "cod" || order.paymentMethod == "Naqt pul") {
+                    image = '{{ asset('images/payment/cashondelivery.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "razorpay") {
+                    image = '{{ asset('images/payment/razorepay.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "paypal") {
+                    image = '{{ asset('images/payment/paypal.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "payfast") {
+                    image = '{{ asset('images/payfast.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '"onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'"  width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "paystack") {
+                    image = '{{ asset('images/payment/paystack.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "flutterwave") {
+                    image = '{{ asset('images/payment/flutter_wave.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "mercadoPago" || order.paymentMethod ==
+                    "mercado pago" || order.paymentMethod == "mercadopago") {
+                    image = '{{ asset('images/payment/marcado_pago.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "wallet") {
+                    image = '{{ asset('images/payment/emart_wallet.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%" >';
+
+                } else if (order.paymentMethod == "paytm") {
+                    image = '{{ asset('images/payment/paytm.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '"onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'"  width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "cancelled order payment") {
+                    image = '{{ asset('images/payment/cancel_order.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+
+                } else if (order.paymentMethod == "refund amount") {
+                    image = '{{ asset('images/payment/refund_amount.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'"  width="30%" height="30%">';
+                } else if (order.paymentMethod == "referral amount") {
+                    image = '{{ asset('images/payment/reffral_amount.png') }}';
+                    payment_method = '<img alt="image" src="' + image +
+                        '" onerror="this.onerror=null;this.src=\'' + place_image +
+                        '\'" width="30%" height="30%">';
+                } else {
+                    payment_method = order.paymentMethod;
+                }
+            }
+            $('#payment_method').html(payment_method);
+
+
+
+            $('#user_email').html('<a href="mailto:' + order.author.email + '">' + shortEmail(order
+                .author.email) + '</a>');
+            $('#user_firstName').text(order.author.firstName);
+            $('#user_lastName').text(order.author.lastName);
+
+            if (order.author.phoneNumber.includes('+')) {
+                $('#user_phone').text('+' + EditPhoneNumber(order.author.phoneNumber.slice(1)));
+            } else {
+                $('#user_phone').text(EditPhoneNumber(order.author.phoneNumber));
+            }
+
+            if (order.driverID != '' && order.driverID != undefined) {
+                driverId = order.driverID;
+            }
+
+            if (order.rentalPackageModel && order.rentalPackageModel != '' && order
+                .rentalPackageModel != undefined) {
+                $('#rental_pack_name').text(order.rentalPackageModel.name);
+                let baseFare = 0;
+                if (currencyAtRight) {
+                    baseFare = parseFloat(order.rentalPackageModel.baseFare).toFixed(
+                        decimal_degits) + "" + currentCurrency;
+                } else {
+                    baseFare = currentCurrency + "" + parseFloat(order.rentalPackageModel.baseFare)
+                        .toFixed(decimal_degits);
+                }
+                $('#rental_pack_price').text(baseFare);
+                $('#rental_pack_hours').text(order.rentalPackageModel.includedHours + ' ' + 'Hr');
+                $('#rental_pack_km').text(order.rentalPackageModel.includedDistance + ' ' + 'Km');
+            }
+
+            fcmToken = order.author.fcmToken;
+
+            customername = order.author.firstName;
+
+            old_order_status = order.status;
+            if (order.payment_shared != undefined) {
+                payment_shared = order.payment_shared;
+            }
+            var productsListHTML = buildHTMLParcelList(order);
+            var productstotalHTML = buildParcelTotal(order);
+
+            if (productstotalHTML != '') {
+                append_procucts_total.innerHTML = productstotalHTML;
+            }
+
+
+            orderPreviousStatus = order.status;
+            if (order.hasOwnProperty('payment_method')) {
+                orderPaymentMethod = order.paymentMethod;
+            }
+
+            $("#order_status option[value='" + order.status + "']").attr("selected", "selected");
+            if (order.status == "Order Rejected" || order.status == "Driver Rejected") {
+                $("#order_status").prop("disabled", true);
+            }
+            var price = 0;
+
+            jQuery("#data-table_processing").hide();
+        })
+
+        $(".edit-form-btn").click(async function () {
+
+            var orderStatus = $("#order_status").val();
+            if (old_order_status != orderStatus) {
+
+                database.collection('rental_orders').doc(id).update({
+                    'status': orderStatus
+                }).then(async function (result) {
+                    if (orderStatus != orderPreviousStatus && payment_shared == false) {
+                        if (orderStatus == 'Order Completed') {
+
+                            await database.collection('rental_orders').doc(id).update({
+                                'payment_shared': true
+                            }).then(async function (result) {
+                                window.location.href =
+                                    '{{ route('rental_orders') }}';
+                            });
                         } else {
                             window.location.href = '{{ route('rental_orders') }}';
                         }
-                    });
-                } else {
-                    window.location.href = '{{ route('rental_orders') }}';
 
-                }
-            })
+                    } else {
+                        window.location.href = '{{ route('rental_orders') }}';
+                    }
+                });
+            } else {
+                window.location.href = '{{ route('rental_orders') }}';
 
-        });
+            }
+        })
+
+            });
 
 
         function buildHTMLParcelList(snapshotsParcel) {
@@ -800,7 +810,7 @@
                     extraKilometerCharge = totalKm * extraKmFare;
                 }
             }
-          
+
             // Convert Firestore timestamps to JS Date
             var startTime = snapshotsProducts.startTime ? snapshotsProducts.startTime.toDate() : null;
             var endTime = snapshotsProducts.endTime ? snapshotsProducts.endTime.toDate() : null;
@@ -908,14 +918,14 @@
                         specialDiscountlabel = snapshotsProducts.specialDiscount.special_discount_label;
                     }
                 }
-            } catch (error) {}
+            } catch (error) { }
 
             if (!isNaN(specialDiscount_) && specialDiscount_ != 0) {
                 if (currencyAtRight) {
                     html +=
                         '<tr><td class="label">{{ trans('lang.special_offer') }}</td><td class="deliveryCharge" style="color:red">(-' +
                         specialDiscount_ + '' + currentCurrency + ')(' + snapshotsProducts.specialDiscount
-                        .special_discount + ' ' + specialDiscounttype + ')</td></tr>';
+                            .special_discount + ' ' + specialDiscounttype + ')</td></tr>';
                 } else {
                     html +=
                         '<tr><td class="label">{{ trans('lang.special_offer') }}</td><td class="deliveryCharge" style="color:red">(-' +
@@ -958,7 +968,7 @@
                         if (currencyAtRight) {
                             html += '<tr><td class="label">' + taxlabel + " (" + taxvalue + taxlabeltype +
                                 ')</td><td class="tax_amount" id="greenColor" style="color:green">+' + parseFloat(tax)
-                                .toFixed(decimal_degits) + '' + currentCurrency + '</td></tr>';
+                                    .toFixed(decimal_degits) + '' + currentCurrency + '</td></tr>';
                         } else {
                             html += '<tr><td class="label">' + taxlabel + " (" + taxvalue + taxlabeltype +
                                 ')</td><td class="tax_amount" id="greenColor" style="color:green">+' + currentCurrency +
@@ -968,6 +978,8 @@
                 }
                 total_price += parseFloat(total_tax_amount);
             }
+
+            total_price = roundToNearestThousand(total_price);
 
             var totalAmount = total_price;
             html += '<tr><td class="seprater" colspan="2"><hr></td></tr>';
@@ -1012,7 +1024,7 @@
         }
 
         function getUserReview(Order) {
-            refUserReview.limit(page_size).get().then(async function(userreviewsnapshot) {
+            refUserReview.limit(page_size).get().then(async function (userreviewsnapshot) {
                 var reviewHTML = '';
                 reviewHTML = buildRatingsAndReviewsHTML(Order, userreviewsnapshot);
                 if (userreviewsnapshot.docs.length > 0) {

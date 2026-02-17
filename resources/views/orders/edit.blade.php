@@ -11,7 +11,7 @@
         $newcountries[$valuecountry->phoneCode] = $valuecountry;
         $newcountriesjs[$valuecountry->phoneCode] = $valuecountry->code;
     }
-    ?>
+        ?>
     <div class="page-wrapper">
 
         <div class="row page-titles non-printable">
@@ -24,7 +24,8 @@
                     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">{{ trans('lang.dashboard') }}</a></li>
 
                     <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
-                    <li class="breadcrumb-item"><a href="{{ route('vendors.orders', $_GET['eid']) }}">{{ trans('lang.order_plural') }}</a>
+                    <li class="breadcrumb-item"><a
+                            href="{{ route('vendors.orders', $_GET['eid']) }}">{{ trans('lang.order_plural') }}</a>
                     </li>
                     <?php } else { ?>
                     <li class="breadcrumb-item"><a href="{!! route('orders') !!}">{{ trans('lang.order_plural') }}</a>
@@ -39,25 +40,28 @@
         <div class="card-header">
             <ul class="nav nav-tabs align-items-end card-header-tabs w-100">
                 <li role="presentation" class="nav-item">
-                    <a href="#category_information" aria-controls="category_information" role="tab" data-toggle="tab" class="nav-link active">{{ trans('lang.order_information') }}</a>
+                    <a href="#category_information" aria-controls="category_information" role="tab" data-toggle="tab"
+                        class="nav-link active">{{ trans('lang.order_information') }}</a>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a href="#review_attributes" aria-controls="review_attributes" role="tab" data-toggle="tab" class="nav-link">{{ trans('lang.reviewattribute_plural') }}</a>
+                    <a href="#review_attributes" aria-controls="review_attributes" role="tab" data-toggle="tab"
+                        class="nav-link">{{ trans('lang.reviewattribute_plural') }}</a>
                 </li>
             </ul>
         </div>
         <?php } ?>
         <div class="card-body">
-            <?php if(in_array('orders.print', json_decode(@session('user_permissions')))){ ?>
-            <?php if (isset($_GET['id']) && $_GET['id'] != '') { ?>
+            <?php if (in_array('orders.print', json_decode(@session('user_permissions')))) { ?>
+            <?php    if (isset($_GET['id']) && $_GET['id'] != '') { ?>
             <div class="text-right print-btn"><a href="{{ route('vendors.orderprint', $id) }}">
                     <button type="button" class="fa fa-print"></button>
                 </a></div>
-            <?php } ?>
+            <?php    } ?>
             <div class="col-md-12">
                 <div class="print-top non-printable mt-3">
                     <div class="text-right print-btn non-printable">
-                        <button type="button" class="fa fa-print non-printable" onclick="printDiv('printableArea')"></button>
+                        <button type="button" class="fa fa-print non-printable"
+                            onclick="printDiv('printableArea')"></button>
                     </div>
                 </div>
 
@@ -102,13 +106,15 @@
                                                     <div class="form-group row widt-100 gendetail-col schedule_date"></div>
                                                     <div class="form-group row widt-100 gendetail-col prepare_time"></div>
 
-                                                    <div class="form-group row widt-100 gendetail-col" id="ccname_div" style="display:none">
+                                                    <div class="form-group row widt-100 gendetail-col" id="ccname_div"
+                                                        style="display:none">
                                                         <label class="col-12 control-label"><strong>{{ trans('lang.courier_company_name') }}
                                                                 :</strong>
                                                             <span id="ccname"></span></label>
                                                     </div>
 
-                                                    <div class="form-group row widt-100 gendetail-col" id="ccid_div" style="display:none">
+                                                    <div class="form-group row widt-100 gendetail-col" id="ccid_div"
+                                                        style="display:none">
                                                         <label class="col-12 control-label"><strong>{{ trans('lang.courier_tracking_id') }}
                                                                 :</strong>
                                                             <span id="ccid"></span></label>
@@ -119,21 +125,29 @@
                                                             :</label>
                                                         <div class="col-7">
                                                             <select id="order_status" class="form-control">
-                                                                <option value="Order Placed" id="order_placed">{{ trans('lang.order_placed') }}
+                                                                <option value="Order Placed" id="order_placed">
+                                                                    {{ trans('lang.order_placed') }}
                                                                 </option>
-                                                                <option value="Order Accepted" id="order_accepted">{{ trans('lang.order_accepted') }}
+                                                                <option value="Order Accepted" id="order_accepted">
+                                                                    {{ trans('lang.order_accepted') }}
                                                                 </option>
-                                                                <option value="Order Rejected" id="order_rejected">{{ trans('lang.order_rejected') }}
+                                                                <option value="Order Rejected" id="order_rejected">
+                                                                    {{ trans('lang.order_rejected') }}
                                                                 </option>
-                                                                <option value="Driver Pending" id="driver_pending">{{ trans('lang.driver_pending') }}
+                                                                <option value="Driver Pending" id="driver_pending">
+                                                                    {{ trans('lang.driver_pending') }}
                                                                 </option>
-                                                                <option value="Driver Rejected" id="driver_rejected">{{ trans('lang.driver_rejected') }}
+                                                                <option value="Driver Rejected" id="driver_rejected">
+                                                                    {{ trans('lang.driver_rejected') }}
                                                                 </option>
-                                                                <option value="Order Shipped" id="order_shipped">{{ trans('lang.order_shipped') }}
+                                                                <option value="Order Shipped" id="order_shipped">
+                                                                    {{ trans('lang.order_shipped') }}
                                                                 </option>
-                                                                <option value="In Transit" id="in_transit">{{ trans('lang.in_transit') }}
+                                                                <option value="In Transit" id="in_transit">
+                                                                    {{ trans('lang.in_transit') }}
                                                                 </option>
-                                                                <option value="Order Completed" id="order_completed">{{ trans('lang.order_completed') }}
+                                                                <option value="Order Completed" id="order_completed">
+                                                                    {{ trans('lang.order_completed') }}
                                                                 </option>
                                                                 <option value="Order Cancelled" id="order_canceled">
                                                                     {{ trans('lang.order_canceled') }}
@@ -145,7 +159,9 @@
                                                     <div class="form-group row width-100 non-printable">
                                                         <label class="col-3 control-label"></label>
                                                         <div class="col-7 text-right">
-                                                            <button type="button" class="btn btn-primary save_order_btn show_popup edit-form-btn"><i class="fa fa-save "></i> {{ trans('lang.update') }}
+                                                            <button type="button"
+                                                                class="btn btn-primary save_order_btn show_popup edit-form-btn"><i
+                                                                    class="fa fa-save "></i> {{ trans('lang.update') }}
                                                             </button>
                                                         </div>
                                                     </div>
@@ -155,7 +171,8 @@
                                         <div class="order-items-list mt-4 ">
                                             <div class="card">
                                                 <div class="card-body">
-                                                    <table cellpadding="0" cellspacing="0" class="table table-striped table-valign-middle">
+                                                    <table cellpadding="0" cellspacing="0"
+                                                        class="table table-striped table-valign-middle">
 
                                                         <thead>
                                                             <tr>
@@ -207,7 +224,8 @@
                                                             : </strong><span id="billing_name"></span></p>
 
                                                     <p id="billing_adrs"><strong>{{ trans('lang.address') }}
-                                                            : </strong><span id="billing_line1"></span> <span id="billing_line2"></span><span id="billing_country"></span></p>
+                                                            : </strong><span id="billing_line1"></span> <span
+                                                            id="billing_line2"></span><span id="billing_country"></span></p>
 
                                                     <p><strong>{{ trans('lang.email_address') }}:</strong>
                                                         <span id="billing_email"></span>
@@ -235,7 +253,8 @@
                                                             </div>
                                                         </a>
                                                         <p>
-                                                            <span id="driver_firstName"></span> <span id="driver_lastName"></span><br>
+                                                            <span id="driver_firstName"></span> <span
+                                                                id="driver_lastName"></span><br>
                                                         </p>
                                                         <p><strong>{{ trans('lang.email_address') }}:</strong>
                                                             <span id="driver_email"></span>
@@ -287,7 +306,8 @@
                                                 <div class="rental-review col-md-12">
                                                     <div class="card">
                                                         <div class="card-header">
-                                                            <h4 class="card-header-title">{{ trans('lang.customer_reviews') }}</h4>
+                                                            <h4 class="card-header-title">
+                                                                {{ trans('lang.customer_reviews') }}</h4>
                                                         </div>
                                                         <div class="card-body">
                                                             <div class="review-inner">
@@ -319,13 +339,16 @@
         </div>
 
         <div class="form-group col-12 text-center btm-btn non-printable">
-            <button type="button" class="btn btn-primary save_order_btn d-none"><i class="fa fa-save"></i> {{ trans('lang.save') }}
+            <button type="button" class="btn btn-primary save_order_btn d-none"><i class="fa fa-save"></i>
+                {{ trans('lang.save') }}
             </button>
 
             <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
-            <a href="{{ route('vendors.orders', $_GET['eid']) }}" class="btn btn-default"><i class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
+            <a href="{{ route('vendors.orders', $_GET['eid']) }}" class="btn btn-default"><i
+                    class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
             <?php } elseif ($oid != '') { ?>
-            <a href="{!! route('orderReview') !!}" class="btn btn-default"><i class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
+            <a href="{!! route('orderReview') !!}" class="btn btn-default"><i
+                    class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
             <?php } else { ?>
             <a href="{!! route('orders') !!}" class="btn btn-default"><i class="fa fa-undo"></i>{{ trans('lang.cancel') }}
             </a>
@@ -333,7 +356,8 @@
 
         </div>
 
-        <div class="modal fade" id="orderTrakingModal" tabindex="-1" role="dialog" aria-labelledby="orderTrakingModalLabel" aria-hidden="true">
+        <div class="modal fade" id="orderTrakingModal" tabindex="-1" role="dialog" aria-labelledby="orderTrakingModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -344,11 +368,13 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="courierCompanyName" class="col-form-label">{{ trans('lang.courier_company_name') }}</label>
+                            <label for="courierCompanyName"
+                                class="col-form-label">{{ trans('lang.courier_company_name') }}</label>
                             <input type="text" class="form-control" id="courierCompanyName">
                         </div>
                         <div class="form-group">
-                            <label for="courierTrackingId" class="col-form-label">{{ trans('lang.courier_tracking_id') }}</label>
+                            <label for="courierTrackingId"
+                                class="col-form-label">{{ trans('lang.courier_tracking_id') }}</label>
                             <input type="text" class="form-control" id="courierTrackingId">
                         </div>
                     </div>
@@ -389,7 +415,8 @@
                                 <div class="form-group row width-100">
                                     <label class="col-12 control-label">{{ trans('lang.time') }}</label>
                                     <div class="col-12">
-                                        <input type="text" name="prepare_time" class="form-control time-picker" id="prepare_time">
+                                        <input type="text" name="prepare_time" class="form-control time-picker"
+                                            id="prepare_time">
                                         <div id="add_prepare_time_error"></div>
 
                                     </div>
@@ -404,7 +431,8 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="add-prepare-time-btn">{{ trans('submit') }}</a>
                         </button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">{{ trans('close') }}</a>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal"
+                            aria-label="Close">{{ trans('close') }}</a>
                         </button>
 
                     </div>
@@ -438,7 +466,9 @@
                             <div class="form-group row">
                                 <div class="form-group row width-100">
                                     <div class="col-12">
-                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#addDeliverymanModal" class="add-deliveryman btn btn-success"><i class="fa fa-plus"></i>{{ trans('lang.add_delivery_man') }}</a>
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#addDeliverymanModal"
+                                            class="add-deliveryman btn btn-success"><i
+                                                class="fa fa-plus"></i>{{ trans('lang.add_delivery_man') }}</a>
                                     </div>
                                 </div>
                             </div>
@@ -524,18 +554,21 @@
                                     <div class="phone-box position-relative" id="phone-box">
                                         <select name="country" id="country_selector">
                                             <?php foreach ($newcountries as $keycy => $valuecy) { ?>
-                                            <?php $selected = ''; ?>
-                                            <option <?php echo $selected; ?> code="<?php echo $valuecy->code; ?>" value="<?php echo $keycy; ?>">
-                                                +<?php echo $valuecy->phoneCode; ?> {{ $valuecy->countryName }}</option>
+                                            <?php    $selected = ''; ?>
+                                            <option <?php    echo $selected; ?> code="<?php    echo $valuecy->code; ?>"
+                                                value="<?php    echo $keycy; ?>">
+                                                +<?php    echo $valuecy->phoneCode; ?> {{ $valuecy->countryName }}</option>
                                             <?php } ?>
                                         </select>
-                                        <input class="form-control user_phone" placeholder="Phone" id="phone" type="phone" name="phone" value="{{ old('phone') }}" required autocomplete="phone" autofocus>
+                                        <input class="form-control user_phone" placeholder="Phone" id="phone" type="phone"
+                                            name="phone" value="{{ old('phone') }}" required autocomplete="phone" autofocus>
                                         <div id="mobilenumber_err" class="text-danger err"></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group row width-100">
-                                <label class="col-3 control-label">{{ trans('lang.zone') }}<span class="required-field"></span></label>
+                                <label class="col-3 control-label">{{ trans('lang.zone') }}<span
+                                        class="required-field"></span></label>
                                 <div class="col-12">
                                     <select id='zone' class="form-control">
                                         <option value="">{{ trans('lang.select_zone') }}</option>
@@ -548,7 +581,8 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="add-deliveryman-btn">{{ trans('submit') }}</a>
                         </button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">{{ trans('close') }}</a>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal"
+                            aria-label="Close">{{ trans('close') }}</a>
                         </button>
                     </div>
                 </div>
@@ -564,6 +598,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.15.0/printThis.js"></script>
 
     <script type="text/javascript">
+        function roundToNearestThousand(amount) {
+            let num = parseFloat(amount);
+            if (isNaN(num)) return amount;
+            let remainder = num % 1000;
+            if (remainder >= 500) {
+                return Math.ceil(num / 1000) * 1000;
+            } else {
+                return Math.floor(num / 1000) * 1000;
+            }
+        }
         var adminCommission = 0;
         var id_rendom = "<?php echo uniqid(); ?>";
 
@@ -596,7 +640,7 @@
 
         var database = firebase.firestore();
         var subscriptionBusinessModel = database.collection('settings').doc("vendor");
-        subscriptionBusinessModel.get().then(async function(snapshots) {
+        subscriptionBusinessModel.get().then(async function (snapshots) {
             var subscriptionSetting = snapshots.data();
             if (subscriptionSetting.subscription_model == true) {
                 subscriptionModel = true;
@@ -627,7 +671,7 @@
         var delivery_enable = false;
         var total_tax_amount = 0;
         var reviewAttributes = {};
-        refCurrency.get().then(async function(snapshots) {
+        refCurrency.get().then(async function (snapshots) {
             var currencyData = snapshots.docs[0].data();
             currentCurrency = currencyData.symbol;
             currencyAtRight = currencyData.symbolAtRight;
@@ -649,7 +693,7 @@
         var geoFirestore = new GeoFirestore(database);
         var place_image = '';
         var ref_place = database.collection('settings').doc("placeHolderImage");
-        ref_place.get().then(async function(snapshots) {
+        ref_place.get().then(async function (snapshots) {
 
             var placeHolderImage = snapshots.data();
             place_image = placeHolderImage.image;
@@ -687,7 +731,7 @@
         var isSelfDeliveryByVendor = false;
         var singleOrderReceive = false;
         var refDriverNearBy = database.collection('settings').doc("DriverNearBy");
-        refDriverNearBy.get().then(async function(snapshot) {
+        refDriverNearBy.get().then(async function (snapshot) {
             var data = snapshot.data();
             if (data.singleOrderReceive) {
                 singleOrderReceive = true;
@@ -695,13 +739,13 @@
         })
         var scheduleOrderAcceptData = {};
         var scheduleOrderNotificationRef = database.collection('settings').doc("scheduleOrderNotification");
-        scheduleOrderNotificationRef.get().then(async function(snapshot) {
+        scheduleOrderNotificationRef.get().then(async function (snapshot) {
             var data = snapshot.data();
             scheduleOrderAcceptData.notifyTime = data.notifyTime;
             scheduleOrderAcceptData.timeUnit = data.timeUnit;
         })
         var refGlobal = database.collection('settings').doc("globalSettings");
-        refGlobal.get().then(async function(
+        refGlobal.get().then(async function (
             settingSnapshots) {
             if (settingSnapshots.data()) {
                 var settingData = settingSnapshots.data();
@@ -711,7 +755,7 @@
             }
         })
 
-        database.collection('dynamic_notification').get().then(async function(snapshot) {
+        database.collection('dynamic_notification').get().then(async function (snapshot) {
             if (snapshot.docs.length > 0) {
                 snapshot.docs.map(async (listval) => {
                     val = listval.data();
@@ -760,7 +804,7 @@
         });
 
 
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             $('.time-picker').timepicker({
                 timeFormat: "HH:mm",
@@ -768,7 +812,7 @@
                 format24: true,
                 dropdown: false
             });
-            $('.time-picker').timepicker().on('changeTime.timepicker', function(e) {
+            $('.time-picker').timepicker().on('changeTime.timepicker', function (e) {
                 var hours = e.time.hours,
                     min = e.time.minutes;
                 if (hours < 10) {
@@ -781,12 +825,12 @@
             if (alovelaceDocumentRef.id) {
                 id_rendom = alovelaceDocumentRef.id;
             }
-            $(document.body).on('click', '.redirecttopage', function() {
+            $(document.body).on('click', '.redirecttopage', function () {
                 var url = $(this).attr('data-url');
                 window.location.href = url;
             });
 
-            $(document.body).on('click', '#save_btn', function() {
+            $(document.body).on('click', '#save_btn', function () {
                 var courierCompanyName = $("#courierCompanyName").val();
                 var courierTrackingId = $("#courierTrackingId").val();
                 if (courierCompanyName == '') {
@@ -804,12 +848,12 @@
 
             jQuery("#data-table_processing").show();
 
-            ref.get().then(async function(snapshots) {
+            ref.get().then(async function (snapshots) {
                 vendorOrder = snapshots.docs[0].data();
                 await getDeliverymanList(vendorOrder.vendorID);
                 getUserReview(vendorOrder);
                 var order = snapshots.docs[0].data();
-                database.collection('zone').where('publish', '==', true)/* .where('sectionId', '==', order.vendor.section_id) */.orderBy('name', 'asc').get().then(async function(snapshots) {
+                database.collection('zone').where('publish', '==', true)/* .where('sectionId', '==', order.vendor.section_id) */.orderBy('name', 'asc').get().then(async function (snapshots) {
                     snapshots.docs.forEach((listval) => {
                         var data = listval.data();
                         $('#zone').append($("<option></option>")
@@ -818,7 +862,7 @@
                     })
                 });
                 if (order.vendor.section_id != undefined && order.vendor.section_id != '') {
-                    await database.collection('sections').doc(order.vendor.section_id).get().then(async function(snapshot) {
+                    await database.collection('sections').doc(order.vendor.section_id).get().then(async function (snapshot) {
                         service_type = snapshot.data().serviceTypeFlag;
                         delivery_enable = snapshot.data().dine_in_active;
                         if (snapshot.data().adminCommision != null && snapshot.data()
@@ -1071,7 +1115,7 @@
                 order_sectionId = order.section_id;
 
                 if (order_sectionId != '' && order_sectionId != undefined) {
-                    database.collection('sections').doc(order_sectionId).get().then(async function(snapshots) {
+                    database.collection('sections').doc(order_sectionId).get().then(async function (snapshots) {
                         var secInfo = snapshots.data();
                         if (secInfo != undefined) {
                             referralAmount = parseFloat(secInfo.referralAmount);
@@ -1080,13 +1124,13 @@
                 }
 
                 if (userId != '' && userId != undefined) {
-                    database.collection('referral').doc(userId).get().then(async function(snapshots) {
+                    database.collection('referral').doc(userId).get().then(async function (snapshots) {
                         var refInfo = snapshots.data();
                         if (refInfo != undefined) {
                             referralBy = refInfo.referralBy;
                         }
                     });
-                    database.collection('vendor_orders').where('author.id', '==', userId).get().then(async function(snapshots) {
+                    database.collection('vendor_orders').where('author.id', '==', userId).get().then(async function (snapshots) {
                         if (snapshots.docs.length == 1) {
                             add_reff_amount = true;
                         }
@@ -1137,7 +1181,7 @@
                 if (order.vendorID) {
                     var vendor = database.collection('vendors').where("id", "==", order.vendorID);
 
-                    await vendor.get().then(async function(snapshotsnew) {
+                    await vendor.get().then(async function (snapshotsnew) {
                         if (snapshotsnew.docs.length > 0) {
                             var vendordata = snapshotsnew.docs[0].data();
                             if (vendordata.hasOwnProperty('isSelfDelivery') && vendordata.isSelfDelivery) {
@@ -1146,7 +1190,7 @@
                             if (subscriptionModel || commissionModel) {
                                 if (vendordata.hasOwnProperty('subscriptionTotalOrders') &&
                                     vendordata.subscriptionTotalOrders != null && vendordata
-                                    .subscriptionTotalOrders != '') {
+                                        .subscriptionTotalOrders != '') {
                                     subscriptionTotalOrders = vendordata
                                         .subscriptionTotalOrders;
                                 }
@@ -1222,7 +1266,7 @@
                 }
                 jQuery("#data-table_processing").hide();
 
-                ref_review_attributes.get().then(async function(snapshots) {
+                ref_review_attributes.get().then(async function (snapshots) {
 
                     var ra_html = '';
                     snapshots.docs.forEach((listval) => {
@@ -1240,7 +1284,7 @@
             })
             async function getDeliverymanList(vendorID) {
 
-                database.collection('users').where('role', '==', 'driver').where('vendorID', '==', vendorID).where('isActive', '==', true).get().then(async function(snapshot) {
+                database.collection('users').where('role', '==', 'driver').where('vendorID', '==', vendorID).where('isActive', '==', true).get().then(async function (snapshot) {
                     if (snapshot.docs.length > 0) {
 
                         snapshot.docs.forEach((listval) => {
@@ -1282,10 +1326,10 @@
 
 
             }
-            $('#deliveryman_list').on('select2:open', function() {
+            $('#deliveryman_list').on('select2:open', function () {
 
-                setTimeout(function() {
-                    $('.select2-results__option').each(function() {
+                setTimeout(function () {
+                    $('.select2-results__option').each(function () {
                         let $this = $(this);
                         if ($this.text().includes('(Occupied)')) {
                             $this.addClass('occupied-option'); // Add custom class
@@ -1302,7 +1346,7 @@
                 }
                 return h;
             }
-            $('#order-assign-btn').click(function() {
+            $('#order-assign-btn').click(function () {
                 var deliveryman = $('#deliveryman_list').val();
                 if (deliveryman == '' || deliveryman == null) {
                     $('#select_deliveryman').html('{{ trans('lang.select_deliveryman') }}');
@@ -1311,7 +1355,7 @@
                 $('#assignDriverModal').hide();
                 $('#addPreparationTimeModal').modal('show');
             });
-            $('#add-prepare-time-btn').click(async function() {
+            $('#add-prepare-time-btn').click(async function () {
                 var preparationTime = $('#prepare_time').val();
                 if (preparationTime == '') {
                     $('#add_prepare_time_error').text('{{ trans('lang.add_prepare_time_error') }}');
@@ -1322,7 +1366,7 @@
                     var orderRequestData = [];
                     var inProgressOrderID = [];
                     var driverData = '';
-                    await database.collection('users').where('id', '==', deliveryman).get().then(async function(snapshot) {
+                    await database.collection('users').where('id', '==', deliveryman).get().then(async function (snapshot) {
                         if (snapshot.docs.length > 0) {
                             driverData = snapshot.docs[0].data();
                             fcmTokenDriver = driverData.fcmToken;
@@ -1358,13 +1402,13 @@
                 }
 
 
-                database.collection('vendor_orders').doc(id).update(updatedData).then(async function(result) {
+                database.collection('vendor_orders').doc(id).update(updatedData).then(async function (result) {
                     status = updatedData.status;
                     callWalletTransaction(status);
                 });
             });
 
-          
+
             async function callWalletTransaction(status) {
                 var orderStatus = status;
 
@@ -1385,7 +1429,7 @@
 
 
 
-                }).then(async function(result) {
+                }).then(async function (result) {
 
 
 
@@ -1411,7 +1455,7 @@
 
                         'user_id': vendorAuthor
 
-                    }).then(async function(result) {
+                    }).then(async function (result) {
 
                         var vendorAmount = basePrice;
 
@@ -1441,7 +1485,7 @@
 
                                 'note': 'Order Tax credited'
 
-                            }).then(async function(result) {})
+                            }).then(async function (result) { })
 
                         }
 
@@ -1449,7 +1493,7 @@
 
                         database.collection('users').where('id', '==', vendorAuthor)
 
-                            .get().then(async function(snapshotsnew) {
+                            .get().then(async function (snapshotsnew) {
 
                                 var vendordata = snapshotsnew.docs[0].data();
 
@@ -1487,15 +1531,15 @@
 
                                         vendorAuthor).update({
 
-                                        'wallet_amount': parseFloat(
+                                            'wallet_amount': parseFloat(
 
-                                            newVendorWallet)
+                                                newVendorWallet)
 
-                                    }).then(async function(result) {
+                                        }).then(async function (result) {
 
-                                        callAjax(orderStatus);
+                                            callAjax(orderStatus);
 
-                                    })
+                                        })
 
                                 } else {
 
@@ -1554,7 +1598,7 @@
                         'subject': subject,
                         'message': message
                     },
-                    success: function(data) {
+                    success: function (data) {
 
                         window.location.href = '{{ route('orders') }}';
 
@@ -1563,7 +1607,7 @@
                 });
             }
 
-            $(".save_order_btn").click(async function() {
+            $(".save_order_btn").click(async function () {
 
                 var courierCompanyName = $("#courierCompanyName").val();
                 var courierTrackingId = $("#courierTrackingId").val();
@@ -1585,7 +1629,7 @@
                             alert('{{ trans('lang.can_not_accept_more_orders_for_store') }}');
                             return false;
                         }
-                        ref.get().then(async function(snapshot) {
+                        ref.get().then(async function (snapshot) {
                             order = snapshot.docs[0].data();
                             id = order.id;
                             var scheduleTime = '';
@@ -1648,7 +1692,7 @@
                             'status': orderStatus,
                             'courierCompanyName': courierCompanyName,
                             'courierTrackingId': courierTrackingId
-                        }).then(async function(result) {
+                        }).then(async function (result) {
 
                             var subject = '';
                             var message = '';
@@ -1683,7 +1727,7 @@
                                     driverAmount = parseFloat(deliveryChargeVal) + parseFloat(tip_amount);
                                     if (driverId && driverAmount) {
                                         var driver = database.collection('users').where("id", "==", driverId);
-                                        await driver.get().then(async function(snapshotsdriver) {
+                                        await driver.get().then(async function (snapshotsdriver) {
                                             var driverdata = snapshotsdriver.docs[0].data();
                                             if (driverdata) {
                                                 if (isNaN(driverdata.wallet_amount) || driverdata.wallet_amount == undefined) {
@@ -1708,7 +1752,7 @@
                                                 if (!isNaN(driverWallet)) {
                                                     await database.collection('users').doc(driverdata.id).update({
                                                         'wallet_amount': parseFloat(driverWallet)
-                                                    }).then(async function(result) {});
+                                                    }).then(async function (result) { });
                                                 }
 
                                             }
@@ -1717,10 +1761,10 @@
 
                                     await database.collection('vendor_orders').doc(id).update({
                                         'payment_shared': true
-                                    }).then(async function(result) {});
+                                    }).then(async function (result) { });
 
                                     if (service_type == "ecommerce-service" && add_reff_amount == true) {
-                                        database.collection('users').doc(referralBy).get().then(async function(snapshots) {
+                                        database.collection('users').doc(referralBy).get().then(async function (snapshots) {
                                             var refUserInfo = snapshots.data();
                                             if (refUserInfo != undefined) {
                                                 if (refUserInfo.hasOwnProperty('wallet_amount')) {
@@ -1764,7 +1808,7 @@
                                         'subject': subject,
                                         'message': message
                                     },
-                                    success: function(data) {
+                                    success: function (data) {
 
                                         if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderPaymentMethod != 'Naqt pul' && orderTakeAwayOption == false) {
                                             if (orderStatus == 'Order Rejected' || orderStatus == 'Driver Rejected') {
@@ -1778,8 +1822,8 @@
                                                     'payment_status': 'success',
                                                     'user_id': orderCustomerId,
                                                     'payment_method': 'Cancelled Order Payment'
-                                                }).then(function(result) {
-                                                    database.collection('users').where("id", "==", orderCustomerId).get().then(async function(userSnapshots) {
+                                                }).then(function (result) {
+                                                    database.collection('users').where("id", "==", orderCustomerId).get().then(async function (userSnapshots) {
                                                         if (userSnapshots.docs.length > 0) {
 
                                                             data = userSnapshots.docs[0].data();
@@ -1790,7 +1834,7 @@
                                                             var newWalletAmount = wallet_amount + parseFloat(orderPaytableAmount);
                                                             database.collection('users').doc(orderCustomerId).update({
                                                                 'wallet_amount': parseFloat(newWalletAmount)
-                                                            }).then(function(result) {
+                                                            }).then(function (result) {
                                                                 <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
                                                                 window.location.href = "{{ route('vendors.orders', $_GET['eid']) }}";
                                                                 <?php } else { ?>
@@ -1840,7 +1884,7 @@
                                         'subject': subject,
                                         'message': message,
                                     },
-                                    success: function(data) {
+                                    success: function (data) {
 
                                         if (orderPreviousStatus != 'Order Rejected' && orderPreviousStatus != 'Driver Rejected' && orderPaymentMethod != 'cod' && orderPaymentMethod != 'Naqt pul' && orderTakeAwayOption == false) {
 
@@ -1856,8 +1900,8 @@
                                                     'payment_status': 'success',
                                                     'user_id': orderCustomerId,
                                                     'payment_method': 'Cancelled Order Payment'
-                                                }).then(function(result) {
-                                                    database.collection('users').where("id", "==", orderCustomerId).get().then(async function(userSnapshots) {
+                                                }).then(function (result) {
+                                                    database.collection('users').where("id", "==", orderCustomerId).get().then(async function (userSnapshots) {
                                                         if (userSnapshots.docs.length > 0) {
 
                                                             data = userSnapshots.docs[0].data();
@@ -1868,7 +1912,7 @@
                                                             var newWalletAmount = wallet_amount + parseFloat(orderPaytableAmount);
                                                             database.collection('users').doc(orderCustomerId).update({
                                                                 'wallet_amount': parseFloat(newWalletAmount)
-                                                            }).then(function(result) {
+                                                            }).then(function (result) {
                                                                 <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
                                                                 window.location.href = "{{ route('vendors.orders', $_GET['eid']) }}";
                                                                 <?php } else { ?>
@@ -1968,7 +2012,7 @@
                 if (val.variant_info) {
                     html = html + '<div class="variant-info">';
                     html = html + '<ul>';
-                    $.each(val.variant_info.variant_options, function(label, value) {
+                    $.each(val.variant_info.variant_options, function (label, value) {
                         html = html + '<li class="variant"><span class="label">' + label + '</span><span class="value">' + value + '</span></li>';
                     });
                     html = html + '</ul>';
@@ -2014,7 +2058,7 @@
                 html = html + '<td class="d-btn" data-pid="' + product.id + '" style="display:none;"></td>';
                 html = html + '<td class="text-green text-center"><span class="item-price">' + price_val +
                     '</span><br><span class="base-price-' + product_id + ' text-muted"></span></td><td> × ' + val
-                    .quantity + '</td><td class="text-green"> + ' + extras_price_val +
+                        .quantity + '</td><td class="text-green"> + ' + extras_price_val +
                     '</td><td class="text-green">  ' + totalProductPrice_val + '</td>';
                 html = html + '</tr>';
                 total_price += parseFloat(totalProductPrice);
@@ -2026,11 +2070,11 @@
         }
 
         function getProductInfo(product) {
-            database.collection('vendor_products').doc(product.id).get().then(async function(snapshots) {
+            database.collection('vendor_products').doc(product.id).get().then(async function (snapshots) {
                 if (snapshots.exists) {
                     var productData = snapshots.data();
                     if (product.variant_info && product.variant_info.variant_id) {
-                        var variant_info = $.map(productData.item_attribute.variants, function(v, i) {
+                        var variant_info = $.map(productData.item_attribute.variants, function (v, i) {
                             if (v.variant_sku == product.variant_info.variant_sku) {
                                 return v;
                             }
@@ -2058,7 +2102,7 @@
         }
 
         function checkIsDownloadedItem(productId) {
-            database.collection('vendor_products').doc(productId).get().then(async function(snapshots) {
+            database.collection('vendor_products').doc(productId).get().then(async function (snapshots) {
                 var productInfo = snapshots.data();
                 if (productInfo != undefined) {
                     if (productInfo.hasOwnProperty('isDigitalProduct') && productInfo.hasOwnProperty('digitalProduct') && productInfo.isDigitalProduct == true && productInfo.digitalProduct) {
@@ -2241,6 +2285,8 @@
             }
             html += '<tr><td class="seprater" colspan="2"><hr></td></tr>';
 
+            totalAmount = roundToNearestThousand(totalAmount);
+
             orderPaytableAmount = totalAmount;
 
 
@@ -2302,7 +2348,7 @@
         }
 
         var refReviewAttributes = database.collection('review_attributes');
-        refReviewAttributes.get().then(async function(snapshots) {
+        refReviewAttributes.get().then(async function (snapshots) {
             if (snapshots != undefined) {
                 snapshots.forEach((doc) => {
                     var data = doc.data();
@@ -2313,7 +2359,7 @@
 
         function getUserReview(vendorOrder, reviewAttr) {
             var refUserReview = database.collection('items_review').where('orderid', "==", vendorOrder.id);
-            refUserReview.limit(page_size).get().then(async function(userreviewsnapshot) {
+            refUserReview.limit(page_size).get().then(async function (userreviewsnapshot) {
                 var reviewHTML = '';
                 reviewHTML = buildRatingsAndReviewsHTML(vendorOrder, userreviewsnapshot);
                 if (userreviewsnapshot.docs.length > 0) {
@@ -2364,7 +2410,7 @@
                         var photos = '';
                         if (val.photos.length > 0) {
                             photos += '<div class="photos"><ul>';
-                            $.each(val.photos, function(key, img) {
+                            $.each(val.photos, function (key, img) {
                                 photos += '<li><img src="' + img + '" onerror="this.onerror=null;this.src=\'' + place_image + '\'" width="100"></li>';
                             });
                             photos += '</ul></div>';
@@ -2375,7 +2421,7 @@
                             var label_feature = "{{ trans('lang.byfeature') }}";
                             reviewhtml += '<h3 class="mb-2">' + label_feature + '</h3>';
                             reviewhtml += '<div class="media-body">';
-                            $.each(val.reviewAttributes, function(aid, data) {
+                            $.each(val.reviewAttributes, function (aid, data) {
                                 var at_id = aid;
                                 var at_title = reviewAttributes[aid];
                                 var at_value = data;
@@ -2434,10 +2480,10 @@
             window.print();
 
         }
-        $('#addDeliverymanModal').on('shown.bs.modal', function() {
+        $('#addDeliverymanModal').on('shown.bs.modal', function () {
             $('#assignDriverModal').hide();
         })
-        $('#add-deliveryman-btn').on('click', function() {
+        $('#add-deliveryman-btn').on('click', function () {
 
             var userFirstName = $(".user_first_name").val();
             var userLastName = $(".user_last_name").val();
@@ -2460,7 +2506,7 @@
             } else {
                 var id = database.collection('tmp').doc().id;
                 firebase.auth().createUserWithEmailAndPassword(email, password)
-                    .then(async function(firebaseUser) {
+                    .then(async function (firebaseUser) {
                         user_id = firebaseUser.user.uid;
                         database.collection('users').doc(user_id).set({
                             'firstName': userFirstName,
@@ -2479,7 +2525,7 @@
                             'zoneId': zoneId,
                             'isActive': true,
 
-                        }).then(function(result) {
+                        }).then(function (result) {
                             window.location.reload();
                         });
                     }).catch(err => {
@@ -2494,7 +2540,7 @@
 
         async function getRefund() {
             $('#data-table_processing').show();
-            ref.get().then(async function(snapshot) {
+            ref.get().then(async function (snapshot) {
 
                 orderData = snapshot.docs[0].data();
                 try {
@@ -2600,19 +2646,19 @@
                         }
                     }
                     if (orderData.hasOwnProperty('driverID') && orderData.driverID != null && orderData.driverID != '') {
-                        await database.collection('users').doc(orderData.driverID).get().then(async function(snapshot) {
+                        await database.collection('users').doc(orderData.driverID).get().then(async function (snapshot) {
                             let newOrderRequestData = [];
                             let inProgressOrderID = [];
                             if (snapshot.exists) {
                                 var driverData = snapshot.data();
                                 driverFcm = driverData.fcmToken;
                                 if (driverData.orderRequestData !== undefined) {
-                                    newOrderRequestData = driverData.orderRequestData.filter(function(oid) {
+                                    newOrderRequestData = driverData.orderRequestData.filter(function (oid) {
                                         return oid !== id;
                                     });
                                 }
                                 if (driverData.inProgressOrderID !== undefined) {
-                                    inProgressOrderID = driverData.inProgressOrderID.filter(function(oid) {
+                                    inProgressOrderID = driverData.inProgressOrderID.filter(function (oid) {
                                         return oid !== id;
                                     });
                                 }
@@ -2645,7 +2691,7 @@
                             'subject': selfDeliveryCustomerCancelledSub,
                             'message': selfDeliveryCustomerCancelledMsg
                         },
-                        success: function(data) {
+                        success: function (data) {
 
                         }
                     });
@@ -2660,7 +2706,7 @@
                             'subject': selfDeliveryDriverCancelledSub,
                             'message': selfDeliveryDriverCancelledMsg
                         },
-                        success: function(data) {
+                        success: function (data) {
 
                         }
                     });

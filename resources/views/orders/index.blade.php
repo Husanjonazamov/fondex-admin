@@ -63,22 +63,30 @@
                         <div class="menu-tab">
                             <ul>
                                 <li>
-                                    <a href="{{ route('drivers.view', $_GET['driverId']) }}"><i class="ri-list-indefinite"></i>{{ trans('lang.tab_basic') }}</a>
+                                    <a href="{{ route('drivers.view', $_GET['driverId']) }}"><i
+                                            class="ri-list-indefinite"></i>{{ trans('lang.tab_basic') }}</a>
                                 </li>
                                 <li class="vehicle_tab" style="display:none">
-                                    <a href="{{ route('drivers.vehicle', $_GET['driverId']) }}"><i class="ri-car-line"></i>{{ trans('lang.vehicle') }}</a>
+                                    <a href="{{ route('drivers.vehicle', $_GET['driverId']) }}"><i
+                                            class="ri-car-line"></i>{{ trans('lang.vehicle') }}</a>
                                 </li>
                                 <li class="active">
-                                    <a href="{{ route('orders', 'driverId=' . $_GET['driverId']) }}"><i class="ri-shopping-bag-line"></i> {{ trans('lang.order_plural') }}</a>
+                                    <a href="{{ route('orders', 'driverId=' . $_GET['driverId']) }}"><i
+                                            class="ri-shopping-bag-line"></i> {{ trans('lang.order_plural') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('driver.payouts', $_GET['driverId']) }}"><i class="ri-bank-card-line"></i>{{ trans('lang.tab_payouts') }}</a>
+                                    <a href="{{ route('driver.payouts', $_GET['driverId']) }}"><i
+                                            class="ri-bank-card-line"></i>{{ trans('lang.tab_payouts') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('payoutRequests.drivers.view', $_GET['driverId']) }}" class="vendor_payout"><i class="ri-refund-line"></i>{{ trans('lang.tab_payout_request') }}</a>
+                                    <a href="{{ route('payoutRequests.drivers.view', $_GET['driverId']) }}"
+                                        class="vendor_payout"><i
+                                            class="ri-refund-line"></i>{{ trans('lang.tab_payout_request') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('users.walletstransaction', $_GET['driverId']) }}" class="wallet_transaction"><i class="ri-wallet-line"></i>{{ trans('lang.wallet_transaction') }}</a>
+                                    <a href="{{ route('users.walletstransaction', $_GET['driverId']) }}"
+                                        class="wallet_transaction"><i
+                                            class="ri-wallet-line"></i>{{ trans('lang.wallet_transaction') }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -86,12 +94,15 @@
                         <?php if (isset($_GET['userId'])) { ?>
                         <div class="menu-tab">
                             <ul>
-                                <li><a href="{{ route('users.view', $_GET['userId']) }}"><i class="ri-list-indefinite"></i>{{ trans('lang.tab_basic') }}</a>
+                                <li><a href="{{ route('users.view', $_GET['userId']) }}"><i
+                                            class="ri-list-indefinite"></i>{{ trans('lang.tab_basic') }}</a>
                                 </li>
-                                <li class="active"><a href="{{ route('orders', 'userId=' . $_GET['userId']) }}"><i class="ri-shopping-bag-line"></i>{{ trans('lang.tab_orders') }}</a>
+                                <li class="active"><a href="{{ route('orders', 'userId=' . $_GET['userId']) }}"><i
+                                            class="ri-shopping-bag-line"></i>{{ trans('lang.tab_orders') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('users.walletstransaction', $_GET['userId']) }}"><i class="ri-wallet-line"></i>{{ trans('lang.wallet_transaction') }}</a>
+                                    <a href="{{ route('users.walletstransaction', $_GET['userId']) }}"><i
+                                            class="ri-wallet-line"></i>{{ trans('lang.wallet_transaction') }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -99,44 +110,56 @@
                         <div class="menu-tab vendorMenuTab d-none">
                             <ul>
                                 <li>
-                                    <a href="{{ route('stores.view', $id) }}"><i class="ri-list-indefinite"></i>{{ trans('lang.tab_basic') }}</a>
+                                    <a href="{{ route('stores.view', $id) }}"><i
+                                            class="ri-list-indefinite"></i>{{ trans('lang.tab_basic') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('vendors.items', $id) }}"><i class="ri-shopping-basket-fill"></i>{{ trans('lang.tab_items') }}</a>
+                                    <a href="{{ route('vendors.items', $id) }}"><i
+                                            class="ri-shopping-basket-fill"></i>{{ trans('lang.tab_items') }}</a>
                                 </li>
                                 <li class="active">
-                                    <a href="{{ route('vendors.orders', $id) }}"><i class="ri-shopping-bag-line"></i> {{ trans('lang.tab_orders') }}</a>
+                                    <a href="{{ route('vendors.orders', $id) }}"><i class="ri-shopping-bag-line"></i>
+                                        {{ trans('lang.tab_orders') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('vendors.reviews', $id) }}"><i class="ri-shield-star-fill"></i>{{ trans('lang.tab_reviews') }}</a>
+                                    <a href="{{ route('vendors.reviews', $id) }}"><i
+                                            class="ri-shield-star-fill"></i>{{ trans('lang.tab_reviews') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('vendors.coupons', $id) }}"><i class="ri-discount-percent-fill"></i>{{ trans('lang.tab_promos') }}</a>
+                                    <a href="{{ route('vendors.coupons', $id) }}"><i
+                                            class="ri-discount-percent-fill"></i>{{ trans('lang.tab_promos') }}</a>
                                 <li>
-                                    <a href="{{ route('vendors.payout', $id) }}"><i class="ri-bank-card-line"></i>{{ trans('lang.tab_payouts') }}</a>
+                                    <a href="{{ route('vendors.payout', $id) }}"><i
+                                            class="ri-bank-card-line"></i>{{ trans('lang.tab_payouts') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('payoutRequests.vendor.view', $id) }}"><i class="ri-refund-line"></i>{{ trans('lang.tab_payout_request') }}</a>
+                                    <a href="{{ route('payoutRequests.vendor.view', $id) }}"><i
+                                            class="ri-refund-line"></i>{{ trans('lang.tab_payout_request') }}</a>
                                 </li>
                                 <li>
-                                    <a class="wallet_transaction_vendor"><i class="ri-wallet-line"></i>{{ trans('lang.wallet_transaction') }}</a>
+                                    <a class="wallet_transaction_vendor"><i
+                                            class="ri-wallet-line"></i>{{ trans('lang.wallet_transaction') }}</a>
                                 </li>
                                 <li class="dine_in_future" style="display:none;">
-                                    <a href="{{ route('vendors.booktable', $id) }}"><i class="ri-restaurant-line"></i>{{ trans('lang.dine_in_booking_history') }}</a>
+                                    <a href="{{ route('vendors.booktable', $id) }}"><i
+                                            class="ri-restaurant-line"></i>{{ trans('lang.dine_in_booking_history') }}</a>
                                 </li>
                                 <?php
-                                $subscription = route('subscription.subscriptionPlanHistory', ':id');
-                                $subscription = str_replace(':id', 'storeID=' . $id, $subscription);
-                                ?>
+    $subscription = route('subscription.subscriptionPlanHistory', ':id');
+    $subscription = str_replace(':id', 'storeID=' . $id, $subscription);
+                                    ?>
                                 <li>
-                                    <a href="{{ $subscription }}"><i class="ri-chat-history-fill"></i>{{ trans('lang.subscription_history') }}</a>
+                                    <a href="{{ $subscription }}"><i
+                                            class="ri-chat-history-fill"></i>{{ trans('lang.subscription_history') }}</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('restaurants.advertisements', $id) }}"><i class="mdi mdi-newspaper"></i>{{ trans('lang.advertisement_plural') }}</a>
+                                    <a href="{{ route('restaurants.advertisements', $id) }}"><i
+                                            class="mdi mdi-newspaper"></i>{{ trans('lang.advertisement_plural') }}</a>
                                 </li>
                                 @if($service_type != 'ecommerce-service')
                                     <li class="">
-                                        <a href="{{ route('restaurants.deliveryman', $id) }}"><i class="ri-riding-fill"></i>{{ trans('lang.deliveryman') }}</a>
+                                        <a href="{{ route('restaurants.deliveryman', $id) }}"><i
+                                                class="ri-riding-fill"></i>{{ trans('lang.deliveryman') }}</a>
                                     </li>
                                 @endif
                             </ul>
@@ -148,45 +171,61 @@
                                         <div class="row">
                                             <div class="col-md-3">
                                                 <div class="card card-box-with-icon bg--1">
-                                                    <div class="card-body d-flex justify-content-between align-items-center">
+                                                    <div
+                                                        class="card-body d-flex justify-content-between align-items-center">
                                                         <div class="card-box-with-content">
-                                                            <h4 class="text-dark-2 mb-1 h4 order_count" id="order_count"></h4>
-                                                            <p class="mb-0 small text-dark-2">{{ trans('lang.dashboard_total_orders') }}</p>
+                                                            <h4 class="text-dark-2 mb-1 h4 order_count" id="order_count">
+                                                            </h4>
+                                                            <p class="mb-0 small text-dark-2">
+                                                                {{ trans('lang.dashboard_total_orders') }}</p>
                                                         </div>
-                                                        <span class="box-icon ab"><img src="{{ asset('images/total_orders.png') }}"></span>
+                                                        <span class="box-icon ab"><img
+                                                                src="{{ asset('images/total_orders.png') }}"></span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="card card-box-with-icon bg--5">
-                                                    <div class="card-body d-flex justify-content-between align-items-center">
+                                                    <div
+                                                        class="card-body d-flex justify-content-between align-items-center">
                                                         <div class="card-box-with-content">
-                                                            <h4 class="text-dark-2 mb-1 h4 placed_count" id="placed_count"></h4>
-                                                            <p class="mb-0 small text-dark-2">{{ trans('lang.dashboard_order_placed') }}</p>
+                                                            <h4 class="text-dark-2 mb-1 h4 placed_count" id="placed_count">
+                                                            </h4>
+                                                            <p class="mb-0 small text-dark-2">
+                                                                {{ trans('lang.dashboard_order_placed') }}</p>
                                                         </div>
-                                                        <span class="box-icon ab"><img src="{{ asset('images/order_placed.png') }}"></span>
+                                                        <span class="box-icon ab"><img
+                                                                src="{{ asset('images/order_placed.png') }}"></span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="card card-box-with-icon bg--6">
-                                                    <div class="card-body d-flex justify-content-between align-items-center">
+                                                    <div
+                                                        class="card-body d-flex justify-content-between align-items-center">
                                                         <div class="card-box-with-content">
-                                                            <h4 class="text-dark-2 mb-1 h4 accepted_count" id="accepted_count"></h4>
-                                                            <p class="mb-0 small text-dark-2">{{ trans('lang.dashboard_order_accepted') }}</p>
+                                                            <h4 class="text-dark-2 mb-1 h4 accepted_count"
+                                                                id="accepted_count"></h4>
+                                                            <p class="mb-0 small text-dark-2">
+                                                                {{ trans('lang.dashboard_order_accepted') }}</p>
                                                         </div>
-                                                        <span class="box-icon ab"><img src="{{ asset('images/order_accepted.png') }}"></span>
+                                                        <span class="box-icon ab"><img
+                                                                src="{{ asset('images/order_accepted.png') }}"></span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="card card-box-with-icon bg--8">
-                                                    <div class="card-body d-flex justify-content-between align-items-center">
+                                                    <div
+                                                        class="card-body d-flex justify-content-between align-items-center">
                                                         <div class="card-box-with-content">
-                                                            <h4 class="text-dark-2 mb-1 h4 order_completed" id="order_completed"></h4>
-                                                            <p class="mb-0 small text-dark-2">{{ trans('lang.dashboard_order_completed') }}</p>
+                                                            <h4 class="text-dark-2 mb-1 h4 order_completed"
+                                                                id="order_completed"></h4>
+                                                            <p class="mb-0 small text-dark-2">
+                                                                {{ trans('lang.dashboard_order_completed') }}</p>
                                                         </div>
-                                                        <span class="box-icon ab"><img src="{{ asset('images/order_completed.png') }}"></span>
+                                                        <span class="box-icon ab"><img
+                                                                src="{{ asset('images/order_completed.png') }}"></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -208,19 +247,25 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive m-t-10">
-                                    <table id="orderTable" class="display nowrap table table-hover table-striped table-bordered table table-striped" cellspacing="0" width="100%">
+                                    <table id="orderTable"
+                                        class="display nowrap table table-hover table-striped table-bordered table table-striped"
+                                        cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
                                                 <?php if (in_array('orders.delete', json_decode(@session('user_permissions'), true))) { ?>
-                                                <th class="delete-all"><input type="checkbox" id="is_active"><label class="col-3 control-label" for="is_active"><a id="deleteAll" class="do_not_delete" href="javascript:void(0)"><i class="mdi mdi-delete"></i> {{ trans('lang.all') }}</a></label></th>
+                                                <th class="delete-all"><input type="checkbox" id="is_active"><label
+                                                        class="col-3 control-label" for="is_active"><a id="deleteAll"
+                                                            class="do_not_delete" href="javascript:void(0)"><i
+                                                                class="mdi mdi-delete"></i>
+                                                            {{ trans('lang.all') }}</a></label></th>
                                                 <?php } ?>
                                                 <th>{{ trans('lang.order_id') }}</th>
-                                                
+
                                                 @if($id == '')
                                                     <th>{{ trans('lang.vendor') }}</th>
                                                 @endif
-                                                
-                                                @if($service_type == 'ecommerce-service')        
+
+                                                @if($service_type == 'ecommerce-service')
                                                     @if (isset($_GET['userId']))
                                                     @elseif (isset($_GET['driverId']))
                                                         <th>{{ trans('lang.order_user_id') }}</th>
@@ -237,7 +282,7 @@
                                                         <th>{{ trans('lang.order_user_id') }}</th>
                                                     @endif
                                                 @endif
-                                                
+
                                                 <th>{{ trans('lang.date') }}</th>
                                                 <th>{{ trans('lang.vendors_payout_amount') }}</th>
                                                 <th>{{ trans('lang.order_type') }}</th>
@@ -263,7 +308,7 @@
     <script type="text/javascript">
 
         var section_id = getCookie('section_id') || null;
-        var service_type = getCookie('service_type') || null;    
+        var service_type = getCookie('service_type') || null;
         console.log(section_id);
         var user_permissions = '<?php echo @session('user_permissions'); ?>';
         user_permissions = JSON.parse(user_permissions);
@@ -285,7 +330,7 @@
         var ref_sections = database.collection('sections');
         var decimal_degits = 0;
 
-        refCurrency.get().then(async function(snapshots) {
+        refCurrency.get().then(async function (snapshots) {
             var currencyData = snapshots.docs[0].data();
             currentCurrency = currencyData.symbol;
             currencyAtRight = currencyData.symbolAtRight;
@@ -293,7 +338,18 @@
                 decimal_degits = currencyData.decimal_degits;
             }
         });
-        
+
+        function roundToNearestThousand(amount) {
+            let num = parseFloat(amount);
+            if (isNaN(num)) return amount;
+            let remainder = num % 1000;
+            if (remainder >= 500) {
+                return Math.ceil(num / 1000) * 1000;
+            } else {
+                return Math.floor(num / 1000) * 1000;
+            }
+        }
+
         var user_permissions = '<?php echo @session('user_permissions'); ?>';
         user_permissions = JSON.parse(user_permissions);
         var checkPrintPermission = false;
@@ -303,21 +359,21 @@
 
         var order_status = jQuery('#order_status').val();
         var search = jQuery("#search").val();
-        
+
         var vendorID = "{{ $id }}";
         var userID = "{{ request()->get('userId', '') }}";
         var driverID = "{{ request()->get('driverId', '') }}";
-        
+
         var ref = '';
-        $(document.body).on('change', '#order_status', function() {
+        $(document.body).on('change', '#order_status', function () {
             order_status = jQuery(this).val();
         });
-        $(document.body).on('keyup', '#search', function() {
+        $(document.body).on('keyup', '#search', function () {
             search = jQuery(this).val();
         });
 
         if (userID) {
-            
+
             const getUserName = getUserNameFunction(userID);
             ref = refData.orderBy('createdAt', 'desc').where('authorID', '==', userID);
 
@@ -326,10 +382,10 @@
             const getUserName = getUserNameFunction(driverID);
             var wallet_route = "{{ route('users.walletstransaction', 'id') }}";
             $(".wallet_transaction").attr("href", wallet_route.replace('id', 'driverID=' + driverID));
-            
-            if(service_type !== 'delivery-service' && service_type !== 'parcel_delivery'){
+
+            if (service_type !== 'delivery-service' && service_type !== 'parcel_delivery') {
                 $('.vehicle_tab').show();
-            }else{
+            } else {
                 $('.vehicle_tab').hide();
             }
 
@@ -339,11 +395,11 @@
 
             $('.vendorMenuTab').removeClass('d-none');
             const getStoreName = getStoreNameFunction(vendorID);
-            
+
             ref = refData.orderBy('createdAt', 'desc').where('vendorID', '==', vendorID);
 
         } else {
-            
+
             ref = refData.orderBy('createdAt', 'desc');
         }
 
@@ -363,9 +419,9 @@
             minimumResultsForSearch: Infinity,
             allowClear: true
         });
-        $('.filteredRecords').on("select2:unselecting", function(e) {
+        $('.filteredRecords').on("select2:unselecting", function (e) {
             var self = $(this);
-            setTimeout(function() {
+            setTimeout(function () {
                 self.select2('close');
             }, 0);
         });
@@ -374,31 +430,31 @@
             $('#daterange span').html('{{ trans('lang.select_range') }}');
             $('#daterange').daterangepicker({
                 autoUpdateInput: false,
-            }, function(start, end) {
+            }, function (start, end) {
                 $('#daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
                 $('.filteredRecords').trigger('change');
             });
-            $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+            $('#daterange').on('apply.daterangepicker', function (ev, picker) {
                 $('#daterange span').html(picker.startDate.format('MMMM D, YYYY') + ' - ' + picker.endDate.format('MMMM D, YYYY'));
                 $('.filteredRecords').trigger('change');
             });
-            $('#daterange').on('cancel.daterangepicker', function(ev, picker) {
+            $('#daterange').on('cancel.daterangepicker', function (ev, picker) {
                 $('#daterange span').html('{{ trans('lang.select_range') }}');
                 $('.filteredRecords').trigger('change');
             });
         }
 
         setDate();
-        
+
         var initialRef = database.collection('vendor_orders');
-        
-        $('select').change(async function() {
+
+        $('select').change(async function () {
 
             var status = $('.status_selector').val();
             var orderType = $('.order_type_selector').val();
             var daterangepicker = $('#daterange').data('daterangepicker');
 
-            var refData = initialRef;  
+            var refData = initialRef;
             if (status) {
                 refData = refData.where('status', '==', status);
             }
@@ -433,7 +489,7 @@
             $('[data-toggle="tooltip"]').tooltip();
         });
 
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             ref.get().then((snapshot) => {
                 jQuery("#order_count").empty();
@@ -445,25 +501,25 @@
                 jQuery("#placed_count").empty();
                 jQuery("#placed_count").text(snapshot.docs.length);
             });
-            
+
             var refAcceptedOrder = ref.where('status', 'in', ["Order Accepted"]);
             refAcceptedOrder.get().then((snapshot) => {
                 jQuery("#accepted_count").empty();
                 jQuery("#accepted_count").text(snapshot.docs.length);
             });
-            
+
             var refCompletedOrder = ref.where('status', 'in', ["Order Completed"]);
             refCompletedOrder.get().then((snapshot) => {
                 jQuery("#order_completed").empty();
                 jQuery("#order_completed").text(snapshot.docs.length);
             });
 
-            $(document.body).on('click', '.redirecttopage', function() {
+            $(document.body).on('click', '.redirecttopage', function () {
                 var url = $(this).attr('data-url');
                 window.location.href = url;
             });
-          
-            $(document.body).on('change', '#selected_search', function() {
+
+            $(document.body).on('change', '#selected_search', function () {
                 if (jQuery(this).val() == 'status') {
                     jQuery('#order_status').show();
                 } else {
@@ -475,23 +531,23 @@
 
             append_list = document.getElementById('append_list1');
             append_list.innerHTML = '';
-            
-            ref.get().then(async function(snapshots) {
+
+            ref.get().then(async function (snapshots) {
 
                 jQuery("#data-table_processing").hide();
-                
-                $(document).on('click', '.dt-button-collection .dt-button', function() {
+
+                $(document).on('click', '.dt-button-collection .dt-button', function () {
                     $('.dt-button-collection').hide();
                     $('.dt-button-background').hide();
                 });
-                
-                $(document).on('click', function(event) {
+
+                $(document).on('click', function (event) {
                     if (!$(event.target).closest('.dt-button-collection, .dt-buttons').length) {
                         $('.dt-button-collection').hide();
                         $('.dt-button-background').hide();
                     }
                 });
-                
+
                 var columns = [];
                 if (vendorID != '') {
                     columns = [
@@ -649,7 +705,7 @@
                         else dateIndex = 4;
                     }
                 }
-                
+
                 var nonOrderableTargets = [];
                 if (service_type === "ecommerce-service") {
                     if (vendorID !== "") {
@@ -674,8 +730,8 @@
                     processing: false, // Show processing indicator
                     serverSide: true, // Enable server-side processing
                     responsive: true,
-                    ajax: function(data, callback, settings) {
-                        
+                    ajax: function (data, callback, settings) {
+
                         const start = data.start;
                         const length = data.length;
                         const searchValue = data.search.value.toLowerCase();
@@ -683,34 +739,34 @@
                         const orderDirection = data.order[0].dir;
 
                         var orderableColumns = [];
-                        if(service_type == "ecommerce-service"){
+                        if (service_type == "ecommerce-service") {
                             if (vendorID != '') {
-                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'clientName', 'createdAt', 'amount', 'orderType', 'status', '']; 
+                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''];
                             } else if (driverID) {
-                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName',  'clientName', 'createdAt', 'amount', 'orderType', 'status', '']; 
+                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''];
                             } else if (userID) {
                                 orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName', 'createdAt', 'amount', 'orderType', 'status', ''];
                             } else {
                                 orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''];
                             }
-                        }else{
+                        } else {
                             if (vendorID != '') {
-                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'driverName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'driverName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', '']; 
+                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'driverName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'driverName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''];
                             } else if (driverID) {
-                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName',  'clientName', 'createdAt', 'amount', 'orderType', 'status', '']; 
+                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''];
                             } else if (userID) {
                                 orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName', 'driverName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName', 'driverName', 'createdAt', 'amount', 'orderType', 'status', ''];
                             } else {
-                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName',  'driverName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName', 'driverName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''];
+                                orderableColumns = (checkDeletePermission) ? ['', 'id', 'storeName', 'driverName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''] : ['id', 'storeName', 'driverName', 'clientName', 'createdAt', 'amount', 'orderType', 'status', ''];
                             }
                         }
-                        
-                        const orderByField = orderableColumns[orderColumnIndex]; 
+
+                        const orderByField = orderableColumns[orderColumnIndex];
                         if (searchValue.length >= 3 || searchValue.length === 0) {
                             $('#data-table_processing').show();
                         }
 
-                        ref.get().then(async function(querySnapshot) {
+                        ref.get().then(async function (querySnapshot) {
 
                             if (querySnapshot.empty) {
                                 $('.total_count').text(0);
@@ -770,7 +826,7 @@
                                     if (
                                         (childData.id && childData.id.toString().includes(searchValue)) ||
                                         (childData.storeName && childData.storeName.toLowerCase().toString().includes(searchValue))/*  ||
-                                        (childData.sectionName && childData.sectionName.toString().includes(searchValue)) */ ||
+                                            (childData.sectionName && childData.sectionName.toString().includes(searchValue)) */ ||
                                         (childData.driverName && childData.driverName.toString().includes(searchValue)) ||
                                         (childData.clientName && childData.clientName.toString().includes(searchValue)) ||
                                         (createdAt && createdAt.toString().toLowerCase().indexOf(searchValue) > -1) ||
@@ -811,11 +867,11 @@
                                 var getData = await buildHTML(childData);
                                 records.push(getData);
                             }));
-                            
+
                             $(function () {
                                 $('[data-toggle="tooltip"]').tooltip();
                             });
-                            
+
                             $('#data-table_processing').hide(); // Hide loader
 
                             callback({
@@ -825,7 +881,7 @@
                                 filteredData: filteredRecords,
                                 data: records // The actual data to display in the table
                             });
-                        }).catch(function(error) {
+                        }).catch(function (error) {
                             console.error("Error fetching data from Firestore:", error);
                             $('#data-table_processing').hide(); // Hide loader
                             callback({
@@ -845,7 +901,7 @@
                         {
                             type: 'date',
                             targets: dateIndex,
-                            render: function(data) {
+                            render: function (data) {
                                 return data;
                             }
                         }
@@ -865,31 +921,31 @@
                                 {
                                     extend: 'excelHtml5',
                                     text: '{{trans("lang.export_excel")}}',
-                                    action: function(e, dt, button, config) {
+                                    action: function (e, dt, button, config) {
                                         exportData(dt, 'excel', fieldConfig);
                                     }
                                 },
                                 {
                                     extend: 'pdfHtml5',
                                     text: '{{trans("lang.export_pdf")}}',
-                                    action: function(e, dt, button, config) {
+                                    action: function (e, dt, button, config) {
                                         exportData(dt, 'pdf', fieldConfig);
                                     }
                                 },
                                 {
                                     extend: 'csvHtml5',
                                     text: '{{trans("lang.export_csv")}}',
-                                    action: function(e, dt, button, config) {
+                                    action: function (e, dt, button, config) {
                                         exportData(dt, 'csv', fieldConfig);
                                     }
                                 }
                             ]
                         }
                     ],
-                    initComplete: function() {
+                    initComplete: function () {
                         $(".dataTables_filter").append($(".dt-buttons").detach());
                         $('.dataTables_filter input').attr('placeholder', 'Search here...').attr('autocomplete', 'new-password').val('');
-                        $('.dataTables_filter label').contents().filter(function() {
+                        $('.dataTables_filter label').contents().filter(function () {
                             return this.nodeType === 3;
                         }).remove();
                     }
@@ -897,12 +953,12 @@
                 function debounce(func, wait) {
                     let timeout;
                     const context = this;
-                    return function(...args) {
+                    return function (...args) {
                         clearTimeout(timeout);
                         timeout = setTimeout(() => func.apply(context, args), wait);
                     };
                 }
-                $('#search-input').on('input', debounce(function() {
+                $('#search-input').on('input', debounce(function () {
                     const searchValue = $(this).val();
                     if (searchValue.length >= 3) {
                         $('#data-table_processing').show();
@@ -917,13 +973,13 @@
         async function buildHTML(val) {
             var html = [];
             var id = val.id;
-            
+
             var user_id = val.authorID;
             var route1 = '{{ route('orders.edit', ':id') }}';
             route1 = route1.replace(':id', id);
             var printRoute = '{{ route('vendors.orderprint', ':id') }}';
             printRoute = printRoute.replace(':id', id);
-            
+
             if (val.vendorID != '') {
                 route1 = route1 + '?eid={{ $id }}';
                 printRoute = printRoute + '?eid={{ $id }}';
@@ -937,22 +993,22 @@
                 html.push('<td class="delete-all"><input type="checkbox" id="is_open_' + id + '" class="is_open" dataId="' + id + '"><label class="col-3 control-label"\n' +
                     'for="is_open_' + id + '" ></label></td>');
             }
-            
+
             html.push('<a href="' + route1 + '" class="redirecttopage"  data-toggle="tooltip" data-bs-original-title="' + val.id + '">' + (val.id.length > 8 ? val.id.substring(0, 8) + '...' : val.id) + '</a>');
 
-            if(service_type == "ecommerce-service"){
+            if (service_type == "ecommerce-service") {
 
                 if (userID) {
 
                     if (val.hasOwnProperty('vendor') && val.vendor.title != undefined) {
                         html.push('<a  data-url="' + route_view + '" href="' + route_view + '" class="redirecttopage">' + val.storeName + '</a>');
-                    }        
-               } else if (driverID) {
-                    
+                    }
+                } else if (driverID) {
+
                     if (val.hasOwnProperty('vendor') && val.vendor.title != undefined) {
                         html.push('<a  data-url="' + route_view + '" href="' + route_view + '" class="redirecttopage">' + val.storeName + '</a>');
                     }
-                    
+
                     if (val.hasOwnProperty("author") && val.author != null) {
                         html.push('<a  data-url="' + customer_view + '" href="' + customer_view + '" class="redirecttopage">' + val.author.firstName + ' ' + val.author.lastName + '</a>');
                     } else {
@@ -960,7 +1016,7 @@
                     }
 
                 } else if (vendorID != '') {
-                    
+
                     if (val.hasOwnProperty("author") && val.author != null) {
                         var driverId = val.author.id;
                         html.push('<a  data-url="' + customer_view + '" href="' + customer_view + '" class="redirecttopage">' + val.author.firstName + ' ' + val.author.lastName + '</a>');
@@ -975,7 +1031,7 @@
                         title = val.vendor.title;
                     }
                     html.push('<a  data-url="' + route_view + '" href="' + route_view + '" class="redirecttopage">' + title + '</a>');
-                    
+
                     if (val.hasOwnProperty("author") && val.author != null) {
                         var driverId = val.author.id;
                         html.push('<a  data-url="' + customer_view + '" href="' + customer_view + '" class="redirecttopage">' + val.author.firstName + ' ' + val.author.lastName + '</a>');
@@ -984,7 +1040,7 @@
                     }
                 }
 
-            }else{
+            } else {
 
                 if (userID) {
 
@@ -993,7 +1049,7 @@
                         title = val.vendor.title;
                     }
                     html.push('<td  data-url="' + route_view + '" href="' + route_view + '" class="redirecttopage">' + title + '</td>');
-                    
+
                     if (val.hasOwnProperty("driver") && val.driver != null) {
                         var driverId = val.driver.id;
                         var diverRoute = '{{ route('drivers.view', ':id') }}';
@@ -1002,13 +1058,13 @@
                     } else {
                         html.push('');
                     }
-                    
+
                 } else if (driverID) {
-                    
+
                     if (val.hasOwnProperty('vendor') && val.vendor.title != undefined) {
                         html.push('<a  data-url="' + route_view + '" href="' + route_view + '" class="redirecttopage">' + val.storeName + '</a>');
                     }
-                    
+
                     if (val.hasOwnProperty("author") && val.author != null) {
                         html.push('<a  data-url="' + customer_view + '" href="' + customer_view + '" class="redirecttopage">' + val.author.firstName + ' ' + val.author.lastName + '</a>');
                     } else {
@@ -1040,7 +1096,7 @@
                         title = val.vendor.title;
                     }
                     html.push('<a  data-url="' + route_view + '" href="' + route_view + '" class="redirecttopage">' + title + '</a>');
-                    
+
                     if (val.hasOwnProperty("driver") && val.driver != null) {
                         var driverId = val.driver.id;
                         var diverRoute = '{{ route('drivers.view', ':id') }}';
@@ -1049,7 +1105,7 @@
                     } else {
                         html.push('');
                     }
-                    
+
                     if (val.hasOwnProperty("author") && val.author != null) {
                         var driverId = val.author.id;
                         html.push('<a  data-url="' + customer_view + '" href="' + customer_view + '" class="redirecttopage">' + val.author.firstName + ' ' + val.author.lastName + '</a>');
@@ -1108,18 +1164,18 @@
             return html;
         }
 
-        $("#is_active").click(function() {
+        $("#is_active").click(function () {
             $("#orderTable .is_open").prop('checked', $(this).prop('checked'));
         });
-        
-        $("#deleteAll").click(function() {
+
+        $("#deleteAll").click(function () {
             if ($('#orderTable .is_open:checked').length) {
                 if (confirm("{{ trans('lang.selected_delete_alert') }}")) {
                     jQuery("#data-table_processing").show();
-                    $('#orderTable .is_open:checked').each(function() {
+                    $('#orderTable .is_open:checked').each(function () {
                         var dataId = $(this).attr('dataId');
-                        database.collection('vendor_orders').doc(dataId).delete().then(function() {
-                            setTimeout(function() {
+                        database.collection('vendor_orders').doc(dataId).delete().then(function () {
+                            setTimeout(function () {
                                 window.location.reload();
                             }, 5000);
                         });
@@ -1131,7 +1187,7 @@
         });
         async function getSectionName(sectionId) {
             var sectionName = '';
-            await database.collection('sections').where("id", "==", sectionId).get().then(async function(snapshots) {
+            await database.collection('sections').where("id", "==", sectionId).get().then(async function (snapshots) {
                 if (snapshots.docs.length > 0) {
                     var data = snapshots.docs[0].data();
                     sectionName = data.name;
@@ -1141,7 +1197,7 @@
         }
         async function getStoreNameFunction(vendorId) {
             var vendorName = '';
-            await database.collection('vendors').where('id', '==', vendorId).get().then(async function(snapshots) {
+            await database.collection('vendors').where('id', '==', vendorId).get().then(async function (snapshots) {
                 var vendorData = snapshots.docs[0].data();
                 vendorName = vendorData.title;
                 $('.orderTitle').html(" - " + vendorName);
@@ -1164,17 +1220,17 @@
         }
         async function getUserNameFunction(userId) {
             var userName = '';
-            await database.collection('users').where('id', '==', userId).get().then(async function(snapshots) {
+            await database.collection('users').where('id', '==', userId).get().then(async function (snapshots) {
                 var userData = snapshots.docs[0].data();
                 userName = userData.firstName + " " + userData.lastName;
                 $('.orderTitle').html(' - ' + userName);
             });
             return userName;
         }
-        $(document).on("click", "a[name='order-delete']", function(e) {
+        $(document).on("click", "a[name='order-delete']", function (e) {
             var id = this.id;
             jQuery("#data-table_processing").show();
-            database.collection('vendor_orders').doc(id).delete().then(function(result) {
+            database.collection('vendor_orders').doc(id).delete().then(function (result) {
                 window.location.href = '{{ url()->current() }}';
             });
         });
@@ -1262,6 +1318,9 @@
                     tip_amount_val = currentCurrency + "" + tip_amount;
                 }
             }
+
+            total_price = roundToNearestThousand(total_price);
+
             if (currencyAtRight) {
                 var total_price_val = parseFloat(total_price).toFixed(decimal_degits) + "" + currentCurrency;
             } else {
