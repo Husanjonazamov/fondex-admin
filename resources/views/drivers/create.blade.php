@@ -10,7 +10,7 @@
         $newcountries[$valuecountry->phoneCode] = $valuecountry;
         $newcountriesjs[$valuecountry->phoneCode] = $valuecountry->code;
     }
-        ?>
+            ?>
     <div class="page-wrapper">
         <div class="row page-titles">
             <div class="col-md-5 align-self-center">
@@ -653,7 +653,7 @@
             var vehicle_type_id = $('.vehicle_type').find(':selected').data('id');
             var options = '<option value="">{{trans("lang.select")}} {{trans("lang.car_model")}}</option>';
             if (cab_make_name && vehicle_type_id) {
-                refCarModel.where('car_make_name', '==', cab_make_name).where('vehicle_type_id', '==', vehicle_type_id).orderBy('name', 'asc').get().then(async function (snapshots) {
+                refCarModel.where('car_make_name', '==', cab_make_name).where('vehicle_type_id', '==', vehicle_type_id).get().then(async function (snapshots) {
                     snapshots.docs.forEach((listval) => {
                         var data = listval.data();
                         options += '<option value="' + data.name + '" data-id="' + data.id + '">' + data.name + '</option>';
@@ -661,7 +661,7 @@
                     $(".car_model").html(options);
                 });
             } else if (cab_make_name) {
-                refCarModel.where('car_make_name', '==', cab_make_name).orderBy('name', 'asc').get().then(async function (snapshots) {
+                refCarModel.where('car_make_name', '==', cab_make_name).get().then(async function (snapshots) {
                     snapshots.docs.forEach((listval) => {
                         var data = listval.data();
                         options += '<option value="' + data.name + '" data-id="' + data.id + '">' + data.name + '</option>';
