@@ -10,7 +10,7 @@
         $newcountries[$valuecountry->phoneCode] = $valuecountry;
         $newcountriesjs[$valuecountry->phoneCode] = $valuecountry->code;
     }
-    ?>
+        ?>
     <div class="page-wrapper">
         <div class="row page-titles">
             <div class="col-md-5 align-self-center">
@@ -70,7 +70,8 @@
                                                 <?php    $selected = ""; ?>
                                                 <option <?php    echo $selected; ?> code="<?php    echo $valuecy->code; ?>"
                                                     value="<?php    echo $keycy; ?>">+<?php    echo $valuecy->phoneCode; ?>
-                                                    {{$valuecy->countryName}}</option>
+                                                    {{$valuecy->countryName}}
+                                                </option>
                                                 <?php } ?>
                                             </select>
                                             <input type="text" class="form-control user_phone"
@@ -374,14 +375,14 @@
 
             if (service_type == "cab-service" || service_type == "rental-service") {
 
-                refCarMake.orderBy('name', 'asc').get().then(async function (snapshots) {
+                /* refCarMake.orderBy('name', 'asc').get().then(async function (snapshots) {
                     snapshots.docs.forEach((listval) => {
                         var data = listval.data();
                         $('.car_make').append($("<option></option>")
                             .attr("value", data.name)
                             .text(data.name));
                     })
-                });
+                }); */
 
                 refVehicleType.where('sectionId', '==', section_id).orderBy('name', 'asc').get().then(async function (snapshots) {
                     snapshots.docs.forEach((listval) => {
@@ -626,16 +627,48 @@
             }
         });
 
+        $('.vehicle_type').on('change', function () {
+            var vehicle_type_id = $(this).find(':selected').data('id');
+            $('.car_make').html('<option value="">{{trans("lang.select")}} {{trans("lang.car_make")}}</option>');
+            $('.car_model').html('<option value="">{{trans("lang.select")}} {{trans("lang.car_model")}}</option>');
+
+            if (vehicle_type_id) {
+                refCarModel.where('vehicle_type_id', '==', vehicle_type_id).get().then(async function (snapshots) {
+                    var makes = [];
+                    snapshots.docs.forEach((listval) => {
+                        var data = listval.data();
+                        if (!makes.includes(data.car_make_name)) {
+                            makes.push(data.car_make_name);
+                            $('.car_make').append($("<option></option>")
+                                .attr("value", data.car_make_name)
+                                .text(data.car_make_name));
+                        }
+                    });
+                });
+            }
+        });
+
         $('.car_make').on('change', function () {
             var cab_make_name = $(this).val();
+            var vehicle_type_id = $('.vehicle_type').find(':selected').data('id');
             var options = '<option value="">{{trans("lang.select")}} {{trans("lang.car_model")}}</option>';
-            refCarModel.where('car_make_name', '==', cab_make_name).orderBy('name', 'asc').get().then(async function (snapshots) {
-                snapshots.docs.forEach((listval) => {
-                    var data = listval.data();
-                    options += '<option value="' + data.name + '" data-id="' + data.id + '">' + data.name + '</option>';
-                })
-                $(".car_model").html(options);
-            });
+            if (cab_make_name && vehicle_type_id) {
+                refCarModel.where('car_make_name', '==', cab_make_name).where('vehicle_type_id', '==', vehicle_type_id).orderBy('name', 'asc').get().then(async function (snapshots) {
+                    snapshots.docs.forEach((listval) => {
+                        var data = listval.data();
+                        options += '<option value="' + data.name + '" data-id="' + data.id + '">' + data.name + '</option>';
+                    })
+                    $(".car_model").html(options);
+                });
+            } else if (cab_make_name) {
+                refCarModel.where('car_make_name', '==', cab_make_name).orderBy('name', 'asc').get().then(async function (snapshots) {
+                    snapshots.docs.forEach((listval) => {
+                        var data = listval.data();
+                        options += '<option value="' + data.name + '" data-id="' + data.id + '">' + data.name + '</option>';
+                    })
+                    $(".car_model").html(options);
+                });
+            }
         })
 
         var storageRef = firebase.storage().ref('images');

@@ -4,91 +4,112 @@
 
 @section('content')
 
-<div class="page-wrapper">
+    <div class="page-wrapper">
 
-    <div class="row page-titles">
+        <div class="row page-titles">
 
-        <div class="col-md-5 align-self-center">
+            <div class="col-md-5 align-self-center">
 
-            <h3 class="text-themecolor">{{trans('lang.edit_car_model')}}</h3>
+                <h3 class="text-themecolor">{{trans('lang.edit_car_model')}}</h3>
 
-        </div>
-
-
-
-        <div class="col-md-7 align-self-center">
-
-            <ol class="breadcrumb">
-
-                <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">{{trans('lang.dashboard')}}</a></li>
-
-                <li class="breadcrumb-item"><a href="{!! route('carModel') !!}">{{trans('lang.car_model')}}</a>
-
-                </li>
-
-                <li class="breadcrumb-item active">{{trans('lang.edit_car_model')}}</li>
-
-            </ol>
-
-        </div>
+            </div>
 
 
 
-        <div class="card-body">
+            <div class="col-md-7 align-self-center">
 
-            <div class="error_top"></div>
+                <ol class="breadcrumb">
+
+                    <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">{{trans('lang.dashboard')}}</a></li>
+
+                    <li class="breadcrumb-item"><a href="{!! route('carModel') !!}">{{trans('lang.car_model')}}</a>
+
+                    </li>
+
+                    <li class="breadcrumb-item active">{{trans('lang.edit_car_model')}}</li>
+
+                </ol>
+
+            </div>
 
 
 
-            <div class="row vendor_payout_create">
+            <div class="card-body">
 
-                <div class="vendor_payout_create-inner">
-
-                    <fieldset>
-
-                        <legend>{{trans('lang.car_model')}}</legend>
+                <div class="error_top"></div>
 
 
 
-                        <div class="form-group row width-50">
+                <div class="row vendor_payout_create">
 
-                            <label class="col-3 control-label">{{trans('lang.car_make')}}</label>
+                    <div class="vendor_payout_create-inner">
 
-                            <div class="col-7 select2-container-full">
+                        <fieldset>
 
-                                <select name="car_make" class="form-control car_make">
+                            <legend>{{trans('lang.car_model')}}</legend>
 
-                                    <option value="">{{trans('lang.select')}}</option>
 
-                                </select>
 
-                            </div>
+                            <div class="form-group row width-50">
 
-                        </div>
+                                <label class="col-3 control-label">{{trans('lang.car_make')}}</label>
 
-                        <div class="form-group row width-50">
+                                <div class="col-7 select2-container-full">
 
-                            <label class="col-3 control-label">{{trans('lang.name')}}</label>
+                                    <select name="car_make" class="form-control car_make">
 
-                            <div class="col-7">
+                                        <option value="">{{trans('lang.select')}}</option>
 
-                                <input type="text" class="form-control title" id="title">
+                                    </select>
+
+                                </div>
 
                             </div>
 
-                        </div>
+                            <div class="form-group row width-50">
+
+                                <label class="col-3 control-label">{{trans('lang.vehicle_type')}}</label>
+
+                                <div class="col-7 select2-container-full">
+
+                                    <select name="vehicle_type" class="form-control vehicle_type">
+
+                                        <option value="">{{trans('lang.select')}}</option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <div class="form-group row width-50">
+
+                                <label class="col-3 control-label">{{trans('lang.name')}}</label>
+
+                                <div class="col-7">
+
+                                    <input type="text" class="form-control title" id="title">
+
+                                </div>
+
+                            </div>
 
 
 
-                        <div class="form-group row width-100">
+                            <div class="form-group row width-100">
 
-                            <div class="form-check">
+                                <div class="form-check">
 
-                                <input type="checkbox" class="car_model_active" id="car_model_active">
+                                    <input type="checkbox" class="car_model_active" id="car_model_active">
 
-                                <label class="col-3 control-label"
+                                    <label class="col-3 control-label"
+                                        for="car_model_active">{{trans('lang.active')}}</label>
 
-                                       for="car_model_active">{{trans('lang.active')}}</label>
+
+
+                                </div>
+
+
 
 
 
@@ -96,43 +117,37 @@
 
 
 
+                        </fieldset>
 
-
-                        </div>
-
-
-
-                    </fieldset>
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
 
 
+            <div class="form-group col-12 text-center btm-btn">
 
-        <div class="form-group col-12 text-center btm-btn">
+                <button type="button" class="btn btn-primary  edit-setting-btn"><i class="fa fa-save"></i> {{
 
-            <button type="button" class="btn btn-primary  edit-setting-btn"><i class="fa fa-save"></i> {{
+        trans('lang.save')}}
 
-                trans('lang.save')}}
+                </button>
 
-            </button>
+                <a href="{!! url('carModel') !!}" class="btn btn-default"><i class="fa fa-undo"></i>{{
 
-            <a href="{!! url('carModel') !!}" class="btn btn-default"><i class="fa fa-undo"></i>{{
+        trans('lang.cancel')}}</a>
 
-                trans('lang.cancel')}}</a>
+            </div>
+
+
 
         </div>
 
 
 
     </div>
-
-
-
-</div>
 
 
 
@@ -144,65 +159,172 @@
 
 
 
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-
-
-<script type="text/javascript">
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
 
-var database = firebase.firestore();
-
-var ref = database.collection('car_make');
-
-var id = "<?php  echo $id; ?>";
-
-var refCarModel = database.collection('car_model').where('id', '==', id);
+    <script type="text/javascript">
 
 
 
-ref.get().then(async function (snapshots) {
+        var database = firebase.firestore();
 
-    snapshots.docs.forEach((listval) => {
+        var ref = database.collection('car_make');
+        var ref_vehicle_type = database.collection('vehicle_type');
 
-        var data = listval.data();
+        var id = "<?php  echo $id; ?>";
 
-
-
-        $('.car_make').append($("<option></option>")
-
-            .attr("value", data.id)
-
-            .text(data.name));
-
-    })
-
-    $('.car_make').select2();
-
-});
+        var refCarModel = database.collection('car_model').where('id', '==', id);
 
 
 
-$(document).ready(function () {
+        ref.get().then(async function (snapshots) {
 
-    refCarModel.get().then(async function (snapshots) {
+            snapshots.docs.forEach((listval) => {
 
-        snapshots.docs.forEach((listval) => {
-
-            var data = listval.data();
+                var data = listval.data();
 
 
 
-            $('.car_make').val(data.car_make_id).trigger('change');
+                $('.car_make').append($("<option></option>")
 
-            $('.title').val(data.name);
+                    .attr("value", data.id)
 
-            if (data.isActive == true) {
+                    .text(data.name));
 
-                $(".car_model_active").prop('checked', true);
+            })
+
+            $('.car_make').select2();
+
+        });
+
+        ref_vehicle_type.get().then(async function (snapshots) {
+
+            snapshots.docs.forEach((listval) => {
+
+                var data = listval.data();
+
+
+
+                $('.vehicle_type').append($("<option></option>")
+
+                    .attr("value", data.id)
+
+                    .text(data.name));
+
+            })
+
+            $('.vehicle_type').select2();
+
+        });
+
+
+
+        $(document).ready(function () {
+
+            refCarModel.get().then(async function (snapshots) {
+
+                snapshots.docs.forEach((listval) => {
+
+                    var data = listval.data();
+
+
+
+                    $('.car_make').val(data.car_make_id).trigger('change');
+
+                    $('.vehicle_type').val(data.vehicle_type_id).trigger('change');
+
+                    $('.title').val(data.name);
+
+                    if (data.isActive == true) {
+
+                        $(".car_model_active").prop('checked', true);
+
+                    }
+
+
+
+                })
+
+            })
+
+        });
+
+
+
+        $(".edit-setting-btn").click(function () {
+
+
+
+            var title = $("#title").val();
+
+            var car_make_id = $('.car_make').val();
+
+            var car_make_name = $('.car_make option:selected').text();
+
+            var vehicle_type_id = $('.vehicle_type').val();
+
+            var vehicle_type_name = $('.vehicle_type option:selected').text();
+
+            var active = $(".car_model_active").is(":checked");
+
+
+
+            if (car_make_id == '') {
+
+                $(".error_top").show();
+
+                $(".error_top").html("");
+
+                $(".error_top").append("<p>{{trans('lang.car_make_error')}}</p>");
+
+                window.scrollTo(0, 0);
+
+
+
+            } else if (title == '') {
+
+                $(".error_top").show();
+
+                $(".error_top").html("");
+
+                $(".error_top").append("<p>{{trans('lang.name_error')}}</p>");
+
+                window.scrollTo(0, 0);
+
+
+
+            } else {
+
+
+
+                jQuery("#data-table_processing").show();
+
+                database.collection('car_model').doc(id).update({
+
+                    'id': id,
+
+                    'name': title,
+
+                    'car_make_id': car_make_id,
+
+                    'car_make_name': car_make_name,
+
+                    'vehicle_type_id': vehicle_type_id,
+
+                    'vehicle_type_name': vehicle_type_name,
+
+                    'isActive': active
+
+                }).then(function (result) {
+
+                    jQuery("#data-table_processing").hide();
+
+                    window.location.href = '{{ route("carModel") }}';
+
+                });
 
             }
 
@@ -210,82 +332,6 @@ $(document).ready(function () {
 
         })
 
-    })
-
-});
-
-
-
-$(".edit-setting-btn").click(function () {
-
-
-
-    var title = $("#title").val();
-
-    var car_make_id = $('.car_make').val();
-
-    var car_make_name = $('.car_make option:selected').text();
-
-    var active = $(".car_model_active").is(":checked");
-
-
-
-    if (car_make_id == '') {
-
-        $(".error_top").show();
-
-        $(".error_top").html("");
-
-        $(".error_top").append("<p>{{trans('lang.car_make_error')}}</p>");
-
-        window.scrollTo(0, 0);
-
-
-
-    } else if (title == '') {
-
-        $(".error_top").show();
-
-        $(".error_top").html("");
-
-        $(".error_top").append("<p>{{trans('lang.name_error')}}</p>");
-
-        window.scrollTo(0, 0);
-
-
-
-    } else {
-
-
-
-        jQuery("#data-table_processing").show();
-
-        database.collection('car_model').doc(id).update({
-
-            'id': id,
-
-            'name': title,
-
-            'car_make_id': car_make_id,
-
-            'car_make_name': car_make_name,
-
-            'isActive': active
-
-        }).then(function (result) {
-
-            jQuery("#data-table_processing").hide();
-
-            window.location.href = '{{ route("carModel") }}';
-
-        });
-
-    }
-
-
-
-})
-
-</script>
+    </script>
 
 @endsection
