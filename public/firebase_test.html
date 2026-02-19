@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Test — Vehicle Type / Make / Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #e94560;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #0f3460;
+        }
+
+        .section h2 {
+            color: #e94560;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .section h3 {
+            color: #53a8b6;
+            margin: 10px 0 5px;
+            font-size: 14px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #0f3460;
+            background: #0a0a23;
+            color: #eee;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .result {
+            background: #0a0a23;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .count {
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #4ecca3;
+        }
+
+        .error {
+            color: #e94560;
+        }
+
+        .warning {
+            color: #f9d923;
+        }
+
+        .loading {
+            color: #f9d923;
+        }
+
+        .field {
+            color: #53a8b6;
+        }
+
+        button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #c81d4e;
+        }
+
+        .btn-group {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .warn-box {
+            background: #332700;
+            border: 1px solid #f9d923;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #f9d923;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🔥 Firebase Test</h1>
+        <p class="subtitle">Vehicle Type → Car Make → Car Model zanjirli test</p>
+
+        <!-- STEP 1 -->
+        <div class="section">
+            <h2>1️⃣ Vehicle Type (Tariflar)</h2>
+            <select id="select_vt" onchange="onVehicleTypeSelected()">
+                <option value="">⏳ Yuklanmoqda...</option>
+            </select>
+            <div class="result" id="result_vt"></div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="section">
+            <h2>2️⃣ Car Make (Brendlar)</h2>
+            <select id="select_mk" onchange="onCarMakeSelected()">
+                <option value="">-- Avval Vehicle Type tanlang --</option>
+            </select>
+            <div class="result" id="result_mk"></div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="section">
+            <h2>3️⃣ Car Model (Modellar)</h2>
+            <select id="select_md" onchange="updateSummary()">
+                <option value="">-- Avval Car Make tanlang --</option>
+            </select>
+            <div class="result" id="result_md"></div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="section">
+            <h2>📋 Saqlash uchun natija (users collection)</h2>
+            <div class="result" id="result_summary">Hamma qadamlarni bajaring...</div>
+        </div>
+
+        <!-- WARNING -->
+        <div id="warn_section" class="section" style="display:none;">
+            <h2>⚠️ Muammo</h2>
+            <div class="result" id="result_warn"></div>
+        </div>
+
+        <!-- RAW DATA -->
+        <div class="section">
+            <h2>🔍 Collection tekshirish</h2>
+            <div class="btn-group">
+                <button onclick="checkCollection('vehicle_type')">vehicle_type</button>
+                <button onclick="checkCollection('car_make')">car_make</button>
+                <button onclick="checkCollection('car_model')">car_model</button>
+            </div>
+            <div class="result" id="result_raw">Istalgan collectionni tekshiring...</div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-firestore.js"></script>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyDOn9daQewwjltYiaYlMrZ8-_QScIZL-sk",
+            authDomain: "fondexuzb.firebaseapp.com",
+            databaseURL: "https://fondexuzb-default-rtdb.firebaseio.com/",
+            projectId: "fondexuzb",
+            storageBucket: "fondexuzb.firebasestorage.app",
+            messagingSenderId: "893074789710",
+            appId: "1:893074789710:web:ddd911936a818b7dc4ba1f",
+            measurementId: "G-CB5QWY6228"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+
+        // Barcha ma'lumotlarni keshlaymiz
+        var allVehicleTypes = [];
+        var allCarMakes = [];
+        var allCarModels = [];
+
+        // ==================== DASTUR BOSHIDA HAMMASINI YUKLASH ====================
+        async function loadAll() {
+            try {
+                // 1. Vehicle Type
+                var vtSnap = await db.collection('vehicle_type').get();
+                allVehicleTypes = vtSnap.docs.map(function (doc) { return doc.data(); });
+
+                var vtSel = document.getElementById('select_vt');
+                vtSel.innerHTML = '<option value="">-- Vehicle Type tanlang --</option>';
+                allVehicleTypes.forEach(function (d) {
+                    vtSel.innerHTML += '<option value="' + d.id + '" data-name="' + d.name + '">' + d.name + ' (id: ' + d.id + ')</option>';
+                });
+                document.getElementById('result_vt').innerHTML = '<span class="success">✅ ' + allVehicleTypes.length + ' ta vehicle type yuklandi</span>';
+
+                // 2. Car Make
+                var mkSnap = await db.collection('car_make').get();
+                allCarMakes = mkSnap.docs.map(function (doc) { return doc.data(); });
+
+                // 3. Car Model
+                var mdSnap = await db.collection('car_model').get();
+                allCarModels = mdSnap.docs.map(function (doc) { return doc.data(); });
+
+                // vehicle_type_id bo'lmagan modellarni tekshirish
+                var noTypeModels = allCarModels.filter(function (m) { return !m.vehicle_type_id; });
+                if (noTypeModels.length > 0) {
+                    document.getElementById('warn_section').style.display = 'block';
+                    var warnHtml = '<span class="warning">⚠️ ' + noTypeModels.length + ' ta car_model da vehicle_type_id YO\'Q!</span>\n\n';
+                    warnHtml += '<span class="field">Bu modellarni admin paneldan tahrirlang va vehicle_type biriktiring:</span>\n';
+                    noTypeModels.forEach(function (m) {
+                        warnHtml += '  ❌ ' + m.name + ' (car_make: ' + m.car_make_name + ', id: ' + m.id + ')\n';
+                    });
+                    document.getElementById('result_warn').innerHTML = warnHtml;
+                }
+
+            } catch (err) {
+                document.getElementById('result_vt').innerHTML = '<span class="error">❌ Xatolik: ' + err.message + '</span>';
+            }
+        }
+
+        // ==================== STEP 1: Vehicle Type tanlandi ====================
+        function onVehicleTypeSelected() {
+            var vtSel = document.getElementById('select_vt');
+            var selectedVtId = vtSel.value;
+            var mkSel = document.getElementById('select_mk');
+            var mdSel = document.getElementById('select_md');
+
+            // Clear
+            mkSel.innerHTML = '<option value="">-- Car Make tanlang --</option>';
+            mdSel.innerHTML = '<option value="">-- Avval Car Make tanlang --</option>';
+            document.getElementById('result_mk').innerHTML = '';
+            document.getElementById('result_md').innerHTML = '';
+
+            if (!selectedVtId) return;
+
+            // Bu vehicle_type ga tegishli car_model larni topamiz
+            var matchingModels = allCarModels.filter(function (m) {
+                return m.vehicle_type_id === selectedVtId;
+            });
+
+            // Ulardan NOYOB Make larni ajratamiz
+            var uniqueMakeIds = [];
+            var uniqueMakes = [];
+            matchingModels.forEach(function (m) {
+                if (m.car_make_id && !uniqueMakeIds.includes(m.car_make_id)) {
+                    uniqueMakeIds.push(m.car_make_id);
+                    uniqueMakes.push({ id: m.car_make_id, name: m.car_make_name });
+                }
+            });
+
+            // Make dropdown ni to'ldiramiz
+            uniqueMakes.forEach(function (mk) {
+                mkSel.innerHTML += '<option value="' + mk.id + '" data-name="' + mk.name + '">' + mk.name + ' (id: ' + mk.id + ')</option>';
+            });
+
+            // Natija
+            var html = '';
+            if (uniqueMakes.length > 0) {
+                html += '<span class="success">✅ ' + matchingModels.length + ' ta model topildi, ' + uniqueMakes.length + ' ta brend</span>\n\n';
+                html += '<span class="field">Brendlar:</span>\n';
+                uniqueMakes.forEach(function (mk) {
+                    html += '  ✅ ' + mk.name + ' (id: ' + mk.id + ')\n';
+                });
+                html += '\n<span class="field">Modellar:</span>\n';
+                matchingModels.forEach(function (m) {
+                    html += '  📄 ' + m.name + ' — ' + m.car_make_name + '\n';
+                });
+            } else {
+                html += '<span class="error">❌ Bu vehicle type uchun hech qanday model topilmadi!</span>\n\n';
+                html += '<span class="warning">⚠️ Admin paneldan Car Model bo\'limiga kirib,\nmodellarni shu vehicle type ga biriktiring.</span>\n';
+            }
+
+            document.getElementById('result_mk').innerHTML = html;
+            updateSummary();
+        }
+
+        // ==================== STEP 2: Car Make tanlandi ====================
+        function onCarMakeSelected() {
+            var vtSel = document.getElementById('select_vt');
+            var mkSel = document.getElementById('select_mk');
+            var mdSel = document.getElementById('select_md');
+
+            var selectedVtId = vtSel.value;
+            var selectedMkId = mkSel.value;
+
+            mdSel.innerHTML = '<option value="">-- Car Model tanlang --</option>';
+            document.getElementById('result_md').innerHTML = '';
+
+            if (!selectedMkId) return;
+
+            // vehicle_type_id VA car_make_id bo'yicha filtrlash
+            var matchingModels = allCarModels.filter(function (m) {
+                return m.vehicle_type_id === selectedVtId && m.car_make_id === selectedMkId;
+            });
+
+            matchingModels.forEach(function (m) {
+                mdSel.innerHTML += '<option value="' + m.name + '" data-id="' + m.id + '">' + m.name + '</option>';
+            });
+
+            var html = '';
+            if (matchingModels.length > 0) {
+                html += '<span class="success">✅ ' + matchingModels.length + ' ta model topildi</span>\n\n';
+                matchingModels.forEach(function (m) {
+                    html += '<span class="field">id:</span> ' + m.id + '\n';
+                    html += '<span class="field">name:</span> ' + m.name + '\n';
+                    html += '<span class="field">car_make_id:</span> ' + m.car_make_id + '\n';
+                    html += '<span class="field">vehicle_type_id:</span> ' + m.vehicle_type_id + '\n';
+                    html += '─────────────────────\n';
+                });
+            } else {
+                html += '<span class="error">❌ Bu brend + tarif uchun model topilmadi!</span>\n';
+            }
+
+            document.getElementById('result_md').innerHTML = html;
+            updateSummary();
+        }
+
+        // ==================== SUMMARY ====================
+        function updateSummary() {
+            var vtSel = document.getElementById('select_vt');
+            var mkSel = document.getElementById('select_mk');
+            var mdSel = document.getElementById('select_md');
+
+            var vtOpt = vtSel.options[vtSel.selectedIndex];
+            var mkOpt = mkSel.options[mkSel.selectedIndex];
+
+            var vtName = vtOpt && vtOpt.getAttribute('data-name') ? vtOpt.getAttribute('data-name') : '-';
+            var vtId = vtSel.value || '-';
+            var mkName = mkOpt && mkOpt.getAttribute('data-name') ? mkOpt.getAttribute('data-name') : '-';
+            var mdName = mdSel.value || '-';
+
+            var html = '';
+            html += '<span class="field">vehicleType:</span> "' + vtName + '"\n';
+            html += '<span class="field">vehicleId:</span>   "' + vtId + '"\n';
+            html += '<span class="field">carMakes:</span>    "' + mkName + '"\n';
+            html += '<span class="field">carName:</span>     "' + mdName + '"\n';
+            html += '\n<span class="success">↑ Bu fieldlarni users collectionga saqlaysiz</span>';
+
+            document.getElementById('result_summary').innerHTML = html;
+        }
+
+        // ==================== RAW CHECK ====================
+        async function checkCollection(name) {
+            var el = document.getElementById('result_raw');
+            el.innerHTML = '<span class="loading">⏳ ' + name + ' yuklanmoqda...</span>';
+
+            try {
+                var snap = await db.collection(name).get();
+                var html = '<span class="count">' + name + ': ' + snap.docs.length + ' ta hujjat</span>\n\n';
+
+                snap.docs.forEach(function (doc) {
+                    var d = doc.data();
+                    html += '<span class="success">📄 ' + (d.name || doc.id) + '</span>\n';
+                    Object.keys(d).sort().forEach(function (key) {
+                        html += '  <span class="field">' + key + ':</span> ' + JSON.stringify(d[key]) + '\n';
+                    });
+                    html += '─────────────────────\n';
+                });
+
+                el.innerHTML = html;
+            } catch (err) {
+                el.innerHTML = '<span class="error">❌ Xatolik: ' + err.message + '</span>';
+            }
+        }
+
+        // Dastur boshlanganda hamma narsani yuklash
+        loadAll();
+    </script>
+
+</body>
+
+</html>
