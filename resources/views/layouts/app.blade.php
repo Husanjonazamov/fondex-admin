@@ -66,6 +66,28 @@
         if (admin_panel_color) {
             document.documentElement.style.setProperty('--admin-panel-color', admin_panel_color);
         }
+
+        const BACKEND_API_URL = "{{ env('BACKEND_API_URL') }}";
+
+        async function syncToDjango(endpoint, method, data) {
+            try {
+                const response = await fetch(`${BACKEND_API_URL}/${endpoint}`, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                console.log(`Sync to Django (${endpoint}):`, result);
+                return result;
+            } catch (error) {
+                console.error(`Error syncing to Django (${endpoint}):`, error);
+                return null;
+            }
+        }
     </script>
 
     <!-- @yield('style') -->

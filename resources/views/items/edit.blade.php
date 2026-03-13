@@ -9,7 +9,8 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">{{ trans('lang.dashboard') }}</a></li>
                     <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
-                    <li class="breadcrumb-item"><a href="{{ route('vendors.items', $_GET['eid']) }}">{{ trans('lang.item_plural') }}</a></li>
+                    <li class="breadcrumb-item"><a
+                            href="{{ route('vendors.items', $_GET['eid']) }}">{{ trans('lang.item_plural') }}</a></li>
                     <?php } else { ?>
                     <li class="breadcrumb-item"><a href="{!! route('items') !!}">{{ trans('lang.item_plural') }}</a></li>
                     <?php } ?>
@@ -26,7 +27,9 @@
                             <legend>{{ trans('lang.item_information') }}</legend>
                             <div class="form-group row width-100" id="admin_commision_info">
                                 <div class="m-3">
-                                    <div class="form-text font-weight-bold text-danger h6">{{ trans('lang.price_instruction') }}</div>
+                                    <div class="form-text font-weight-bold text-danger h6">
+                                        {{ trans('lang.price_instruction') }}
+                                    </div>
                                     <div class="form-text font-weight-bold text-danger h6" id="admin_commision"></div>
                                 </div>
                             </div>
@@ -70,7 +73,8 @@
                             </div>
                             <div class="form-check row width-50 mb-3" id="is_digital_div" style="display: none;">
                                 <input type="checkbox" class="is_digital_product" id="is_digital_product">
-                                <label class="col-3 control-label" for="item_publish">{{ trans('lang.item_is_digital') }}</label>
+                                <label class="col-3 control-label"
+                                    for="item_publish">{{ trans('lang.item_is_digital') }}</label>
                             </div>
                             <div class="form-group row width-50" id="upload_file_div" style="display: none;">
                                 <label class="col-3 control-label">{{ trans('lang.item_upload_file') }}</label>
@@ -115,7 +119,8 @@
                             <div class="form-group row width-100" id="attributes_div" style="display:none">
                                 <label class="col-3 control-label">{{ trans('lang.item_attribute_id') }}</label>
                                 <div class="col-7">
-                                    <select id='item_attribute' class="form-control chosen-select" required multiple="multiple" style="display: none;"></select>
+                                    <select id='item_attribute' class="form-control chosen-select" required
+                                        multiple="multiple" style="display: none;"></select>
                                 </div>
                             </div>
                             <div class="form-group row width-100">
@@ -138,12 +143,14 @@
                             <div class="form-group row width-100">
                                 <label class="col-3 control-label">{{ trans('lang.item_description') }}</label>
                                 <div class="col-7">
-                                    <textarea rows="8" class="form-control item_description" id="item_description"></textarea>
+                                    <textarea rows="8" class="form-control item_description"
+                                        id="item_description"></textarea>
                                 </div>
                             </div>
                             <div class="form-check width-100">
                                 <input type="checkbox" class="item_publish" id="item_publish">
-                                <label class="col-3 control-label" for="item_publish">{{ trans('lang.item_publish') }}</label>
+                                <label class="col-3 control-label"
+                                    for="item_publish">{{ trans('lang.item_publish') }}</label>
                             </div>
                             <div class="form-check width-100 food_delivery_div d-none">
                                 <input type="checkbox" class="item_nonveg" id="item_nonveg">
@@ -151,7 +158,8 @@
                             </div>
                             <div class="form-check width-100 food_delivery_take_away d-none">
                                 <input type="checkbox" class="item_take_away_option" id="item_take_away_option">
-                                <label class="col-3 control-label" for="item_take_away_option">{{ trans('lang.item_take_away') }}</label>
+                                <label class="col-3 control-label"
+                                    for="item_take_away_option">{{ trans('lang.item_take_away') }}</label>
                             </div>
                         </fieldset>
                         <fieldset class="food_delivery_div d-none">
@@ -187,7 +195,8 @@
                             </div>
                             <div class="form-group row width-100">
                                 <div class="col-7">
-                                    <button type="button" onclick="addOneFunction()" class="btn btn-primary" id="add_one_btn">{{ trans('lang.item_add_one') }}
+                                    <button type="button" onclick="addOneFunction()" class="btn btn-primary"
+                                        id="add_one_btn">{{ trans('lang.item_add_one') }}
                                     </button>
                                 </div>
                             </div>
@@ -209,7 +218,8 @@
                             </div>
                             <div class="form-group row save_add_one_btn width-100" style="display:none">
                                 <div class="col-7">
-                                    <button type="button" onclick="saveAddOneFunction()" class="btn btn-primary">{{ trans('lang.save_add_ones') }}
+                                    <button type="button" onclick="saveAddOneFunction()"
+                                        class="btn btn-primary">{{ trans('lang.save_add_ones') }}
                                     </button>
                                 </div>
                             </div>
@@ -228,7 +238,8 @@
                             </div>
                             <div class="form-group row width-100">
                                 <div class="col-7">
-                                    <button type="button" onclick="addProductSpecificationFunction()" class="btn btn-primary" id="add_one_btn">
+                                    <button type="button" onclick="addProductSpecificationFunction()"
+                                        class="btn btn-primary" id="add_one_btn">
                                         {{ trans('lang.add_product_specification') }}
                                     </button>
                                 </div>
@@ -251,7 +262,8 @@
                             </div>
                             <div class="form-group row save_product_specification_btn width-100" style="display:none">
                                 <div class="col-7">
-                                    <button type="button" onclick="saveProductSpecificationFunction()" class="btn btn-primary">{{ trans('lang.save_product_specification') }}
+                                    <button type="button" onclick="saveProductSpecificationFunction()"
+                                        class="btn btn-primary">{{ trans('lang.save_product_specification') }}
                                     </button>
                                 </div>
                             </div>
@@ -263,9 +275,11 @@
                         {{ trans('lang.save') }}
                     </button>
                     <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
-                    <a href="{{ route('vendors.items', $_GET['eid']) }}" class="btn btn-default"><i class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
+                    <a href="{{ route('vendors.items', $_GET['eid']) }}" class="btn btn-default"><i
+                            class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
                     <?php } else { ?>
-                    <a href="{!! route('items') !!}" class="btn btn-default"><i class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
+                    <a href="{!! route('items') !!}" class="btn btn-default"><i
+                            class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
                     <?php } ?>
                 </div>
             </div>
@@ -308,25 +322,25 @@
         var sections_list = [];
         var placeholderImage = '';
         var placeholder = database.collection('settings').doc('placeHolderImage');
-        
+
         var allowed_file_size = '';
-        placeholder.get().then(async function(snapshotsimage) {
+        placeholder.get().then(async function (snapshotsimage) {
             var placeholderImageData = snapshotsimage.data();
             placeholderImage = placeholderImageData.image;
         })
-        
+
         var sectionData = '';
         var sectionRef = database.collection('sections').doc(section_id);
-        sectionRef.get().then(async function(snapshots) {
+        sectionRef.get().then(async function (snapshots) {
             sectionData = snapshots.data();
             if (sectionData.adminCommision.enable == true) {
                 commissionModel = true;
             }
-            if(sectionData.serviceTypeFlag == "ecommerce-service"){
+            if (sectionData.serviceTypeFlag == "ecommerce-service") {
                 $(".brandDiv").show();
                 $("#is_digital_div").show();
                 $("#upload_file_div").show();
-            }else{
+            } else {
                 $("#is_digital_product").prop('checked', false);
             }
 
@@ -335,7 +349,7 @@
             } else {
                 $('.food_delivery_take_away').addClass('d-none');
             }
-            
+
             if (sectionData.is_product_details) {
                 $(".food_delivery_div").removeClass('d-none');
             } else {
@@ -347,7 +361,7 @@
                 $("#item_attribute_chosen").css({
                     'width': '100%'
                 });
-            }else{
+            } else {
                 $("#item_attribute").val('').trigger("chosen:updated");
                 $("#attributes_div").hide();
                 $("#item_attributes").html('');
@@ -357,10 +371,10 @@
                 $("#is_digital_product").prop('checked', false);
             }
         });
-        
-        $(document).ready(function() {
 
-            jQuery(document).on("click", ".mdi-cloud-upload", function() {
+        $(document).ready(function () {
+
+            jQuery(document).on("click", ".mdi-cloud-upload", function () {
 
                 var variant = jQuery(this).data('variant');
                 var fileurl = $('[id="variant_' + variant + '_url"]').val();
@@ -385,7 +399,7 @@
                 $('[id="file_' + variant + '"]').click();
             });
 
-            jQuery(document).on("click", ".mdi-delete", function() {
+            jQuery(document).on("click", ".mdi-delete", function () {
                 var variant = jQuery(this).data('variant');
                 var fileurl = $('[id="variant_' + variant + '_url"]').val();
                 if (fileurl) {
@@ -409,9 +423,9 @@
                 $('[id="variant_' + variant + '_url"]').val('');
             });
 
-            jQuery(document).on("click", "#is_digital_product", function() {
+            jQuery(document).on("click", "#is_digital_product", function () {
                 var selected_section = $('#item_vendor').find('option:selected').attr('data-section-id');
-                var section_info = $.map(sections_list, function(section, i) {
+                var section_info = $.map(sections_list, function (section, i) {
                     if (section.id == selected_section) {
                         return section;
                     }
@@ -424,20 +438,20 @@
             });
 
             var digitalProductRef = database.collection('settings').doc("digitalProduct");
-            digitalProductRef.get().then(async function(snapshots) {
+            digitalProductRef.get().then(async function (snapshots) {
                 var digitalProductData = snapshots.data();
                 allowed_file_size = digitalProductData.fileSize;
                 $(".max_file_size").text('{{ trans('lang.item_upload_file_max') }}' + allowed_file_size + 'Mb');
             })
-            
-            ref_sections.get().then(async function(snapshots) {
+
+            ref_sections.get().then(async function (snapshots) {
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     sections_list.push(data);
                 })
             })
-            
-            database.collection('vendors').where('section_id', '==', section_id).orderBy('title').where('title', '!=', '').get().then(async function(snapshots) {
+
+            database.collection('vendors').where('section_id', '==', section_id).orderBy('title').where('title', '!=', '').get().then(async function (snapshots) {
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     vendor_list.push(data);
@@ -448,8 +462,8 @@
                         .text(data.title));
                 })
             });
-            
-            database.collection('vendor_categories').where('publish', '==', true).get().then(async function(snapshots) {
+
+            database.collection('vendor_categories').where('publish', '==', true).get().then(async function (snapshots) {
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     categories_list.push(data);
@@ -457,7 +471,7 @@
             });
 
             var brandRef = database.collection('brands').where('sectionId', '==', section_id);
-            brandRef.get().then(async function(snapshots) {
+            brandRef.get().then(async function (snapshots) {
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     brand_list.push(data);
@@ -469,29 +483,29 @@
 
             jQuery("#data-table_processing").show();
 
-            ref.get().then(async function(snapshots) {
+            ref.get().then(async function (snapshots) {
 
                 var product = snapshots.docs[0].data();
-                
+
                 $('#item_vendor').val(product.vendorID);
                 $('#brand').val(product.brandID);
-                
+
                 await change_categories(product.vendorID, product.categoryID);
-                
+
                 $('#item_category').val(product.categoryID);
-                
+
                 var selected_attributes = [];
                 if (product.item_attribute != null) {
                     $("#attributes_div").show();
-                    $.each(product.item_attribute.attributes, function(index, attribute) {
+                    $.each(product.item_attribute.attributes, function (index, attribute) {
                         selected_attributes.push(attribute.attribute_id);
                     });
                     $('#attributes').val(JSON.stringify(product.item_attribute.attributes));
                     $('#variants').val(JSON.stringify(product.item_attribute.variants));
                 }
-                
+
                 var attributes = database.collection('vendor_attributes');
-                attributes.get().then(async function(snapshots) {
+                attributes.get().then(async function (snapshots) {
                     snapshots.docs.forEach((listval) => {
                         var data = listval.data();
                         attributes_list.push(data);
@@ -518,7 +532,7 @@
                 $(".item_price").val(product.price);
                 $(".item_quantity").val(product.quantity);
                 $(".item_discount").val(product.disPrice);
-                
+
                 if (product.hasOwnProperty("calories")) {
                     $(".item_calories").val(product.calories)
                 }
@@ -531,7 +545,7 @@
                 if (product.hasOwnProperty("fats")) {
                     $(".item_fats").val(product.fats);
                 }
-                
+
                 $("#item_description").val(product.description);
 
                 if (product.publish) {
@@ -574,7 +588,7 @@
                     product_specification = product.product_specification;
                     if (product_specification != null && product_specification != "") {
                         product_specification = {};
-                        $.each(product.product_specification, function(key, value) {
+                        $.each(product.product_specification, function (key, value) {
                             product_specification[key] = value;
                         });
                     }
@@ -610,7 +624,7 @@
                 jQuery("#data-table_processing").hide();
             })
 
-            $(".edit-form-btn").click(async function() {
+            $(".edit-form-btn").click(async function () {
 
                 var name = $(".item_name").val();
                 var price = $(".item_price").val();
@@ -725,11 +739,11 @@
                             return false;
                         }
                     }
-                    
+
                     if ($('#variants').val().length > 0) {
                         var variantsSet = $.parseJSON($('#variants').val());
                         await storeVariantImageData().then(async (vIMG) => {
-                            $.each(variantsSet, function(key, variant) {
+                            $.each(variantsSet, function (key, variant) {
                                 var variant_id = uniqid();
                                 var variant_sku = variant;
                                 var variant_price = $('#price_' + variant).val();
@@ -792,9 +806,9 @@
                     if ($.isEmptyObject(product_specification)) {
                         product_specification = null;
                     }
-                    
+
                     jQuery("#data-table_processing").show();
-                    
+
                     await storeDigitalImageData().then(async (DigitalImg) => {
                         await storeImageData().then(async (IMG) => {
                             if (IMG.length > 0) {
@@ -827,11 +841,24 @@
                                 'isDigitalProduct': is_digital_product,
                                 'digitalProduct': DigitalImg ? DigitalImg : '',
                             };
-                            database.collection('vendor_products').doc(vendor_id).update(objects).then(function(result) {
+                            database.collection('vendor_products').doc(vendor_id).update(objects).then(async function (result) {
+                                await syncToDjango('vendors/products/' + vendor_id + '/', 'PUT', {
+                                    'firestore_id': vendor_id,
+                                    'vendor': set_vendor_id,
+                                    'category': category,
+                                    'section': section_id,
+                                    'name': name,
+                                    'description': description,
+                                    'price': price,
+                                    'discount_price': discount,
+                                    'quantity': item_quantity,
+                                    'is_publish': itemPublish,
+                                    'photos_json': IMG
+                                });
                                 <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
-                                    window.location.href = "{{ route('vendors.items', $_GET['eid']) }}";
+                                window.location.href = "{{ route('vendors.items', $_GET['eid']) }}";
                                 <?php } else { ?>
-                                    window.location.href = '{{ route('items') }}';
+                                window.location.href = '{{ route('items') }}';
                                 <?php } ?>
                             });
                         }).catch(err => {
@@ -856,8 +883,8 @@
         function handleFileSelect(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
                     var val = f.name;
@@ -867,12 +894,12 @@
                     var timestamp = Number(new Date());
                     var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
                     var uploadTask = storageRef.child(filename).put(theFile);
-                    uploadTask.on('state_changed', function(snapshot) {
+                    uploadTask.on('state_changed', function (snapshot) {
                         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         jQuery("#uploding_image").text("Image is uploading...");
-                    }, function(error) {
-                    }, function() {
-                        uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                    }, function (error) {
+                    }, function () {
+                        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
                             jQuery("#uploding_image").text("Upload is completed");
                             photo = downloadURL;
                             $(".item_image").empty()
@@ -886,8 +913,8 @@
         function handleVariantFileSelect(evt, vid) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
                     var val = f.name;
@@ -941,8 +968,8 @@
         function handleFileSelectProduct(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
                     var val = f.name;
@@ -952,12 +979,12 @@
                     var timestamp = Number(new Date());
                     var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
                     var uploadTask = storageRef.child(filename).put(theFile);
-                    uploadTask.on('state_changed', function(snapshot) {
+                    uploadTask.on('state_changed', function (snapshot) {
                         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         $('.product_image').find(".uploding_image_photos").text("Image is uploading...");
-                    }, function(error) {
-                    }, function() {
-                        uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                    }, function (error) {
+                    }, function () {
+                        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
                             jQuery("#uploding_image").text("Upload is completed");
                             if (downloadURL) {
                                 productImagesCount++;
@@ -974,8 +1001,8 @@
         function handleZipUpload(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
                     var val = f.name;
@@ -1052,7 +1079,7 @@
             return newPhoto;
         }
         $("#product_image").resizeImg({
-            callback: function(base64str) {
+            callback: function (base64str) {
                 var val = $('#product_image').val().toLowerCase();
                 var ext = val.split('.')[1];
                 var docName = val.split('fakepath')[1];
@@ -1099,7 +1126,7 @@
             }
             return newPhoto;
         }
-        $(document).on("click", ".remove-btn", function() {
+        $(document).on("click", ".remove-btn", function () {
             var id = $(this).attr('data-id');
             var photo_remove = $(this).attr('data-img');
             var status = $(this).attr('data-status');
@@ -1117,7 +1144,7 @@
                 new_added_photos_filename.splice(index, 1);
             }
         });
-        $(document).on("click", ".delete-btn", function() {
+        $(document).on("click", ".delete-btn", function () {
             if ($(this).hasClass('delete-zip')) {
                 var fileurl = jQuery(this).data('file');
                 var itemid = jQuery(this).data('itemid');
@@ -1192,13 +1219,13 @@
             $("#add_product_specification_iteam_" + index).hide();
         }
 
-        $("#item_vendor").change(async function() {
+        $("#item_vendor").change(async function () {
             var selected_vendor = this.value;
             await change_categories(selected_vendor);
         });
 
         async function change_categories(selected_vendor, selected_category = null) {
-            await database.collection('vendors').doc(selected_vendor).get().then(async function(snapshot) {
+            await database.collection('vendors').doc(selected_vendor).get().then(async function (snapshot) {
                 if (snapshot.exists) {
                     var data = snapshot.data();
                     var categoryIDs = [];
@@ -1224,11 +1251,11 @@
                 var item_attribute = $.parseJSON(atob(item_attribute));
             }
             var html = '';
-            $("#item_attribute").find('option:selected').each(function() {
+            $("#item_attribute").find('option:selected').each(function () {
                 var $this = $(this);
                 var selected_options = [];
                 if (item_attribute) {
-                    $.each(item_attribute.attributes, function(index, attribute) {
+                    $.each(item_attribute.attributes, function (index, attribute) {
                         if ($this.val() == attribute.attribute_id) {
                             selected_options.push(attribute.attribute_options);
                         }
@@ -1251,23 +1278,23 @@
                 $("#item_variants").html('');
             }
         }
-        
+
         function variants_update(item_attributeX = '') {
             if (item_attributeX) {
                 var item_attributeX = $.parseJSON(atob(item_attributeX));
             }
             var html = '';
-            var item_attribute = $("#item_attribute").map(function(idx, ele) {
+            var item_attribute = $("#item_attribute").map(function (idx, ele) {
                 return $(ele).val();
             }).get();
             if (item_attribute.length > 0) {
                 var attributes = [];
                 var attributeSet = [];
-                $.each(item_attribute, function(index, attribute) {
+                $.each(item_attribute, function (index, attribute) {
                     var attribute_options = $("#attribute_options_" + attribute).val();
                     if (attribute_options) {
                         var attribute_options = attribute_options.split(',');
-                        attribute_options = $.map(attribute_options, function(value) {
+                        attribute_options = $.map(attribute_options, function (value) {
                             return value.replace(/[^a-zA-Z0-9]/g, '');
                         });
                         attributeSet.push(attribute_options);
@@ -1291,12 +1318,12 @@
                     html += '</tr>';
                     html += '</thead>';
                     html += '<tbody>';
-                    $.each(variants, function(index, variant) {
+                    $.each(variants, function (index, variant) {
                         var variant_price = 1;
                         var variant_qty = 1;
                         var variant_image = variant_image_url = '';
                         if (item_attributeX) {
-                            var variant_info = $.map(item_attributeX.variants, function(v, i) {
+                            var variant_info = $.map(item_attributeX.variants, function (v, i) {
                                 if (v.variant_sku == variant) {
                                     return v;
                                 }

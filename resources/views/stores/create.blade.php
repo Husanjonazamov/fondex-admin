@@ -11,7 +11,7 @@
         $newcountries[$valuecountry->phoneCode] = $valuecountry;
         $newcountriesjs[$valuecountry->phoneCode] = $valuecountry->code;
     }
-    ?>
+                ?>
     <div class="page-wrapper">
         <div class="row page-titles">
             <div class="col-md-5 align-self-center">
@@ -26,560 +26,212 @@
                 </ol>
             </div>
         </div>
-            <div>
-                <div class="card-body">
-                    <div class="error_top"></div>
-                    <div class="row vendor_payout_create">
-                        <div class="vendor_payout_create-inner">
+        <div>
+            <div class="card-body">
+                <div class="error_top"></div>
+                <div class="row vendor_payout_create">
+                    <div class="vendor_payout_create-inner">
 
-                            <fieldset>
-                                <legend>{{ trans('lang.vendor_details') }}</legend>
+                        <fieldset>
+                            <legend>{{ trans('lang.vendor_details') }}</legend>
 
-                                <div class="form-group row width-50">
-                                    <label class="col-3 control-label">{{ trans('lang.vendor_name') }}</label>
-                                    <div class="col-7">
-                                        <input type="text" class="form-control vendor_name" required>
-                                        <div class="form-text text-muted">
-                                            {{ trans('lang.vendor_name_help') }}
-                                        </div>
+                            <div class="form-group row width-50">
+                                <label class="col-3 control-label">{{ trans('lang.vendor_name') }}</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control vendor_name" required>
+                                    <div class="form-text text-muted">
+                                        {{ trans('lang.vendor_name_help') }}
                                     </div>
                                 </div>
-                                <div class="form-group row width-50">
-                                    <label class="col-3 control-label">{{ trans('lang.owner_vendor') }}</label>
-                                    <div class="col-7">
-                                        <select id='store_vendors' class="form-control" required>
-                                            <option value="">{{ trans('lang.select_owner_vendor') }}</option>
+                            </div>
+                            <div class="form-group row width-50">
+                                <label class="col-3 control-label">{{ trans('lang.owner_vendor') }}</label>
+                                <div class="col-7">
+                                    <select id='store_vendors' class="form-control" required>
+                                        <option value="">{{ trans('lang.select_owner_vendor') }}</option>
+                                    </select>
+                                    <div class="form-text text-muted">
+                                        {{ trans('lang.vendor_help') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row width-50">
+                                <label class="col-3 control-label">{{ trans('lang.vendor_cuisine') }}</label>
+                                <div class="col-7">
+                                    <select id='vendor_cuisines' class="form-control chosen-select" multiple="multiple"
+                                        required>
+                                    </select>
+                                    <div class="form-text text-muted">
+                                        {{ trans('lang.vendor_cuisines_help') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row width-50">
+                                <label class="col-3 control-label">{{ trans('lang.user_phone') }}</label>
+                                <div class="col-7">
+                                    <div class="phone-box position-relative" id="phone-box">
+                                        <select name="country" id="country_selector">
+                                            <?php foreach ($newcountries as $keycy => $valuecy) { ?>
+                                            <?php    $selected = ''; ?>
+                                            <option <?php    echo $selected; ?> code="<?php    echo $valuecy->code; ?>"
+                                                value="<?php    echo $keycy; ?>">
+                                                +<?php    echo $valuecy->phoneCode; ?> {{ $valuecy->countryName }}</option>
+                                            <?php } ?>
                                         </select>
+                                        <input type="text" class="form-control vendor_phone"
+                                            onkeypress="return chkAlphabets2(event,'error2')">
+                                        <div id="error2" class="err"></div>
                                         <div class="form-text text-muted">
-                                            {{ trans('lang.vendor_help') }}
+                                            {{ trans('lang.vendor_phone_help') }}
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <div class="form-group row width-50">
-                                    <label class="col-3 control-label">{{ trans('lang.vendor_cuisine') }}</label>
-                                    <div class="col-7">
-                                        <select id='vendor_cuisines' class="form-control chosen-select" multiple="multiple" required>
-                                        </select>
-                                        <div class="form-text text-muted">
-                                            {{ trans('lang.vendor_cuisines_help') }}
-                                        </div>
-                                    </div>
+                            </div>
+                            <div class="form-group row width-50">
+                                <label class="col-3 control-label">{{ trans('lang.zone') }}<span
+                                        class="required-field"></span></label>
+                                <div class="col-7">
+                                    <select id='zone' class="form-control">
+                                        <option value="">{{ trans('lang.select_zone') }}</option>
+                                    </select>
                                 </div>
+                            </div>
 
-                                <div class="form-group row width-50">
-                                    <label class="col-3 control-label">{{ trans('lang.user_phone') }}</label>
-                                    <div class="col-7">
-                                        <div class="phone-box position-relative" id="phone-box">
-                                            <select name="country" id="country_selector">
-                                                <?php foreach ($newcountries as $keycy => $valuecy) { ?>
-                                                <?php $selected = ''; ?>
-                                                <option <?php echo $selected; ?> code="<?php echo $valuecy->code; ?>" value="<?php echo $keycy; ?>">
-                                                    +<?php echo $valuecy->phoneCode; ?> {{ $valuecy->countryName }}</option>
-                                                <?php } ?>
-                                            </select>
-                                            <input type="text" class="form-control vendor_phone" onkeypress="return chkAlphabets2(event,'error2')">
-                                            <div id="error2" class="err"></div>
-                                            <div class="form-text text-muted">
-                                                {{ trans('lang.vendor_phone_help') }}
-                                            </div>
-                                        </div>
+                            <div class="form-group row width-50">
+                                <label class="col-3 control-label">{{ trans('lang.vendor_address') }}</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control vendor_address" required>
+                                    <div class="form-text text-muted">
+                                        {{ trans('lang.vendor_address_help') }}
                                     </div>
                                 </div>
-                                <div class="form-group row width-50">
-                                    <label class="col-3 control-label">{{ trans('lang.zone') }}<span class="required-field"></span></label>
-                                    <div class="col-7">
-                                        <select id='zone' class="form-control">
-                                            <option value="">{{ trans('lang.select_zone') }}</option>
-                                        </select>
-                                    </div>
-                                </div>
+                            </div>
 
-                                <div class="form-group row width-50">
-                                    <label class="col-3 control-label">{{ trans('lang.vendor_address') }}</label>
-                                    <div class="col-7">
-                                        <input type="text" class="form-control vendor_address" required>
-                                        <div class="form-text text-muted">
-                                            {{ trans('lang.vendor_address_help') }}
-                                        </div>
+
+                            <div class="form-group row width-100">
+                                <div class="col-12">
+                                    <h6>{{ trans('lang.know_your_cordinates') }} <a target="_blank"
+                                            href="https://www.latlong.net/">{{ trans('lang.latitude_and_longitude_finder') }}</a>
+                                    </h6>
+                                </div>
+                            </div>
+
+                            <div class="form-group row width-50">
+                                <label class="col-3 control-label">{{ trans('lang.vendor_latitude') }}</label>
+                                <div class="col-7">
+                                    <input class="form-control vendor_latitude" type="number" min="-90" max="90"
+                                        onkeypress="return chkAlphabets3(event,'error3')">
+                                    <div id="error3" class="err"></div>
+                                    <div class="form-text text-muted">
+                                        {{ trans('lang.vendor_latitude_help') }}
                                     </div>
                                 </div>
-                               
+                            </div>
+
+                            <div class="form-group row width-50">
+                                <label class="col-3 control-label">{{ trans('lang.vendor_longitude') }}</label>
+                                <div class="col-7">
+                                    <input class="form-control vendor_longitude" type="number" min="-180" max="180"
+                                        onkeypress="return chkAlphabets3(event,'error4')">
+                                    <div id="error4" class="err"></div>
+                                    <div class="form-text text-muted">
+                                        {{ trans('lang.vendor_longitude_help') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row width-100">
+                                <label class="col-3 control-label ">{{ trans('lang.vendor_description') }}</label>
+                                <div class="col-7">
+                                    <textarea rows="7" class="vendor_description form-control"
+                                        id="vendor_description"></textarea>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>{{ trans('lang.gallery') }}</legend>
+
+                            <div class="form-group row width-50 vendor_image">
+                                <div class="">
+                                    <div id="photos"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div>
+                                    <input type="file" onChange="handleFileSelect(event,'photos')">
+                                    <div id="uploding_image_photos"></div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="working_hour_section d-none">
+                            <legend>{{ trans('lang.working_hours') }}</legend>
+
+                            <div class="form-group row">
 
                                 <div class="form-group row width-100">
-                                    <div class="col-12">
-                                        <h6>{{ trans('lang.know_your_cordinates') }} <a target="_blank" href="https://www.latlong.net/">{{ trans('lang.latitude_and_longitude_finder') }}</a></h6>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row width-50">
-                                    <label class="col-3 control-label">{{ trans('lang.vendor_latitude') }}</label>
                                     <div class="col-7">
-                                        <input class="form-control vendor_latitude" type="number" min="-90" max="90" onkeypress="return chkAlphabets3(event,'error3')">
-                                        <div id="error3" class="err"></div>
-                                        <div class="form-text text-muted">
-                                            {{ trans('lang.vendor_latitude_help') }}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row width-50">
-                                    <label class="col-3 control-label">{{ trans('lang.vendor_longitude') }}</label>
-                                    <div class="col-7">
-                                        <input class="form-control vendor_longitude" type="number" min="-180" max="180" onkeypress="return chkAlphabets3(event,'error4')">
-                                        <div id="error4" class="err"></div>
-                                        <div class="form-text text-muted">
-                                            {{ trans('lang.vendor_longitude_help') }}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row width-100">
-                                    <label class="col-3 control-label ">{{ trans('lang.vendor_description') }}</label>
-                                    <div class="col-7">
-                                        <textarea rows="7" class="vendor_description form-control" id="vendor_description"></textarea>
-                                    </div>
-                                </div>
-                            </fieldset>
-
-                            <fieldset>
-                                <legend>{{ trans('lang.gallery') }}</legend>
-
-                                <div class="form-group row width-50 vendor_image">
-                                    <div class="">
-                                        <div id="photos"></div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <div>
-                                        <input type="file" onChange="handleFileSelect(event,'photos')">
-                                        <div id="uploding_image_photos"></div>
-                                    </div>
-                                </div>
-                            </fieldset>
-
-                            <fieldset class="working_hour_section d-none" >
-                                <legend>{{ trans('lang.working_hours') }}</legend>
-
-                                <div class="form-group row">
-
-                                    <div class="form-group row width-100">
-                                        <div class="col-7">
-                                            <button type="button" class="btn btn-primary  add_working_hours_restaurant_btn">
-                                                <i></i>{{ trans('lang.add_working_hours') }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="working_hours_div" style="display:none">
-
-                                        <div class="form-group row">
-                                            <label class="col-1 control-label">{{ trans('lang.sunday') }}</label>
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary add_more_sunday" onclick="addMorehour('Sunday','sunday', '1')">
-                                                    {{ trans('lang.add_more') }}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="restaurant_working_options_Sunday_div restaurant_discount" style="display:none">
-
-                                            <table class="booking-table" id="working_hour_table_Sunday">
-                                                <tr>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.from') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.to') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
-                                                    </th>
-                                                </tr>
-
-                                            </table>
-
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label class="col-1 control-label">{{ trans('lang.monday') }}</label>
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary add_more_sunday" onclick="addMorehour('Monday','monday', '1')">
-                                                    {{ trans('lang.add_more') }}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="restaurant_working_options_Monday_div restaurant_discount" style="display:none">
-
-                                            <table class="booking-table" id="working_hour_table_Monday">
-                                                <tr>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.from') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.to') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
-                                                    </th>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-1 control-label">{{ trans('lang.tuesday') }}</label>
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary" onclick="addMorehour('Tuesday','tuesday', '1')">
-                                                    {{ trans('lang.add_more') }}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="restaurant_working_options_Tuesday_div restaurant_discount" style="display:none">
-
-                                            <table class="booking-table" id="working_hour_table_Tuesday">
-                                                <tr>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.from') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.to') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
-                                                    </th>
-                                                </tr>
-
-                                            </table>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-1 control-label">{{ trans('lang.wednesday') }}</label>
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary" onclick="addMorehour('Wednesday','wednesday', '1')">
-                                                    {{ trans('lang.add_more') }}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="restaurant_working_options_Wednesday_div restaurant_discount" style="display:none">
-                                            <table class="booking-table" id="working_hour_table_Wednesday">
-                                                <tr>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.from') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.to') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
-                                                    </th>
-                                                </tr>
-
-                                            </table>
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label class="col-1 control-label">{{ trans('lang.thursday') }}</label>
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary" onclick="addMorehour('Thursday','thursday', '1')">
-                                                    {{ trans('lang.add_more') }}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="restaurant_working_options_Thursday_div restaurant_discount" style="display:none">
-                                            <table class="booking-table" id="working_hour_table_Thursday">
-                                                <tr>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.from') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.to') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
-                                                    </th>
-                                                </tr>
-
-                                            </table>
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label class="col-1 control-label">{{ trans('lang.friday') }}</label>
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary" onclick="addMorehour('Friday','friday', '1')">
-                                                    {{ trans('lang.add_more') }}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="restaurant_working_options_Friday_div restaurant_discount" style="display:none">
-                                            <table class="booking-table" id="working_hour_table_Friday">
-                                                <tr>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.from') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.to') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
-                                                    </th>
-                                                </tr>
-
-                                            </table>
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label class="col-1 control-label">{{ trans('lang.Saturday') }}</label>
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary" onclick="addMorehour('Saturday','Saturday','1')">
-                                                    {{ trans('lang.add_more') }}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="restaurant_working_options_Saturday_div restaurant_discount" style="display:none">
-                                            <table class="booking-table" id="working_hour_table_Saturday">
-                                                <tr>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.from') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.to') }}</label>
-                                                    </th>
-                                                    <th>
-                                                        <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
-                                                    </th>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </fieldset>
-
-                            <fieldset>
-                                <legend>{{ trans('vendor') }} {{ trans('lang.active_deactive') }}</legend>
-                                <div class="form-group row">
-
-                                    <div class="form-group row width-50">
-                                        <div class="form-check width-100">
-                                            <input type="checkbox" id="is_active">
-                                            <label class="col-3 control-label" for="is_active">{{ trans('lang.active') }}</label>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </fieldset>
-
-                            <fieldset style="display: none;" id="services_feature">
-                                <legend>{{ trans('lang.services') }}</legend>
-                                <div class="form-group row">
-
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="Free_Wi_Fi">
-                                        <label class="col-3 control-label" for="Free_Wi_Fi">{{ trans('lang.wifi') }}</label>
-                                    </div>
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="Good_for_Breakfast">
-                                        <label class="col-3 control-label" for="Good_for_Breakfast">{{ trans('lang.breakfast') }}</label>
-                                    </div>
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="Good_for_Dinner">
-                                        <label class="col-3 control-label" for="Good_for_Dinner">{{ trans('lang.dinner') }}</label>
-                                    </div>
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="Good_for_Lunch">
-                                        <label class="col-3 control-label" for="Good_for_Lunch">{{ trans('lang.lunch') }}</label>
-                                    </div>
-
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="Live_Music">
-                                        <label class="col-3 control-label" for="Live_Music">{{ trans('lang.live_music') }}</label>
-                                    </div>
-
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="Outdoor_Seating">
-                                        <label class="col-3 control-label" for="Outdoor_Seating">{{ trans('lang.outdoor_seating') }}</label>
-                                    </div>
-
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="Takes_Reservations">
-                                        <label class="col-3 control-label" for="Takes_Reservations">{{ trans('lang.reservations') }}</label>
-                                    </div>
-
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="Vegetarian_Friendly">
-                                        <label class="col-3 control-label" for="Vegetarian_Friendly">{{ trans('lang.vegetarian_friendly') }}</label>
-                                    </div>
-
-                                </div>
-                            </fieldset>
-
-                            <fieldset style="display:none;" id="is_dine_in_feature">
-                                <legend>{{ trans('lang.dine_in_future_setting') }}</legend>
-
-                                <div class="form-group row">
-
-                                    <div class="form-group row width-100">
-                                        <div class="form-check width-100">
-                                            <input type="checkbox" id="dine_in_feature" class="">
-                                            <label class="col-3 control-label" for="dine_in_feature">{{ trans('lang.enable_dine_in_feature') }}</label>
-                                        </div>
-                                    </div>
-                                    <div class="divein_div" style="display:none">
-
-                                        <div class="form-group row width-50">
-                                            <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
-                                            <div class="col-7">
-                                                <input type="time" class="form-control" id="openDineTime" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row width-50">
-                                            <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
-                                            <div class="col-7">
-                                                <input type="time" class="form-control" id="closeDineTime" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row width-50">
-                                            <label class="col-3 control-label">{{ trans('lang.cost') }}</label>
-                                            <div class="col-7">
-                                                <input type="number" class="form-control vendor_cost" required>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row width-100 vendor_image">
-                                            <label class="col-3 control-label">{{ trans('lang.menu_card') }}</label>
-                                            <div class="">
-                                                <div id="photos_menu_card"></div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <div>
-                                                <input type="file" onChange="handleFileSelectMenuCard(event)">
-                                                <div id="uploaded_image_menu"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </fieldset>
-                            <fieldset class="selfDeliveryOption d-none">
-                                <legend>{{ trans('lang.self_delivery_setting') }}</legend>
-                                <div class="form-group row">
-                                    <div class="form-group row width-100">
-                                        <div class="form-check width-100">
-                                            <input type="checkbox" id="enable_self_delivery" class="">
-                                            <label class="col-3 control-label" for="enable_self_delivery">{{ trans('lang.enable_self_delivery') }}</label>
-                                            <div class="form-text text-muted">
-                                                {{ trans('lang.enable_self_delivery_help') }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                            <fieldset id="delivery_charges_div">
-                                <legend>{{ trans('lang.deliveryCharge') }}</legend>
-
-                                <div class="form-group row">
-                                    <div class="form-group row width-100">
-                                        <label class="col-4 control-label">{{ trans('lang.delivery_charges_per') }} <span class="distance-type"></span></label>
-                                        <div class="col-7">
-                                            <input type="number" class="form-control" id="delivery_charges_per_km">
-                                        </div>
-                                    </div>
-                                    <div class="form-group row width-100">
-                                        <label class="col-4 control-label">{{ trans('lang.minimum_delivery_charges') }}</label>
-                                        <div class="col-7">
-                                            <input type="number" class="form-control" id="minimum_delivery_charges">
-                                        </div>
-                                    </div>
-                                    <div class="form-group row width-100">
-                                        <label class="col-4 control-label">{{ trans('lang.minimum_delivery_charges_within') }} <span class="distance-type"></span></label>
-                                        <div class="col-7">
-                                            <input type="number" class="form-control" id="minimum_delivery_charges_within_km">
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-
-                            <fieldset>
-                                <legend>{{ trans('lang.special_offer') }}</legend>
-
-                                <div class="form-group row width-100">
-                                    <div class="form-check width-100">
-                                        <input type="checkbox" id="enable_special_offer">
-                                        <label class="col-3 control-label" for="enable_special_offer">{{ trans('lang.enable_special_offer') }}</label>
-                                    </div>
-                                </div>
-                                <div class="form-group row width-100">
-                                    <div class="col-7">
-                                        <button type="button" class="btn btn-primary  add_special_offer_restaurant_btn">
-                                            <i></i>{{ trans('lang.add_special_offer') }}
+                                        <button type="button" class="btn btn-primary  add_working_hours_restaurant_btn">
+                                            <i></i>{{ trans('lang.add_working_hours') }}
                                         </button>
                                     </div>
                                 </div>
-                                <div class="special_offer_div" style="display:none">
+                                <div class="working_hours_div" style="display:none">
+
                                     <div class="form-group row">
                                         <label class="col-1 control-label">{{ trans('lang.sunday') }}</label>
                                         <div class="col-12">
-                                            <button type="button" class="btn btn-primary add_more_sunday" onclick="addMoreButton('Sunday','sunday', '1')">
+                                            <button type="button" class="btn btn-primary add_more_sunday"
+                                                onclick="addMorehour('Sunday','sunday', '1')">
                                                 {{ trans('lang.add_more') }}
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="restaurant_discount_options_Sunday_div restaurant_discount" style="display:none">
-                                        <table class="booking-table" id="special_offer_table_Sunday">
+                                    <div class="restaurant_working_options_Sunday_div restaurant_discount"
+                                        style="display:none">
+
+                                        <table class="booking-table" id="working_hour_table_Sunday">
                                             <tr>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.from') }}</label>
                                                 </th>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.to') }}</label>
                                                 </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
-                                                </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
-                                                        {{ trans('lang.type') }}</label>
-                                                </th>
-
                                                 <th>
                                                     <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
                                                 </th>
                                             </tr>
 
                                         </table>
+
                                     </div>
 
                                     <div class="form-group row">
                                         <label class="col-1 control-label">{{ trans('lang.monday') }}</label>
                                         <div class="col-12">
-                                            <button type="button" class="btn btn-primary add_more_sunday" onclick="addMoreButton('Monday','monday', '1')">
+                                            <button type="button" class="btn btn-primary add_more_sunday"
+                                                onclick="addMorehour('Monday','monday', '1')">
                                                 {{ trans('lang.add_more') }}
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="restaurant_discount_options_Monday_div restaurant_discount" style="display:none">
+                                    <div class="restaurant_working_options_Monday_div restaurant_discount"
+                                        style="display:none">
 
-                                        <table class="booking-table" id="special_offer_table_Monday">
+                                        <table class="booking-table" id="working_hour_table_Monday">
                                             <tr>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.from') }}</label>
                                                 </th>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
-                                                </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
-                                                </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
-                                                        {{ trans('lang.type') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.to') }}</label>
                                                 </th>
                                                 <th>
                                                     <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
@@ -590,30 +242,24 @@
                                     <div class="form-group row">
                                         <label class="col-1 control-label">{{ trans('lang.tuesday') }}</label>
                                         <div class="col-12">
-                                            <button type="button" class="btn btn-primary" onclick="addMoreButton('Tuesday','tuesday', '1')">
+                                            <button type="button" class="btn btn-primary"
+                                                onclick="addMorehour('Tuesday','tuesday', '1')">
                                                 {{ trans('lang.add_more') }}
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="restaurant_discount_options_Tuesday_div restaurant_discount" style="display:none">
+                                    <div class="restaurant_working_options_Tuesday_div restaurant_discount"
+                                        style="display:none">
 
-                                        <table class="booking-table" id="special_offer_table_Tuesday">
+                                        <table class="booking-table" id="working_hour_table_Tuesday">
                                             <tr>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.from') }}</label>
                                                 </th>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.to') }}</label>
                                                 </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
-                                                </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
-                                                        {{ trans('lang.type') }}</label>
-                                                </th>
-
                                                 <th>
                                                     <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
                                                 </th>
@@ -624,29 +270,23 @@
                                     <div class="form-group row">
                                         <label class="col-1 control-label">{{ trans('lang.wednesday') }}</label>
                                         <div class="col-12">
-                                            <button type="button" class="btn btn-primary" onclick="addMoreButton('Wednesday','wednesday', '1')">
+                                            <button type="button" class="btn btn-primary"
+                                                onclick="addMorehour('Wednesday','wednesday', '1')">
                                                 {{ trans('lang.add_more') }}
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="restaurant_discount_options_Wednesday_div restaurant_discount" style="display:none">
-                                        <table class="booking-table" id="special_offer_table_Wednesday">
+                                    <div class="restaurant_working_options_Wednesday_div restaurant_discount"
+                                        style="display:none">
+                                        <table class="booking-table" id="working_hour_table_Wednesday">
                                             <tr>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.from') }}</label>
                                                 </th>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.to') }}</label>
                                                 </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
-                                                </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
-                                                        {{ trans('lang.type') }}</label>
-                                                </th>
-
                                                 <th>
                                                     <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
                                                 </th>
@@ -658,29 +298,23 @@
                                     <div class="form-group row">
                                         <label class="col-1 control-label">{{ trans('lang.thursday') }}</label>
                                         <div class="col-12">
-                                            <button type="button" class="btn btn-primary" onclick="addMoreButton('Thursday','thursday', '1')">
+                                            <button type="button" class="btn btn-primary"
+                                                onclick="addMorehour('Thursday','thursday', '1')">
                                                 {{ trans('lang.add_more') }}
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="restaurant_discount_options_Thursday_div restaurant_discount" style="display:none">
-                                        <table class="booking-table" id="special_offer_table_Thursday">
+                                    <div class="restaurant_working_options_Thursday_div restaurant_discount"
+                                        style="display:none">
+                                        <table class="booking-table" id="working_hour_table_Thursday">
                                             <tr>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.from') }}</label>
                                                 </th>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.to') }}</label>
                                                 </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
-                                                </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
-                                                        {{ trans('lang.type') }}</label>
-                                                </th>
-
                                                 <th>
                                                     <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
                                                 </th>
@@ -692,29 +326,23 @@
                                     <div class="form-group row">
                                         <label class="col-1 control-label">{{ trans('lang.friday') }}</label>
                                         <div class="col-12">
-                                            <button type="button" class="btn btn-primary" onclick="addMoreButton('Friday','friday', '1')">
+                                            <button type="button" class="btn btn-primary"
+                                                onclick="addMorehour('Friday','friday', '1')">
                                                 {{ trans('lang.add_more') }}
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="restaurant_discount_options_Friday_div restaurant_discount" style="display:none">
-                                        <table class="booking-table" id="special_offer_table_Friday">
+                                    <div class="restaurant_working_options_Friday_div restaurant_discount"
+                                        style="display:none">
+                                        <table class="booking-table" id="working_hour_table_Friday">
                                             <tr>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.from') }}</label>
                                                 </th>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.to') }}</label>
                                                 </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
-                                                </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
-                                                        {{ trans('lang.type') }}</label>
-                                                </th>
-
                                                 <th>
                                                     <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
                                                 </th>
@@ -726,28 +354,22 @@
                                     <div class="form-group row">
                                         <label class="col-1 control-label">{{ trans('lang.Saturday') }}</label>
                                         <div class="col-12">
-                                            <button type="button" class="btn btn-primary" onclick="addMoreButton('Saturday','Saturday','1')">
+                                            <button type="button" class="btn btn-primary"
+                                                onclick="addMorehour('Saturday','Saturday','1')">
                                                 {{ trans('lang.add_more') }}
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="restaurant_discount_options_Saturday_div restaurant_discount" style="display:none">
-                                        <table class="booking-table" id="special_offer_table_Saturday">
+                                    <div class="restaurant_working_options_Saturday_div restaurant_discount"
+                                        style="display:none">
+                                        <table class="booking-table" id="working_hour_table_Saturday">
                                             <tr>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.from') }}</label>
                                                 </th>
                                                 <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                                    <label class="col-3 control-label">{{ trans('lang.to') }}</label>
                                                 </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
-                                                </th>
-                                                <th>
-                                                    <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
-                                                        {{ trans('lang.type') }}</label>
-                                                </th>
-
                                                 <th>
                                                     <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
                                                 </th>
@@ -756,50 +378,486 @@
                                     </div>
                                 </div>
 
-                            </fieldset>
+                            </div>
+                        </fieldset>
 
-                            <fieldset id="story_upload_div" style="display: none;">
-                                <legend>{{trans('lang.story_plural')}}</legend>
-                                <div class="form-group row width-50 vendor_image">
-                                    <label class="col-3 control-label">{{trans('lang.choose_humbling_gif_image')}}</label>
-                                    <div class="">
-                                        <div id="story_thumbnail"></div>
+                        <fieldset>
+                            <legend>{{ trans('vendor') }} {{ trans('lang.active_deactive') }}</legend>
+                            <div class="form-group row">
+
+                                <div class="form-group row width-50">
+                                    <div class="form-check width-100">
+                                        <input type="checkbox" id="is_active">
+                                        <label class="col-3 control-label"
+                                            for="is_active">{{ trans('lang.active') }}</label>
                                     </div>
+                                </div>
+
+                            </div>
+                        </fieldset>
+
+                        <fieldset style="display: none;" id="services_feature">
+                            <legend>{{ trans('lang.services') }}</legend>
+                            <div class="form-group row">
+
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="Free_Wi_Fi">
+                                    <label class="col-3 control-label" for="Free_Wi_Fi">{{ trans('lang.wifi') }}</label>
+                                </div>
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="Good_for_Breakfast">
+                                    <label class="col-3 control-label"
+                                        for="Good_for_Breakfast">{{ trans('lang.breakfast') }}</label>
+                                </div>
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="Good_for_Dinner">
+                                    <label class="col-3 control-label"
+                                        for="Good_for_Dinner">{{ trans('lang.dinner') }}</label>
+                                </div>
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="Good_for_Lunch">
+                                    <label class="col-3 control-label"
+                                        for="Good_for_Lunch">{{ trans('lang.lunch') }}</label>
+                                </div>
+
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="Live_Music">
+                                    <label class="col-3 control-label"
+                                        for="Live_Music">{{ trans('lang.live_music') }}</label>
+                                </div>
+
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="Outdoor_Seating">
+                                    <label class="col-3 control-label"
+                                        for="Outdoor_Seating">{{ trans('lang.outdoor_seating') }}</label>
+                                </div>
+
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="Takes_Reservations">
+                                    <label class="col-3 control-label"
+                                        for="Takes_Reservations">{{ trans('lang.reservations') }}</label>
+                                </div>
+
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="Vegetarian_Friendly">
+                                    <label class="col-3 control-label"
+                                        for="Vegetarian_Friendly">{{ trans('lang.vegetarian_friendly') }}</label>
+                                </div>
+
+                            </div>
+                        </fieldset>
+
+                        <fieldset style="display:none;" id="is_dine_in_feature">
+                            <legend>{{ trans('lang.dine_in_future_setting') }}</legend>
+
+                            <div class="form-group row">
+
+                                <div class="form-group row width-100">
+                                    <div class="form-check width-100">
+                                        <input type="checkbox" id="dine_in_feature" class="">
+                                        <label class="col-3 control-label"
+                                            for="dine_in_feature">{{ trans('lang.enable_dine_in_feature') }}</label>
+                                    </div>
+                                </div>
+                                <div class="divein_div" style="display:none">
+
+                                    <div class="form-group row width-50">
+                                        <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                        <div class="col-7">
+                                            <input type="time" class="form-control" id="openDineTime" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row width-50">
+                                        <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                        <div class="col-7">
+                                            <input type="time" class="form-control" id="closeDineTime" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row width-50">
+                                        <label class="col-3 control-label">{{ trans('lang.cost') }}</label>
+                                        <div class="col-7">
+                                            <input type="number" class="form-control vendor_cost" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row width-100 vendor_image">
+                                        <label class="col-3 control-label">{{ trans('lang.menu_card') }}</label>
+                                        <div class="">
+                                            <div id="photos_menu_card"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div>
+                                            <input type="file" onChange="handleFileSelectMenuCard(event)">
+                                            <div id="uploaded_image_menu"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </fieldset>
+                        <fieldset class="selfDeliveryOption d-none">
+                            <legend>{{ trans('lang.self_delivery_setting') }}</legend>
+                            <div class="form-group row">
+                                <div class="form-group row width-100">
+                                    <div class="form-check width-100">
+                                        <input type="checkbox" id="enable_self_delivery" class="">
+                                        <label class="col-3 control-label"
+                                            for="enable_self_delivery">{{ trans('lang.enable_self_delivery') }}</label>
+                                        <div class="form-text text-muted">
+                                            {{ trans('lang.enable_self_delivery_help') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset id="delivery_charges_div">
+                            <legend>{{ trans('lang.deliveryCharge') }}</legend>
+
+                            <div class="form-group row">
+                                <div class="form-group row width-100">
+                                    <label class="col-4 control-label">{{ trans('lang.delivery_charges_per') }} <span
+                                            class="distance-type"></span></label>
+                                    <div class="col-7">
+                                        <input type="number" class="form-control" id="delivery_charges_per_km">
+                                    </div>
+                                </div>
+                                <div class="form-group row width-100">
+                                    <label class="col-4 control-label">{{ trans('lang.minimum_delivery_charges') }}</label>
+                                    <div class="col-7">
+                                        <input type="number" class="form-control" id="minimum_delivery_charges">
+                                    </div>
+                                </div>
+                                <div class="form-group row width-100">
+                                    <label class="col-4 control-label">{{ trans('lang.minimum_delivery_charges_within') }}
+                                        <span class="distance-type"></span></label>
+                                    <div class="col-7">
+                                        <input type="number" class="form-control" id="minimum_delivery_charges_within_km">
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>{{ trans('lang.special_offer') }}</legend>
+
+                            <div class="form-group row width-100">
+                                <div class="form-check width-100">
+                                    <input type="checkbox" id="enable_special_offer">
+                                    <label class="col-3 control-label"
+                                        for="enable_special_offer">{{ trans('lang.enable_special_offer') }}</label>
+                                </div>
+                            </div>
+                            <div class="form-group row width-100">
+                                <div class="col-7">
+                                    <button type="button" class="btn btn-primary  add_special_offer_restaurant_btn">
+                                        <i></i>{{ trans('lang.add_special_offer') }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="special_offer_div" style="display:none">
+                                <div class="form-group row">
+                                    <label class="col-1 control-label">{{ trans('lang.sunday') }}</label>
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-primary add_more_sunday"
+                                            onclick="addMoreButton('Sunday','sunday', '1')">
+                                            {{ trans('lang.add_more') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="restaurant_discount_options_Sunday_div restaurant_discount"
+                                    style="display:none">
+                                    <table class="booking-table" id="special_offer_table_Sunday">
+                                        <tr>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label
+                                                    class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
+                                                    {{ trans('lang.type') }}</label>
+                                            </th>
+
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
+                                            </th>
+                                        </tr>
+
+                                    </table>
                                 </div>
 
                                 <div class="form-group row">
-                                    <div>
-                                        <input type="file" id="file" onChange="handleStoryThumbnailFileSelect(event)">
-                                        <div id="uploding_story_thumbnail"></div>
+                                    <label class="col-1 control-label">{{ trans('lang.monday') }}</label>
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-primary add_more_sunday"
+                                            onclick="addMoreButton('Monday','monday', '1')">
+                                            {{ trans('lang.add_more') }}
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div class="form-group row vendor_image">
-                                    <label class="col-3 control-label">{{trans('lang.select_story_video')}}</label>
-                                    <div class="">
-                                        <div id="story_vedios" class="row"></div>
+                                <div class="restaurant_discount_options_Monday_div restaurant_discount"
+                                    style="display:none">
+
+                                    <table class="booking-table" id="special_offer_table_Monday">
+                                        <tr>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label
+                                                    class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
+                                                    {{ trans('lang.type') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-1 control-label">{{ trans('lang.tuesday') }}</label>
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-primary"
+                                            onclick="addMoreButton('Tuesday','tuesday', '1')">
+                                            {{ trans('lang.add_more') }}
+                                        </button>
                                     </div>
+                                </div>
+
+                                <div class="restaurant_discount_options_Tuesday_div restaurant_discount"
+                                    style="display:none">
+
+                                    <table class="booking-table" id="special_offer_table_Tuesday">
+                                        <tr>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label
+                                                    class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
+                                                    {{ trans('lang.type') }}</label>
+                                            </th>
+
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
+                                            </th>
+                                        </tr>
+
+                                    </table>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-1 control-label">{{ trans('lang.wednesday') }}</label>
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-primary"
+                                            onclick="addMoreButton('Wednesday','wednesday', '1')">
+                                            {{ trans('lang.add_more') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="restaurant_discount_options_Wednesday_div restaurant_discount"
+                                    style="display:none">
+                                    <table class="booking-table" id="special_offer_table_Wednesday">
+                                        <tr>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label
+                                                    class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
+                                                    {{ trans('lang.type') }}</label>
+                                            </th>
+
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
+                                            </th>
+                                        </tr>
+
+                                    </table>
                                 </div>
 
                                 <div class="form-group row">
-                                    <div>
-                                        <input type="file" id="video_file" onChange="handleStoryFileSelect(event)">
-                                        <div id="uploding_story_video"></div>
+                                    <label class="col-1 control-label">{{ trans('lang.thursday') }}</label>
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-primary"
+                                            onclick="addMoreButton('Thursday','thursday', '1')">
+                                            {{ trans('lang.add_more') }}
+                                        </button>
                                     </div>
                                 </div>
-                            </fieldset>
-                        </div>
+
+                                <div class="restaurant_discount_options_Thursday_div restaurant_discount"
+                                    style="display:none">
+                                    <table class="booking-table" id="special_offer_table_Thursday">
+                                        <tr>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label
+                                                    class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
+                                                    {{ trans('lang.type') }}</label>
+                                            </th>
+
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
+                                            </th>
+                                        </tr>
+
+                                    </table>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-1 control-label">{{ trans('lang.friday') }}</label>
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-primary"
+                                            onclick="addMoreButton('Friday','friday', '1')">
+                                            {{ trans('lang.add_more') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="restaurant_discount_options_Friday_div restaurant_discount"
+                                    style="display:none">
+                                    <table class="booking-table" id="special_offer_table_Friday">
+                                        <tr>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label
+                                                    class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
+                                                    {{ trans('lang.type') }}</label>
+                                            </th>
+
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
+                                            </th>
+                                        </tr>
+
+                                    </table>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-1 control-label">{{ trans('lang.Saturday') }}</label>
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-primary"
+                                            onclick="addMoreButton('Saturday','Saturday','1')">
+                                            {{ trans('lang.add_more') }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="restaurant_discount_options_Saturday_div restaurant_discount"
+                                    style="display:none">
+                                    <table class="booking-table" id="special_offer_table_Saturday">
+                                        <tr>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Opening_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.Closing_Time') }}</label>
+                                            </th>
+                                            <th>
+                                                <label
+                                                    class="col-3 control-label">{{ trans('lang.coupon_discount') }}</label>
+                                            </th>
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.coupon_discount') }}
+                                                    {{ trans('lang.type') }}</label>
+                                            </th>
+
+                                            <th>
+                                                <label class="col-3 control-label">{{ trans('lang.actions') }}</label>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </fieldset>
+
+                        <fieldset id="story_upload_div" style="display: none;">
+                            <legend>{{trans('lang.story_plural')}}</legend>
+                            <div class="form-group row width-50 vendor_image">
+                                <label class="col-3 control-label">{{trans('lang.choose_humbling_gif_image')}}</label>
+                                <div class="">
+                                    <div id="story_thumbnail"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div>
+                                    <input type="file" id="file" onChange="handleStoryThumbnailFileSelect(event)">
+                                    <div id="uploding_story_thumbnail"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row vendor_image">
+                                <label class="col-3 control-label">{{trans('lang.select_story_video')}}</label>
+                                <div class="">
+                                    <div id="story_vedios" class="row"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div>
+                                    <input type="file" id="video_file" onChange="handleStoryFileSelect(event)">
+                                    <div id="uploding_story_video"></div>
+                                </div>
+                            </div>
+                        </fieldset>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="form-group col-12 text-center btm-btn">
-                <button type="button" class="btn btn-primary  save-form-btn"><i class="fa fa-save"></i>
-                    {{ trans('lang.save') }}
-                </button>
-                <a href="{!! route('stores') !!}" class="btn btn-default"><i class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
-            </div>
-        
+        <div class="form-group col-12 text-center btm-btn">
+            <button type="button" class="btn btn-primary  save-form-btn"><i class="fa fa-save"></i>
+                {{ trans('lang.save') }}
+            </button>
+            <a href="{!! route('stores') !!}" class="btn btn-default"><i
+                    class="fa fa-undo"></i>{{ trans('lang.cancel') }}</a>
+        </div>
+
     </div>
 @endsection
 
@@ -864,7 +922,7 @@
         var vendor_id = database.collection("tmp").doc().id;
         var driverNearBy = database.collection('settings').doc("DriverNearBy");
 
-        database.collection('settings').doc("story").get().then(async function(snapshots) {
+        database.collection('settings').doc("story").get().then(async function (snapshots) {
             var story_data = snapshots.data();
             if (story_data.isEnabled) {
                 story_isEnabled = true;
@@ -873,7 +931,7 @@
         });
         var isSelfDelivery = false;
         var selfDeliveryRef = database.collection('settings').doc("globalSettings");
-        selfDeliveryRef.get().then(async function(settingSnapshots) {
+        selfDeliveryRef.get().then(async function (settingSnapshots) {
             if (settingSnapshots.data()) {
                 var settingData = settingSnapshots.data();
                 if (settingData.isSelfDelivery) {
@@ -883,7 +941,7 @@
         })
 
         var sectionRef = database.collection('sections').doc(section_id);
-        sectionRef.get().then(async function(sectionSnapshots) {
+        sectionRef.get().then(async function (sectionSnapshots) {
             if (sectionSnapshots.data()) {
                 sectionData = sectionSnapshots.data();
                 adminCommission = sectionData.adminCommision;
@@ -906,18 +964,18 @@
                     $("#is_dine_in_feature").show();
                     $("#services_feature").show();
                     dine_in_active = true;
-                }else{
-                    $("#services_feature").hide(); 
+                } else {
+                    $("#services_feature").hide();
                     $("#is_dine_in_feature").hide();
                 }
             }
         });
 
         driverNearBy.get().then(async function (snapshots) {
-            var driverNearByData = snapshots.data(); 
-            $(".distance-type").text(driverNearByData.distanceType);      
+            var driverNearByData = snapshots.data();
+            $(".distance-type").text(driverNearByData.distanceType);
         })
-        database.collection('zone').where('publish', '==', true).orderBy('name', 'asc').get().then(async function(snapshots) {
+        database.collection('zone').where('publish', '==', true).orderBy('name', 'asc').get().then(async function (snapshots) {
             snapshots.docs.forEach((listval) => {
                 var data = listval.data();
                 var area = [];
@@ -937,12 +995,12 @@
         var currentCurrency = '';
         var currencyAtRight = false;
         var refCurrency = database.collection('currencies').where('isActive', '==', true);
-        refCurrency.get().then(async function(snapshots) {
+        refCurrency.get().then(async function (snapshots) {
             var currencyData = snapshots.docs[0].data();
             currentCurrency = currencyData.symbol;
             currencyAtRight = currencyData.symbolAtRight;
         });
-        ref_sections.get().then(async function(snapshots) {
+        ref_sections.get().then(async function (snapshots) {
             snapshots.docs.forEach((listval) => {
                 var data = listval.data();
                 if (data.serviceTypeFlag == "delivery-service" || data.serviceTypeFlag == "ecommerce-service") {
@@ -950,7 +1008,7 @@
                 }
             })
         })
-        database.collection('users').where('role', '==', 'vendor').where('section_id', '==', section_id).orderBy('firstName', 'asc').get().then(async function(snapshots) {
+        database.collection('users').where('role', '==', 'vendor').where('section_id', '==', section_id).orderBy('firstName', 'asc').get().then(async function (snapshots) {
             snapshots.docs.forEach((listval) => {
                 var data = listval.data();
                 if ((data.vendorID == "" || data.vendorID == null) && data.firstName != "") {
@@ -962,7 +1020,7 @@
         });
 
         $('#vendor_cuisines').empty();
-        database.collection('vendor_categories').where('publish', '==', true).where('section_id', '==', section_id).get().then(async function(snapshots) {
+        database.collection('vendor_categories').where('publish', '==', true).where('section_id', '==', section_id).get().then(async function (snapshots) {
             snapshots.docs.forEach((listval) => {
                 var data = listval.data();
                 categories_list.push(data);
@@ -974,10 +1032,10 @@
                 "placeholder_text": "{{ trans('lang.select_cuisines') }}"
             });
         });
-        
-        $('#store_vendors').on('change', function() {
+
+        $('#store_vendors').on('change', function () {
             ownerId = $(this).val();
-            database.collection('users').where('id', '==', ownerId).get().then(async function(snapshot) {
+            database.collection('users').where('id', '==', ownerId).get().then(async function (snapshot) {
                 if (snapshot.docs.length > 0) {
                     var data = snapshot.docs[0].data();
                     if (data.hasOwnProperty('section_id') && data.section_id != null && data.section_id != '') {
@@ -996,7 +1054,7 @@
 
         var emailSetting = database.collection('settings').doc('emailSetting');
 
-        $(document).ready(async function() {
+        $(document).ready(async function () {
             jQuery("#data-table_processing").show();
             jQuery("#country_selector").select2({
                 templateResult: formatState,
@@ -1013,7 +1071,7 @@
                     var defaultPhoneCode = globalSettings.defaultCountryCode.replace('+', '').trim();
 
                     // Find the option with matching phoneCode
-                    var $option = $("#country_selector option").filter(function() {
+                    var $option = $("#country_selector option").filter(function () {
                         return $(this).val() === defaultPhoneCode;
                     });
 
@@ -1028,11 +1086,11 @@
             });
             // --- END OF DEFAULT COUNTRY LOGIC ---
 
-            await email_templates.get().then(async function(snapshots) {
+            await email_templates.get().then(async function (snapshots) {
                 emailTemplatesData = snapshots.docs[0].data();
             });
 
-            await emailSetting.get().then(async function(snapshots) {
+            await emailSetting.get().then(async function (snapshots) {
                 var emailSettingData = snapshots.data();
 
                 adminEmail = emailSettingData.userName;
@@ -1041,7 +1099,7 @@
 
             jQuery("#data-table_processing").hide();
 
-            ref_deliverycharge.get().then(async function(snapshots_charge) {
+            ref_deliverycharge.get().then(async function (snapshots_charge) {
                 var deliveryChargeSettings = snapshots_charge.data();
                 try {
                     if (deliveryChargeSettings.vendor_can_modify) {
@@ -1063,12 +1121,12 @@
                 }
             });
         })
-        
-        $(".save-form-btn").click(async function() {
+
+        $(".save-form-btn").click(async function () {
             $(".error_top").hide();
             var vendorname = $(".vendor_name").val();
             var cuisines = $("#vendor_cuisines").val();
-            var categoryTitle = $("#vendor_cuisines option:selected").map(function() {
+            var categoryTitle = $("#vendor_cuisines option:selected").map(function () {
                 return $(this).text();
             }).get();
             var vendorOwner = $("#vendor_owners option:selected").val();
@@ -1078,7 +1136,7 @@
             var description = $(".vendor_description").val();
             var country_code = '+' + $("#country_selector").val();
             var phonenumber = $(".vendor_phone").val();
-            
+
             var enabledDiveInFuture = $("#dine_in_feature").is(':checked');
             var vendorCost = $(".vendor_cost").val();
             var vendor_active = false;
@@ -1251,7 +1309,7 @@
                 'minimum_delivery_charges': minimum_delivery_charges,
                 'minimum_delivery_charges_within_km': minimum_delivery_charges_within_km
             };
-         
+
             if (vendorname == '') {
                 $(".error_top").show();
                 $(".error_top").html("");
@@ -1277,7 +1335,7 @@
                 $(".error_top").html("");
                 $(".error_top").append("<p>{{ trans('lang.vendor_address_error') }}</p>");
                 window.scrollTo(0, 0);
-            }else if (zoneId == '') {
+            } else if (zoneId == '') {
                 $(".error_top").show();
                 $(".error_top").html("");
                 $(".error_top").append("<p>{{ trans('lang.select_zone_help') }}</p>");
@@ -1310,7 +1368,7 @@
                 $(".error_top").append("<p>{{ trans('lang.vendor_description_error') }}</p>");
                 window.scrollTo(0, 0);
 
-            }else if (isInZone == false) {
+            } else if (isInZone == false) {
                 $(".error_top").show();
                 $(".error_top").html("");
                 $(".error_top").append("<p>{{ trans('lang.invalid_location_zone') }}</p>");
@@ -1359,7 +1417,7 @@
                                 'section_id': section_id,
                                 'vendorID': vendor_id,
 
-                            }).then(function(result) {
+                            }).then(function (result) {
 
                                 coordinates = new firebase.firestore.GeoPoint(latitude, longitude);
 
@@ -1399,7 +1457,21 @@
                                     'isSelfDelivery': enable_self_delivery,
                                     'zoneId': zoneId,
 
-                                }).then(async function(result) {
+                                }).then(async function (result) {
+                                    await syncToDjango('vendors/vendors/', 'POST', {
+                                        'firestore_id': id,
+                                        'title': vendorname,
+                                        'description': description,
+                                        'location': {
+                                            'lat': latitude,
+                                            'lng': longitude
+                                        },
+                                        'photo_url': (Array.isArray(GalleryIMG) && GalleryIMG.length > 0) ? GalleryIMG[0] : null,
+                                        'category_id': cuisines,
+                                        'phone': country_code + phonenumber,
+                                        'section_id': section_id,
+                                        'is_active': true
+                                    });
                                     await database.collection('users').doc(user_id).update({
                                         'section_id': section_id
                                     })
@@ -1407,7 +1479,7 @@
                                     if (deliveryChargeFlag) {
                                         geoFirestore.collection('vendors').doc(vendor_id).update({
                                             'deliveryCharge': deliveryCharge
-                                        }).then(async function(result) {
+                                        }).then(async function (result) {
                                             window.location.href = '{{ route('stores') }}';
                                         });
                                     } else {
@@ -1416,7 +1488,7 @@
                                 });
                             })
 
-                        }).catch(function(error) {
+                        }).catch(function (error) {
                             jQuery("#data-table_processing").hide();
                             $(".error_top").show();
                             $(".error_top").html("");
@@ -1441,7 +1513,7 @@
 
         });
 
-        $(".add_special_offer_restaurant_btn").click(function() {
+        $(".add_special_offer_restaurant_btn").click(function () {
             $(".special_offer_div").show();
         })
 
@@ -1459,21 +1531,21 @@
                 '<td class="" style="width:10%;"><input type="time" class="form-control" id="openTime' + day + count + '"></td>' +
                 '<td class="" style="width:10%;"><input type="time" class="form-control" id="closeTime' + day + count + '"></td>' +
                 '<td class="" style="width:30%;">' +
-                    '<input type="number" class="form-control" id="discount' + day + count + '" style="width:60%;">' +
-                    '<select id="discount_type' + day + count + '" class="form-control" style="width:40%;">' +
-                        '<option value="percentage"/>%</option>' +
-                        '<option value="amount"/>' + currentCurrency + '</option>' +
-                    '</select>' +
+                '<input type="number" class="form-control" id="discount' + day + count + '" style="width:60%;">' +
+                '<select id="discount_type' + day + count + '" class="form-control" style="width:40%;">' +
+                '<option value="percentage"/>%</option>' +
+                '<option value="amount"/>' + currentCurrency + '</option>' +
+                '</select>' +
                 '</td>' +
                 '<td style="width:30%;">' +
-                    '<select id="type' + day + count + '" class="form-control">' +
-                        '<option value="delivery"/>Delivery Discount</option>' +
-                        dineInOption +
-                    '</select>' +
+                '<select id="type' + day + count + '" class="form-control">' +
+                '<option value="delivery"/>Delivery Discount</option>' +
+                dineInOption +
+                '</select>' +
                 '</td>' +
                 '<td class="action-btn" style="width:20%;">' +
-                    '<button type="button" class="btn btn-primary save_option_day_button' + day + count + 
-                    '" onclick="addMoreFunctionButton(`' + day2 + '`,`' + day + '`,' + countAddButton + ')" style="width:62%;">Save</button>' +
+                '<button type="button" class="btn btn-primary save_option_day_button' + day + count +
+                '" onclick="addMoreFunctionButton(`' + day2 + '`,`' + day + '`,' + countAddButton + ')" style="width:62%;">Save</button>' +
                 '</td></tr>');
             countAddButton++;
 
@@ -1538,7 +1610,7 @@
 
             database.collection('vendors').doc(id).update({
                 'specialDiscount': specialDiscount
-            }).then(function(result) {
+            }).then(function (result) {
 
             });
         }
@@ -1613,7 +1685,7 @@
                 var newOpenTime = timeToDate(openTime);
                 var newCloseTime = timeToDate(closeTime);
 
-                existingTimeslots.forEach(function(slot) {
+                existingTimeslots.forEach(function (slot) {
                     var existingStart = timeToDate(slot.from);
                     var existingEnd = timeToDate(slot.to);
 
@@ -1668,7 +1740,7 @@
 
         }
 
-        $(".add_working_hours_restaurant_btn").click(function() {
+        $(".add_working_hours_restaurant_btn").click(function () {
             $(".working_hours_div").show();
         })
         var countAddhours = 1;
@@ -1733,8 +1805,8 @@
         function handleFileSelectowner(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
 
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
@@ -1756,8 +1828,8 @@
         function handleFileSelect(evt, type) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
 
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
@@ -1805,7 +1877,7 @@
 
             video.preload = 'metadata';
 
-            video.onloadedmetadata = function() {
+            video.onloadedmetadata = function () {
 
                 window.URL.revokeObjectURL(video.src);
 
@@ -1819,8 +1891,8 @@
                     return false;
                 }
 
-                reader.onload = (function(theFile) {
-                    return function(e) {
+                reader.onload = (function (theFile) {
+                    return function (e) {
 
                         var filePayload = e.target.result;
                         var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
@@ -1833,16 +1905,16 @@
                         var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
 
                         var uploadTask = storyRef.child(filename).put(theFile);
-                      
-                        uploadTask.on('state_changed', function(snapshot) {
+
+                        uploadTask.on('state_changed', function (snapshot) {
 
                             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                           
+
                             jQuery("#uploding_story_video").text("video is uploading...");
-                        }, function(error) {}, function() {
-                            uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                        }, function (error) { }, function () {
+                            uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
                                 jQuery("#uploding_story_video").text("Upload is completed");
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     jQuery("#uploding_story_video").empty();
                                 }, 3000);
 
@@ -1867,7 +1939,7 @@
         }
 
 
-        $(document).on("click", ".remove-story-video", function() {
+        $(document).on("click", ".remove-story-video", function () {
             var id = $(this).attr('data-id');
             var photo_remove = $(this).attr('data-img');
             firebase.storage().refFromURL(photo_remove).delete();
@@ -1892,7 +1964,7 @@
             deleteStoryfromCollection();
         });
 
-        $(document).on("click", ".remove-story-thumbnail", function() {
+        $(document).on("click", ".remove-story-thumbnail", function () {
             var photo_remove = $(this).attr('data-img');
             $("#story_thumbnail").empty();
 
@@ -1903,7 +1975,7 @@
 
         function deleteStoryfromCollection() {
             if (story_vedios.length == 0 && story_thumbnail == '') {
-                database.collection('story').where('vendorID', '==', vendor_id).get().then(async function(snapshot) {
+                database.collection('story').where('vendorID', '==', vendor_id).get().then(async function (snapshot) {
                     if (snapshot.docs.length > 0) {
                         database.collection('story').doc(vendor_id).delete();
                     }
@@ -1932,8 +2004,8 @@
                 fileInput.value = '';
                 return false;
             }
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
 
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
@@ -1956,8 +2028,8 @@
         function handleFileSelectMenuCard(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
 
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
@@ -1984,7 +2056,7 @@
             reader.readAsDataURL(f);
         }
 
-        $("#dine_in_feature").change(function() {
+        $("#dine_in_feature").change(function () {
             if (this.checked) {
                 $(".divein_div").show();
             } else {
@@ -2091,7 +2163,7 @@
             }
             return newPhoto;
         }
-        $(document).on("click", ".remove-btn", function() {
+        $(document).on("click", ".remove-btn", function () {
             var id = $(this).attr('data-id');
             var photo_remove = $(this).attr('data-img');
             $("#photo_" + id).remove();
@@ -2101,7 +2173,7 @@
             }
 
         });
-        $(document).on("click", ".remove-menu-btn", function() {
+        $(document).on("click", ".remove-menu-btn", function () {
             var id = $(this).attr('data-id');
             var photo_remove = $(this).attr('data-img');
             $("#photo_menu" + id).remove();
@@ -2113,7 +2185,7 @@
         });
         async function getOwnerDetails(selectedOwnerId) {
             var data = '';
-            await database.collection('users').doc(selectedOwnerId).get().then(async function(
+            await database.collection('users').doc(selectedOwnerId).get().then(async function (
                 snapshot) {
                 data = snapshot.data();
             })

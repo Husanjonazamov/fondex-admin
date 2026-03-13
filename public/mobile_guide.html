@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mobile Guide — Haydovchi Ro'yxatdan O'tish</title>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 750px;
+            margin: 30px auto;
+            padding: 20px;
+            color: #1a1a1a;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        h1 {
+            color: #e94560;
+            border-bottom: 3px solid #e94560;
+            padding-bottom: 10px;
+            font-size: 24px;
+        }
+
+        h2 {
+            color: #0f3460;
+            margin-top: 30px;
+            border-left: 4px solid #e94560;
+            padding-left: 12px;
+            font-size: 18px;
+        }
+
+        .date {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        pre {
+            background: #f4f4f8;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        code {
+            background: #f0f0f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: #0f3460;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .important {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .important strong {
+            color: #856404;
+        }
+
+        .step-box {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 15px 0;
+        }
+
+        .flow-box {
+            background: #f4f4f8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        .flow-box .arrow {
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .btn-print {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .btn-print:hover {
+            background: #c81d4e;
+        }
+
+        .collection-name {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .field-name {
+            color: #0f3460;
+            font-weight: bold;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="btn-print no-print" onclick="window.print()">📄 PDF sifatida saqlash (Ctrl+P)</button>
+
+    <h1>📱 Mobile Guide — Haydovchi Ro'yxatdan O'tish</h1>
+    <p class="date">Sana: 2026-02-19 | Loyiha: Fondex</p>
+
+    <!-- =============== COLLECTIONS =============== -->
+    <h2>Firestore Collectionlar</h2>
+
+    <h3>1. <span class="collection-name">vehicle_type</span> — Transport tariflari</h3>
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Misol</th>
+            <th>Tavsif</th>
+        </tr>
+        <tr>
+            <td class="field-name">id</td>
+            <td>String</td>
+            <td>"vt_001"</td>
+            <td>Unique ID</td>
+        </tr>
+        <tr>
+            <td class="field-name">name</td>
+            <td>String</td>
+            <td>"Comfort"</td>
+            <td>Tarif nomi</td>
+        </tr>
+        <tr>
+            <td class="field-name">sectionId</td>
+            <td>String</td>
+            <td>"section_abc"</td>
+            <td>Section ID</td>
+        </tr>
+        <tr>
+            <td class="field-name">isActive</td>
+            <td>Boolean</td>
+            <td>true</td>
+            <td>Faolmi</td>
+        </tr>
+    </table>
+
+    <h3>2. <span class="collection-name">car_make</span> — Brendlar</h3>
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Misol</th>
+            <th>Tavsif</th>
+        </tr>
+        <tr>
+            <td class="field-name">id</td>
+            <td>String</td>
+            <td>"mk_001"</td>
+            <td>Unique ID</td>
+        </tr>
+        <tr>
+            <td class="field-name">name</td>
+            <td>String</td>
+            <td>"Chevrolet"</td>
+            <td>Brend nomi</td>
+        </tr>
+        <tr>
+            <td class="field-name">isActive</td>
+            <td>Boolean</td>
+            <td>true</td>
+            <td>Faolmi</td>
+        </tr>
+    </table>
+
+    <h3>3. <span class="collection-name">car_model</span> — Modellar</h3>
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Misol</th>
+            <th>Tavsif</th>
+        </tr>
+        <tr>
+            <td class="field-name">id</td>
+            <td>String</td>
+            <td>"md_001"</td>
+            <td>Unique ID</td>
+        </tr>
+        <tr>
+            <td class="field-name">name</td>
+            <td>String</td>
+            <td>"Malibu 2"</td>
+            <td>Model nomi</td>
+        </tr>
+        <tr>
+            <td class="field-name">car_make_id</td>
+            <td>String</td>
+            <td>"mk_001"</td>
+            <td>Brendning ID si</td>
+        </tr>
+        <tr>
+            <td class="field-name">car_make_name</td>
+            <td>String</td>
+            <td>"Chevrolet"</td>
+            <td>Brend nomi</td>
+        </tr>
+        <tr>
+            <td class="field-name">vehicle_type_id</td>
+            <td>String</td>
+            <td>"vt_001"</td>
+            <td>Tarif ID si</td>
+        </tr>
+        <tr>
+            <td class="field-name">vehicle_type_name</td>
+            <td>String</td>
+            <td>"Comfort"</td>
+            <td>Tarif nomi</td>
+        </tr>
+        <tr>
+            <td class="field-name">isActive</td>
+            <td>Boolean</td>
+            <td>true</td>
+            <td>Faolmi</td>
+        </tr>
+    </table>
+
+    <!-- =============== STEP 1 =============== -->
+    <h2>QADAM 1 — Vehicle Type olish</h2>
+
+    <div class="step-box">
+        <strong>Collection:</strong> <span class="collection-name">vehicle_type</span><br>
+        <strong>Filtr:</strong> <code>where('sectionId', isEqualTo: currentSectionId)</code>
+    </div>
+
+    <pre>
+QuerySnapshot types = await FirebaseFirestore.instance
+    .collection('vehicle_type')
+    .where('sectionId', isEqualTo: currentSectionId)
+    .get();
+
+// Dropdown uchun:
+// value = doc['id']     → "vt_001"
+// label = doc['name']   → "Comfort"
+
+// Saqlab qo'yish:
+String selectedVehicleTypeId = doc['id'];       // "vt_001"
+String selectedVehicleTypeName = doc['name'];   // "Comfort"
+</pre>
+
+    <!-- =============== STEP 2 =============== -->
+    <h2>QADAM 2 — Car Make olish (Vehicle Type bo'yicha)</h2>
+
+    <div class="step-box">
+        <strong>Collection:</strong> <span class="collection-name">car_model</span><br>
+        <strong>Filtr:</strong> <code>where('vehicle_type_id', isEqualTo: selectedVehicleTypeId)</code><br>
+        <strong>Natija:</strong> Noyob <code>car_make_id</code> va <code>car_make_name</code> larni ajratish
+    </div>
+
+    <pre>
+QuerySnapshot models = await FirebaseFirestore.instance
+    .collection('car_model')
+    .where('vehicle_type_id', isEqualTo: selectedVehicleTypeId)
+    .get();
+
+// Noyob brendlarni ajratish:
+Set&lt;String&gt; usedMakeIds = {};
+List&lt;Map&lt;String, String&gt;&gt; makesList = [];
+
+for (var doc in models.docs) {
+  String makeId = doc['car_make_id'];
+  String makeName = doc['car_make_name'];
+
+  if (!usedMakeIds.contains(makeId)) {
+    usedMakeIds.add(makeId);
+    makesList.add({'id': makeId, 'name': makeName});
+  }
+}
+
+// makesList = [{id: "mk_001", name: "Chevrolet"}, ...]
+// Faqat tanlangan tarifga tegishli brendlar!
+
+// Saqlab qo'yish:
+String selectedCarMakeId = tanlangan['id'];      // "mk_001"
+String selectedCarMakeName = tanlangan['name'];  // "Chevrolet"
+</pre>
+
+    <!-- =============== STEP 3 =============== -->
+    <h2>QADAM 3 — Car Model olish (Vehicle Type + Make bo'yicha)</h2>
+
+    <div class="step-box">
+        <strong>Collection:</strong> <span class="collection-name">car_model</span><br>
+        <strong>Filtr:</strong> <code>where('vehicle_type_id' == ...) + where('car_make_id' == ...)</code>
+    </div>
+
+    <pre>
+QuerySnapshot filteredModels = await FirebaseFirestore.instance
+    .collection('car_model')
+    .where('vehicle_type_id', isEqualTo: selectedVehicleTypeId)
+    .where('car_make_id', isEqualTo: selectedCarMakeId)
+    .get();
+
+// filteredModels = [Malibu 2, Captiva, ...]
+// Faqat tanlangan tarif + brend ga tegishli modellar!
+
+// Saqlab qo'yish:
+String selectedCarModelName = doc['name'];  // "Malibu 2"
+</pre>
+
+    <!-- =============== STEP 4 =============== -->
+    <h2>QADAM 4 — Saqlash (users collection)</h2>
+
+    <div class="step-box">
+        <strong>Collection:</strong> <span class="collection-name">users</span><br>
+        <strong>Amal:</strong> <code>doc(uid).set({...})</code>
+    </div>
+
+    <pre>
+await FirebaseFirestore.instance.collection('users').doc(uid).set({
+  'id': uid,
+  'firstName': firstName,
+  'lastName': lastName,
+  'email': email,
+  'phoneNumber': phone,
+  'role': 'driver',
+  'serviceType': 'cab-service',
+  'sectionId': sectionId,
+  'vehicleType': selectedVehicleTypeName,   // "Comfort"
+  'vehicleId': selectedVehicleTypeId,       // "vt_001"
+  'carMakes': selectedCarMakeName,          // "Chevrolet"
+  'carName': selectedCarModelName,          // "Malibu 2"
+  'carNumber': carNumber,                   // "01A123AA"
+  'rideType': rideType,                     // "ride"
+  'active': true,
+  'zoneId': zoneId,
+  'isDocumentVerify': false,
+  'wallet_amount': 0,
+});
+</pre>
+
+    <!-- =============== FLOW =============== -->
+    <h2>To'liq Jarayon</h2>
+
+    <div class="flow-box">
+        <strong>1.</strong> vehicle_type → <code>where('sectionId' == ...)</code> → <span class="field-name">id</span>,
+        <span class="field-name">name</span><br>
+        <span class="arrow">↓</span><br>
+        <strong>2.</strong> car_model → <code>where('vehicle_type_id' == ...)</code> → noyob <span
+            class="field-name">car_make_id</span>, <span class="field-name">car_make_name</span><br>
+        <span class="arrow">↓</span><br>
+        <strong>3.</strong> car_model → <code>where('vehicle_type_id' == ...) + where('car_make_id' == ...)</code> →
+        <span class="field-name">name</span><br>
+        <span class="arrow">↓</span><br>
+        <strong>4.</strong> users → <code>doc(uid).set({...})</code>
+    </div>
+
+    <!-- =============== IMPORTANT =============== -->
+    <div class="important">
+        <strong>❗ MUHIM:</strong> Agar <code>car_model</code> hujjatlarida <code>vehicle_type_id</code> fieldi bo'lmasa,
+        admin paneldan <strong>Car Model</strong> bo'limiga kirib, har bir modelga <strong>Vehicle Type</strong>
+        biriktirish kerak. Bu fieldni admin panel avtomatik saqlaydi.
+    </div>
+
+    <h2>Xulosa Jadvali</h2>
+    <table>
+        <tr>
+            <th>Qadam</th>
+            <th>Collection</th>
+            <th>Query</th>
+            <th>Olinadigan field</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>vehicle_type</td>
+            <td>where('sectionId' == ...)</td>
+            <td>id, name</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>car_model</td>
+            <td>where('vehicle_type_id' == ...)</td>
+            <td>noyob car_make_id, car_make_name</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>car_model</td>
+            <td>where('vehicle_type_id') + where('car_make_id')</td>
+            <td>id, name</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>users</td>
+            <td>doc(uid).set({...})</td>
+            <td>—</td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

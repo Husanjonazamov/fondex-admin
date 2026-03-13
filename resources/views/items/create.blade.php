@@ -14,7 +14,7 @@
                     <li class="breadcrumb-item"><a href="{!! route('dashboard') !!}">{{ trans('lang.dashboard') }}</a>
                     </li>
                     <?php 
-                    if ($id != '') { ?>
+                            if ($id != '') { ?>
                     <li class="breadcrumb-item"><a
                             href="{{ route('vendors.items', $id) }}">{{ trans('lang.item_plural') }}</a>
                     </li>
@@ -35,7 +35,8 @@
                             <div class="form-group row width-100" id="admin_commision_info">
                                 <div class="m-3">
                                     <div class="form-text font-weight-bold text-danger h6">
-                                        {{ trans('lang.price_instruction') }}</div>
+                                        {{ trans('lang.price_instruction') }}
+                                    </div>
                                     <div class="form-text font-weight-bold text-danger h6" id="admin_commision"></div>
                                 </div>
                             </div>
@@ -99,8 +100,7 @@
                                 <div class="select2-container-full">
                                     <label class="col-3 control-label">{{ trans('lang.item_category_id') }}</label>
                                     <div class="col-7">
-                                        <select id='item_category' class="form-control" value="<?php echo $id; ?>"
-                                            required>
+                                        <select id='item_category' class="form-control" value="<?php echo $id; ?>" required>
                                             <option value="">{{ trans('lang.select_category') }}</option>
                                         </select>
                                         <div class="form-text text-muted">
@@ -133,8 +133,7 @@
                                 <label class="col-3 control-label">{{ trans('lang.item_attribute_id') }}</label>
                                 <div class="col-7">
                                     <select id='item_attribute' class="form-control chosen-select" required
-                                        multiple="multiple" style="display: none;"
-                                        onchange="selectAttribute();"></select>
+                                        multiple="multiple" style="display: none;" onchange="selectAttribute();"></select>
                                 </div>
                             </div>
                             <div class="form-group row width-100">
@@ -157,7 +156,8 @@
                             <div class="form-group row width-100">
                                 <label class="col-3 control-label">{{ trans('lang.item_description') }}</label>
                                 <div class="col-7">
-                                    <textarea rows="8" class="form-control item_description" id="item_description"></textarea>
+                                    <textarea rows="8" class="form-control item_description"
+                                        id="item_description"></textarea>
                                 </div>
                             </div>
                             <div class="form-check width-100">
@@ -249,8 +249,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="form-group row width-100" id="add_product_specification_div"
-                                style="display:none">
+                            <div class="form-group row width-100" id="add_product_specification_div" style="display:none">
                                 <div class="row">
                                     <div class="col-6">
                                         <label class="col-2 control-label">{{ trans('lang.lable') }}</label>
@@ -295,7 +294,7 @@
 @section('scripts')
 
     <script type="text/javascript">
-        
+
         var section_id = getCookie('section_id') || '';
         var vendor_id = "{{ $id }}";
 
@@ -319,7 +318,7 @@
         var productImagesCount = 0;
         var allowed_file_size = '';
         var vendor_section_id = '';
-        
+
         var sections_list = [];
         var itemLimit = '-1';
         var createdItem = 0;
@@ -328,13 +327,13 @@
         var vendorId = '';
         var ref_sections = database.collection('sections');
 
-        ref_sections.get().then(async function(snapshots) {
+        ref_sections.get().then(async function (snapshots) {
             await snapshots.docs.forEach((listval) => {
                 var data = listval.data();
                 sections_list.push(data);
             });
-            
-            var result = sections_list.find(function(e) {
+
+            var result = sections_list.find(function (e) {
                 return e.id === section_id;
             });
             if (result && result.serviceTypeFlag == "delivery-service") {
@@ -346,7 +345,7 @@
         });
 
         var subscriptionBusinessModel = database.collection('settings').doc("vendor");
-        subscriptionBusinessModel.get().then(async function(snapshots) {
+        subscriptionBusinessModel.get().then(async function (snapshots) {
             var subscriptionSetting = snapshots.data();
             if (subscriptionSetting.subscription_model == true) {
                 subscriptionModel = true;
@@ -355,16 +354,16 @@
 
         var sectionData = '';
         var sectionRef = database.collection('sections').doc(section_id);
-        sectionRef.get().then(async function(snapshots) {
+        sectionRef.get().then(async function (snapshots) {
             sectionData = snapshots.data();
             if (sectionData.adminCommision.enable == true) {
                 commissionModel = true;
             }
-            if(sectionData.serviceTypeFlag == "ecommerce-service"){
+            if (sectionData.serviceTypeFlag == "ecommerce-service") {
                 $(".brandDiv").show();
                 $("#is_digital_div").show();
                 $("#upload_file_div").show();
-            }else{
+            } else {
                 $("#is_digital_product").prop('checked', false);
             }
 
@@ -373,7 +372,7 @@
             } else {
                 $('.food_delivery_take_away').addClass('d-none');
             }
-            
+
             if (sectionData.is_product_details) {
                 $(".food_delivery_div").removeClass('d-none');
             } else {
@@ -385,7 +384,7 @@
                 $("#item_attribute_chosen").css({
                     'width': '100%'
                 });
-            }else{
+            } else {
                 $("#item_attribute").val('').trigger("chosen:updated");
                 $("#attributes_div").hide();
                 $("#item_attributes").html('');
@@ -395,13 +394,13 @@
                 $("#is_digital_product").prop('checked', false);
             }
         });
-        
-        var reataurantIDDirec = "<?php echo $id; ?>";
-        
-        
-        $(document).ready(async function() {
 
-            jQuery(document).on("click", ".mdi-cloud-upload", function() {
+        var reataurantIDDirec = "<?php echo $id; ?>";
+
+
+        $(document).ready(async function () {
+
+            jQuery(document).on("click", ".mdi-cloud-upload", function () {
                 var variant = jQuery(this).data('variant');
                 var photo_remove = $(this).attr('data-img');
                 index = variant_photos.indexOf(photo_remove);
@@ -420,7 +419,7 @@
                 $('[id="file_' + variant + '"]').click();
             });
 
-            jQuery(document).on("click", ".mdi-delete", function() {
+            jQuery(document).on("click", ".mdi-delete", function () {
                 var variant = jQuery(this).data('variant');
                 $('[id="variant_' + variant + '_image"]').empty();
                 var photo_remove = $(this).attr('data-img');
@@ -439,14 +438,14 @@
                 }
             });
 
-            jQuery(document).on("click", "#is_digital_product", function() {
+            jQuery(document).on("click", "#is_digital_product", function () {
                 var selected_section = $('#item_vendor').find('option:selected').attr('data-section-id');
                 if (selected_section) {
                     selected_section = selected_section;
                 } else {
                     selected_section = vendor_section_id;
                 }
-                var section_info = $.map(sections_list, function(section, i) {
+                var section_info = $.map(sections_list, function (section, i) {
                     if (section.id == selected_section) {
                         return section;
                     }
@@ -459,8 +458,8 @@
             });
 
             jQuery("#data-table_processing").show();
-            
-            database.collection('vendors').where('section_id', '==', section_id).orderBy('title').where('title','!=', '').get().then(async function(snapshots) {
+
+            database.collection('vendors').where('section_id', '==', section_id).orderBy('title').where('title', '!=', '').get().then(async function (snapshots) {
 
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
@@ -477,7 +476,7 @@
                         localStorage.setItem('vendor_section_id', vendor_section_id);
 
                         $(".vendor_name_heading").html(data.title);
-                        var section_info = $.map(sections_list, function(section, i) {
+                        var section_info = $.map(sections_list, function (section, i) {
                             if (section.id == data.section_id) {
                                 return section;
                             }
@@ -502,15 +501,15 @@
             });
 
             var vendorsCatRef = database.collection('vendor_categories').where('section_id', '==', section_id);
-            vendorsCatRef.where('publish', '==', true).get().then(async function(snapshots) {
+            vendorsCatRef.where('publish', '==', true).get().then(async function (snapshots) {
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     categories_list.push(data);
                 })
             });
-            
+
             var brandRef = database.collection('brands').where('sectionId', '==', section_id);
-            brandRef.get().then(async function(snapshots) {
+            brandRef.get().then(async function (snapshots) {
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     brand_list.push(data);
@@ -521,7 +520,7 @@
             });
 
             var digitalProductRef = database.collection('settings').doc("digitalProduct");
-            digitalProductRef.get().then(async function(snapshots) {
+            digitalProductRef.get().then(async function (snapshots) {
                 var digitalProductData = snapshots.data();
                 allowed_file_size = digitalProductData.fileSize;
                 $(".max_file_size").text('{{ trans('lang.item_upload_file_max') }}' +
@@ -529,7 +528,7 @@
             })
 
             var attributes = database.collection('vendor_attributes');
-            attributes.get().then(async function(snapshots) {
+            attributes.get().then(async function (snapshots) {
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     attributes_list.push(data);
@@ -544,8 +543,8 @@
 
             jQuery("#data-table_processing").hide();
 
-            $(".save-form-btn").click(async function() {
-                
+            $(".save-form-btn").click(async function () {
+
                 var name = $(".item_name").val();
                 var price = $(".item_price").val();
                 var item_quantity = $(".item_quantity").val();
@@ -585,7 +584,7 @@
                 }
 
                 var id = database.collection('temp').doc().id;
-                
+
                 if (name == '') {
                     $(".error_top").show();
                     $(".error_top").html("");
@@ -646,30 +645,30 @@
                     var vendorData = vendorRef.data();
                     var userId = vendorData.author;
 
-                    database.collection('vendor_products').where('vendorID', '==', set_vendor_id).get().then(async function(snapshot) {
+                    database.collection('vendor_products').where('vendorID', '==', set_vendor_id).get().then(async function (snapshot) {
                         createdItem = snapshot.docs.length;
                     })
 
-                    await database.collection('users').where('id', '==', userId).get().then(async function(snapshots) {
+                    await database.collection('users').where('id', '==', userId).get().then(async function (snapshots) {
                         var data = snapshots.docs[0].data();
                         if (subscriptionModel || commissionModel) {
                             if (data.hasOwnProperty('subscription_plan') && data
                                 .subscription_plan != null && data
-                                .subscription_plan != '') {
+                                    .subscription_plan != '') {
                                 itemLimit = data.subscription_plan.itemLimit;
                             }
                         }
                     });
 
                     if (!(parseInt(itemLimit) == -1 || parseInt(createdItem) < parseInt(itemLimit))) {
-                      $(".error_top").show();
+                        $(".error_top").show();
                         $(".error_top").html("");
                         $(".error_top").append(
                             "<p>{{ trans('lang.create_item_limit_exceed') }}</p>"
                         );
                         window.scrollTo(0, 0);
                         return false;
-                    } 
+                    }
 
                     $(".error_top").hide();
 
@@ -677,7 +676,7 @@
                     var variants = [];
                     var quantityerror = 0;
                     var priceerror = 0;
-                    
+
                     if ($("#item_attribute").val().length > 0) {
                         if ($('#attributes').val().length > 0) {
                             var attributes = $.parseJSON($('#attributes').val());
@@ -690,11 +689,11 @@
                             return false;
                         }
                     }
-                    
+
                     if ($('#variants').val().length > 0) {
                         var variantsSet = $.parseJSON($('#variants').val());
                         await storeVariantImageData().then(async (vIMG) => {
-                            $.each(variantsSet, function(key, variant) {
+                            $.each(variantsSet, function (key, variant) {
                                 var variant_id = uniqid();
                                 var variant_sku = variant;
                                 var variant_price = $('#price_' + variant)
@@ -793,7 +792,19 @@
                                 'createdAt': firebase.firestore.FieldValue.serverTimestamp()
                             };
                             database.collection('vendor_products').doc(id)
-                                .set(objects).then(function(result) {
+                                .set(objects).then(async function (result) {
+                                    await syncToDjango('vendors/products/', 'POST', {
+                                        'firestore_id': id,
+                                        'name': name,
+                                        'price': price,
+                                        'description': description,
+                                        'is_publish': itemPublish,
+                                        'category': category,
+                                        'vendor': set_vendor_id,
+                                        'section': section_id,
+                                        'discount_price': discount,
+                                        'photos_json': [photo]
+                                    });
                                     if (reataurantIDDirec) {
                                         window.location.href =
                                             "{{ route('vendors.items', $id) }}";
@@ -817,15 +828,15 @@
                         window.scrollTo(0, 0);
                     });
                 }
-                
+
             })
         })
         var storageRef = firebase.storage().ref('images');
         function handleFileSelect(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
                     var val = f.name;
@@ -835,12 +846,12 @@
                     var timestamp = Number(new Date());
                     var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
                     var uploadTask = storageRef.child(filename).put(theFile);
-                    uploadTask.on('state_changed', function(snapshot) {
+                    uploadTask.on('state_changed', function (snapshot) {
                         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         jQuery("#uploding_image").text("Image is uploading...");
-                    }, function(error) {
-                    }, function() {
-                        uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                    }, function (error) {
+                    }, function () {
+                        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
                             jQuery("#uploding_image").text("Upload is completed");
                             photo = downloadURL;
                             $(".item_image").empty()
@@ -857,8 +868,8 @@
         function handleFileSelectProduct(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
                     var val = f.name;
@@ -868,13 +879,13 @@
                     var timestamp = Number(new Date());
                     var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
                     var uploadTask = storageRef.child(filename).put(theFile);
-                    uploadTask.on('state_changed', function(snapshot) {
+                    uploadTask.on('state_changed', function (snapshot) {
                         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         $('.product_image').find(".uploding_image_photos").text(
                             "Image is uploading...");
-                    }, function(error) {
-                    }, function() {
-                        uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                    }, function (error) {
+                    }, function () {
+                        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
                             jQuery("#uploding_image").text("Upload is completed");
                             if (downloadURL) {
                                 productImagesCount++;
@@ -897,8 +908,8 @@
         function handleZipUpload(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
                     var val = f.name;
@@ -950,7 +961,7 @@
             reader.readAsDataURL(f);
         }
 
-        $(document).on("click", ".remove-btn", function() {
+        $(document).on("click", ".remove-btn", function () {
             var id = $(this).attr('data-id');
             var photo_remove = $(this).attr('data-img');
             $("#photo_" + id).remove();
@@ -963,8 +974,8 @@
         function handleVariantFileSelect(evt, vid) {
             var f = evt.target.files[0];
             var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
+            reader.onload = (function (theFile) {
+                return function (e) {
                     var filePayload = e.target.result;
                     var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(filePayload));
                     var val = f.name;
@@ -1045,15 +1056,15 @@
             $("#add_product_specification_iteam_" + index).hide();
         }
 
-        $("#item_vendor").change(function() {
+        $("#item_vendor").change(function () {
             var selected_vendor = this.value;
             var vendor_name = $(this).find('option:selected').text();
             $(".vendor_name_heading").html(vendor_name);
             change_categories(selected_vendor);
         });
-        
+
         function change_categories(selected_vendor) {
-            database.collection('vendors').doc(selected_vendor).get().then(async function(snapshot) {
+            database.collection('vendors').doc(selected_vendor).get().then(async function (snapshot) {
                 if (snapshot.exists) {
                     var data = snapshot.data();
                     // var categoryIDs = [];
@@ -1080,10 +1091,10 @@
                 }
             })
         }
-       
+
         function selectAttribute() {
             var html = '';
-            $("#item_attribute").find('option:selected').each(function() {
+            $("#item_attribute").find('option:selected').each(function () {
                 html += '<div class="row">';
                 html += '<div class="col-md-3">';
                 html += '<label>' + $(this).text() + '</label>';
@@ -1105,17 +1116,17 @@
             variant_photos = [];
             variant_vIds = [];
             variant_filename = [];
-            var item_attribute = $("#item_attribute").map(function(idx, ele) {
+            var item_attribute = $("#item_attribute").map(function (idx, ele) {
                 return $(ele).val();
             }).get();
             if (item_attribute.length > 0) {
                 var attributes = [];
                 var attributeSet = [];
-                $.each(item_attribute, function(index, attribute) {
+                $.each(item_attribute, function (index, attribute) {
                     var attribute_options = $("#attribute_options_" + attribute).val();
                     if (attribute_options) {
                         var attribute_options = attribute_options.split(',');
-                        attribute_options = $.map(attribute_options, function(value) {
+                        attribute_options = $.map(attribute_options, function (value) {
                             return value.replace(/[^a-zA-Z0-9]/g, '');
                         });
                         attributeSet.push(attribute_options);
@@ -1139,7 +1150,7 @@
                     html += '</tr>';
                     html += '</thead>';
                     html += '<tbody>';
-                    $.each(variants, function(index, variant) {
+                    $.each(variants, function (index, variant) {
                         html += '<tr>';
                         html += '<td><label for="" class="control-label">' + variant + '</label></td>';
                         html += '<td>';
@@ -1198,7 +1209,7 @@
             return `${prefix}${id}${random ? `.${Math.trunc(Math.random() * 100000000)}` : ""}`;
         }
         $("#product_image").resizeImg({
-            callback: function(base64str) {
+            callback: function (base64str) {
                 var val = $('#product_image').val().toLowerCase();
                 var ext = val.split('.')[1];
                 var docName = val.split('fakepath')[1];
@@ -1223,8 +1234,8 @@
                     productPhoto = productPhoto.replace(/^data:image\/[a-z]+;base64,/, "");
                     var uploadTask = await storageRef.child(product_image_filename[index]).putString(
                         productPhoto, 'base64', {
-                            contentType: 'image/jpg'
-                        });
+                        contentType: 'image/jpg'
+                    });
                     var downloadURL = await uploadTask.ref.getDownloadURL();
                     newPhoto.push(downloadURL);
                 }));
@@ -1241,8 +1252,8 @@
                     } else {
                         var uploadTask = await storageRef.child(digital_product_file_name).putString(
                             digital_product_file, 'base64', {
-                                contentType: 'image/jpg'
-                            });
+                            contentType: 'image/jpg'
+                        });
                     }
                     var downloadURL = await uploadTask.ref.getDownloadURL();
                     newPhoto = downloadURL;
@@ -1260,8 +1271,8 @@
                     variantPhoto = variantPhoto.replace(/^data:image\/[a-z]+;base64,/, "");
                     var uploadTask = await storageRef.child(variant_filename[index]).putString(
                         variantPhoto, 'base64', {
-                            contentType: 'image/jpg'
-                        });
+                        contentType: 'image/jpg'
+                    });
                     var downloadURL = await uploadTask.ref.getDownloadURL();
                     $('[id="variant_' + variant_vIds[index] + '_url"]').val(downloadURL);
                     newPhoto.push(downloadURL);

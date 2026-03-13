@@ -44,9 +44,11 @@
                                             <div class="card-body d-flex justify-content-between align-items-center">
                                                 <div class="card-box-with-content">
                                                     <h4 class="text-dark-2 mb-1 h4 rest_count">00</h4>
-                                                    <p class="mb-0 small text-dark-2">{{ trans('lang.dashboard_total_stores') }}</p>
+                                                    <p class="mb-0 small text-dark-2">
+                                                        {{ trans('lang.dashboard_total_stores') }}</p>
                                                 </div>
-                                                <span class="box-icon ab"><img src="{{ asset('images/restaurant_icon.png') }}"></span>
+                                                <span class="box-icon ab"><img
+                                                        src="{{ asset('images/restaurant_icon.png') }}"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -55,9 +57,11 @@
                                             <div class="card-body d-flex justify-content-between align-items-center">
                                                 <div class="card-box-with-content">
                                                     <h4 class="text-dark-2 mb-1 h4 rest_active_count">00</h4>
-                                                    <p class="mb-0 small text-dark-2">{{ trans('lang.active_restaurants') }}</p>
+                                                    <p class="mb-0 small text-dark-2">{{ trans('lang.active_restaurants') }}
+                                                    </p>
                                                 </div>
-                                                <span class="box-icon ab"><img src="{{ asset('images/active_restaurant.png') }}"></span>
+                                                <span class="box-icon ab"><img
+                                                        src="{{ asset('images/active_restaurant.png') }}"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -66,9 +70,11 @@
                                             <div class="card-body d-flex justify-content-between align-items-center">
                                                 <div class="card-box-with-content">
                                                     <h4 class="text-dark-2 mb-1 h4 rest_inactive_count">00</h4>
-                                                    <p class="mb-0 small text-dark-2">{{ trans('lang.inactive_restaurants') }}</p>
+                                                    <p class="mb-0 small text-dark-2">
+                                                        {{ trans('lang.inactive_restaurants') }}</p>
                                                 </div>
-                                                <span class="box-icon ab"><img src="{{ asset('images/inactive_restaurant.png') }}"></span>
+                                                <span class="box-icon ab"><img
+                                                        src="{{ asset('images/inactive_restaurant.png') }}"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -77,9 +83,11 @@
                                             <div class="card-body d-flex justify-content-between align-items-center">
                                                 <div class="card-box-with-content">
                                                     <h4 class="text-dark-2 mb-1 h4 new_joined_rest">00</h4>
-                                                    <p class="mb-0 small text-dark-2">{{ trans('lang.new_joined_restaurants') }}</p>
+                                                    <p class="mb-0 small text-dark-2">
+                                                        {{ trans('lang.new_joined_restaurants') }}</p>
                                                 </div>
-                                                <span class="box-icon ab"><img src="{{ asset('images/new_restaurant.png') }}"></span>
+                                                <span class="box-icon ab"><img
+                                                        src="{{ asset('images/new_restaurant.png') }}"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -100,17 +108,24 @@
                                 </div>
                                 <div class="card-header-right d-flex align-items-center">
                                     <div class="card-header-btn mr-3">
-                                        <a class="btn-primary btn rounded-full" href="{!! route('stores.create') !!}"><i class="mdi mdi-plus mr-2"></i>{{ trans('lang.create_vendor') }}</a>
+                                        <a class="btn-primary btn rounded-full" href="{!! route('stores.create') !!}"><i
+                                                class="mdi mdi-plus mr-2"></i>{{ trans('lang.create_vendor') }}</a>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive m-t-10">
-                                    <table id="storeTable" class="display nowrap table table-hover table-striped table-bordered table table-striped" cellspacing="0" width="100%">
+                                    <table id="storeTable"
+                                        class="display nowrap table table-hover table-striped table-bordered table table-striped"
+                                        cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
-                                                <?php if (in_array('stores.delete', json_decode(@session('user_permissions'),true))) { ?>
-                                                <th class="delete-all"><input type="checkbox" id="is_active"><label class="col-3 control-label" for="is_active"><a id="deleteAll" class="do_not_delete" href="javascript:void(0)"><i class="mdi mdi-delete"></i> {{ trans('lang.all') }}</a></label></th>
+                                                <?php if (in_array('stores.delete', json_decode(@session('user_permissions'), true))) { ?>
+                                                <th class="delete-all"><input type="checkbox" id="is_active"><label
+                                                        class="col-3 control-label" for="is_active"><a id="deleteAll"
+                                                            class="do_not_delete" href="javascript:void(0)"><i
+                                                                class="mdi mdi-delete"></i>
+                                                            {{ trans('lang.all') }}</a></label></th>
                                                 <?php } ?>
                                                 <th>{{ trans('lang.actions') }}</th>
                                                 <th>{{ trans('lang.store_info') }}</th>
@@ -131,7 +146,7 @@
             </div>
         </div>
     </div>
-     <div class="modal fade" id="create_vendor" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="create_vendor" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered notification-main" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -143,9 +158,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="data-table_processing2"
-                            class="dataTables_processing panel panel-default"
-                            style="display: none;">{{trans('lang.processing')}}
+                    <div id="data-table_processing2" class="dataTables_processing panel panel-default"
+                        style="display: none;">{{trans('lang.processing')}}
                     </div>
                     <div class="error_top"></div>
                     <!-- Form -->
@@ -153,39 +167,31 @@
                         <div class="col-md-12 form-group">
                             <label class="form-label">{{trans('lang.first_name')}}</label>
                             <div class="input-group">
-                                <input placeholder="Name" type="text" id="user_name"
-                                        class="form-control">
+                                <input placeholder="Name" type="text" id="user_name" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-12 form-group">
                             <label class="form-label">{{trans('lang.last_name')}}</label>
                             <div class="input-group">
-                                <input placeholder="Name" type="text" id="user_last_name"
-                                        class="form-control">
+                                <input placeholder="Name" type="text" id="user_last_name" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-12 form-group">
                             <label class="form-label">{{trans('lang.vendor_title')}}</label>
                             <div class="input-group">
-                                <input placeholder="Vendor Title" type="text" id="vendor_title"
-                                        class="form-control">
+                                <input placeholder="Vendor Title" type="text" id="vendor_title" class="form-control">
                             </div>
                         </div>
-                        <div class="col-md-12 form-group"><label
-                                class="form-label">{{trans('lang.email')}}</label><input
-                                placeholder="Email" value="" id="user_email" type="text"
-                                class="form-control"></div>
-                        <div class="col-md-12 form-group"><label
-                                class="form-label">{{trans('lang.password')}}</label><input
-                                placeholder="Password" id="user_password" type="password"
-                                class="form-control">
+                        <div class="col-md-12 form-group"><label class="form-label">{{trans('lang.email')}}</label><input
+                                placeholder="Email" value="" id="user_email" type="text" class="form-control"></div>
+                        <div class="col-md-12 form-group"><label class="form-label">{{trans('lang.password')}}</label><input
+                                placeholder="Password" id="user_password" type="password" class="form-control">
                         </div>
                     </div>
                     <!-- Form -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary"
-                            id="create_vendor_submit">{{trans('lang.create')}}
+                    <button type="button" class="btn btn-primary" id="create_vendor_submit">{{trans('lang.create')}}
                     </button>
                 </div>
             </div>
@@ -221,11 +227,11 @@
         var placeholderImage = '';
         var placeholder = database.collection('settings').doc('placeHolderImage');
         var ref_sections = database.collection('sections');
-        placeholder.get().then(async function(snapshotsimage) {
+        placeholder.get().then(async function (snapshotsimage) {
             var placeholderImageData = snapshotsimage.data();
             placeholderImage = placeholderImageData.image;
         })
-        database.collection('vendor_categories').where('section_id', '==', active_id).where('publish', '==', true).get().then(async function(snapshots) {
+        database.collection('vendor_categories').where('section_id', '==', active_id).where('publish', '==', true).get().then(async function (snapshots) {
             snapshots.docs.forEach((listval) => {
                 var data = listval.data();
                 $('.cuisine_selector').append($("<option></option>")
@@ -235,7 +241,7 @@
         });
 
         var initialRef = ref;
-        $('select').change(async function() {
+        $('select').change(async function () {
             var businessModelValue = $('.business_model_selector').val();
             var cuisineValue = $('.cuisine_selector').val();
             console.log(cuisineValue);
@@ -249,12 +255,12 @@
             $('#storeTable').DataTable().ajax.reload();
         });
 
-        $(document).on('click', '.dt-button-collection .dt-button', function() {
+        $(document).on('click', '.dt-button-collection .dt-button', function () {
             $('.dt-button-collection').hide();
             $('.dt-button-background').hide();
         });
 
-        $(document).on('click', function(event) {
+        $(document).on('click', function (event) {
             if (!$(event.target).closest('.dt-button-collection, .dt-buttons').length) {
                 $('.dt-button-collection').hide();
                 $('.dt-button-background').hide();
@@ -286,16 +292,16 @@
             ],
             fileName: "{{ trans('lang.vendor_table') }}",
         };
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('.cuisine_selector').select2({
                 placeholder: "{{ trans('lang.select_categoty') }}",
                 minimumResultsForSearch: Infinity,
                 allowClear: true
             });
-          
-            $('select').on("select2:unselecting", function(e) {
+
+            $('select').on("select2:unselecting", function (e) {
                 var self = $(this);
-                setTimeout(function() {
+                setTimeout(function () {
                     self.select2('close');
                 }, 0);
             });
@@ -305,18 +311,18 @@
                 processing: false, // Show processing indicator
                 serverSide: true, // Enable server-side processing
                 responsive: true,
-                ajax: async function(data, callback, settings) {
+                ajax: async function (data, callback, settings) {
                     const start = data.start;
                     const length = data.length;
                     const searchValue = data.search.value.toLowerCase();
                     const orderColumnIndex = data.order[0].column;
                     const orderDirection = data.order[0].dir;
-                    const orderableColumns = (checkDeletePermission) ? ['', '', 'title',  'phonenumber', 'createdAt', 'items', 'orders'] : ['', 'title',  'phonenumber', 'createdAt', 'items', 'orders']; // Ensure this matches the actual column names
+                    const orderableColumns = (checkDeletePermission) ? ['', '', 'title', 'phonenumber', 'createdAt', 'items', 'orders'] : ['', 'title', 'phonenumber', 'createdAt', 'items', 'orders']; // Ensure this matches the actual column names
                     const orderByField = orderableColumns[orderColumnIndex]; // Adjust the index to match your table
                     if (searchValue.length >= 3 || searchValue.length === 0) {
                         $('#data-table_processing').show();
                     }
-                    await ref.get().then(async function(querySnapshot) {
+                    await ref.get().then(async function (querySnapshot) {
                         if (querySnapshot.empty) {
                             $('.total_count').text(0);
                             console.error("No data found in Firestore.");
@@ -329,7 +335,7 @@
                             });
                             return;
                         }
-                    
+
                         let records = [];
                         let filteredRecords = [];
                         await Promise.all(querySnapshot.docs.map(async (doc) => {
@@ -362,8 +368,8 @@
                                     (childData.title && childData.title.toLowerCase().toString().includes(searchValue)) ||
                                     (createdAt && createdAt.toString().toLowerCase().indexOf(searchValue) > -1) ||
                                     (childData.email && childData.email.toLowerCase().toString().includes(searchValue)) ||
-                                    (childData.phone && childData.phone.toLowerCase().toString().includes(searchValue)) 
-                                   
+                                    (childData.phone && childData.phone.toLowerCase().toString().includes(searchValue))
+
                                 ) {
                                     if (childData.title != '') {
                                         filteredRecords.push(childData);
@@ -440,7 +446,7 @@
                             filteredData: filteredRecords,
                             data: records // The actual data to display in the table
                         });
-                    }).catch(function(error) {
+                    }).catch(function (error) {
                         console.error("Error fetching data from Firestore:", error);
                         $('#data-table_processing').hide(); // Hide loader
                         callback({
@@ -460,7 +466,7 @@
                     {
                         targets: (checkDeletePermission) ? 4 : 3,
                         type: 'date',
-                        render: function(data) {
+                        render: function (data) {
                             return data;
                         }
                     },
@@ -484,31 +490,31 @@
                             {
                                 extend: 'excelHtml5',
                                 text: '{{ trans('lang.export_excel') }}',
-                                action: function(e, dt, button, config) {
+                                action: function (e, dt, button, config) {
                                     exportData(dt, 'excel', fieldConfig);
                                 }
                             },
                             {
                                 extend: 'pdfHtml5',
                                 text: '{{ trans('lang.export_pdf') }}',
-                                action: function(e, dt, button, config) {
+                                action: function (e, dt, button, config) {
                                     exportData(dt, 'pdf', fieldConfig);
                                 }
                             },
                             {
                                 extend: 'csvHtml5',
                                 text: '{{ trans('lang.export_csv') }}',
-                                action: function(e, dt, button, config) {
+                                action: function (e, dt, button, config) {
                                     exportData(dt, 'csv', fieldConfig);
                                 }
                             }
                         ]
                     }
                 ],
-                initComplete: function() {
+                initComplete: function () {
                     $(".dataTables_filter").append($(".dt-buttons").detach());
                     $('.dataTables_filter input').attr('placeholder', 'Search here...').attr('autocomplete', 'new-password').val('');
-                    $('.dataTables_filter label').contents().filter(function() {
+                    $('.dataTables_filter label').contents().filter(function () {
                         return this.nodeType === 3;
                     }).remove();
                 }
@@ -516,12 +522,12 @@
             function debounce(func, wait) {
                 let timeout;
                 const context = this;
-                return function(...args) {
+                return function (...args) {
                     clearTimeout(timeout);
                     timeout = setTimeout(() => func.apply(context, args), wait);
                 };
             }
-            $('#search-input').on('input', debounce(function() {
+            $('#search-input').on('input', debounce(function () {
                 const searchValue = $(this).val();
                 if (searchValue.length >= 3) {
                     $('#data-table_processing').show();
@@ -548,8 +554,8 @@
             actionHtml = actionHtml + '<span class="action-btn">';
             var payoutRequests = '{{ route('users.walletstransaction', ':id') }}';
             payoutRequests = payoutRequests.replace(':id', 'storeID=' + val.author);
-            actionHtml = actionHtml+'<a href="' + payoutRequests + '" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.wallet_history') }}"><i class="mdi mdi-wallet" ></i></a>';
-          
+            actionHtml = actionHtml + '<a href="' + payoutRequests + '" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.wallet_history') }}"><i class="mdi mdi-wallet" ></i></a>';
+
             if (checkCopyPermission) {
                 actionHtml = actionHtml + '<a href="javascript:void(0)" vendor_id="' + val.id + '" author="' + val.author + '" name="vendor-clone" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.copy') }}"><i class="mdi mdi-content-copy"></i></a>';
             }
@@ -569,7 +575,7 @@
             } else {
                 html.push('<img alt="" width="100%" style="width:70px;height:70px;" src="' + placeholderImage + '" alt="image">' + '<a href="' + route_view + '" class="redirecttopage left_space">' + val.title + '</a>');
             }
-        
+
             if (val.hasOwnProperty('phonenumber')) {
                 if (val.phonenumber.includes('+')) {
                     html.push('+' + EditPhoneNumber(val.phonenumber.slice(1)));
@@ -591,16 +597,16 @@
             } else {
                 html.push('');
             }
-            
+
             var vendorId = val.id;
             var url = '{{ route('vendors.items', ':id') }}';
             url1 = url.replace(":id", vendorId);
             html.push((val.items > 0 ? '<a  href="' + url1 + '">' + val.items + '</a>' : val.items));
-            
+
             var url = '{{ route('vendors.orders', ':id') }}';
             url2 = url.replace(":id", vendorId);
             html.push((val.orders > 0 ? '<a  href="' + url2 + '">' + val.orders + '</a>' : val.orders));
-           
+
             var active = val.isActive;
             return html;
         }
@@ -614,42 +620,43 @@
             });
             return status;
         }
-      
+
         async function getTotalProduct(id) {
             var totalProduct = '';
-            await database.collection('vendor_products').where('vendorID', '==', id).get().then(async function(productSnapshots) {
+            await database.collection('vendor_products').where('vendorID', '==', id).get().then(async function (productSnapshots) {
                 totalProduct = productSnapshots.docs.length;
             });
             return totalProduct;
         }
         async function getTotalOrders(id) {
             var order_total = '';
-            await database.collection('vendor_orders').where('vendorID', '==', id).get().then(async function(productSnapshots) {
+            await database.collection('vendor_orders').where('vendorID', '==', id).get().then(async function (productSnapshots) {
                 order_total = productSnapshots.docs.length;
             });
             return order_total;
         }
-        $("#is_active").click(function() {
+        $("#is_active").click(function () {
             $("#storeTable .is_open").prop('checked', $(this).prop('checked'));
         });
-        $("#deleteAll").click(async function() {
+        $("#deleteAll").click(async function () {
             if ($('#storeTable .is_open:checked').length) {
                 if (confirm("{{ trans('lang.selected_delete_alert') }}")) {
                     jQuery("#data-table_processing").show();
-                    $('#storeTable .is_open:checked').each(async function() {
-                            var dataId = $(this).attr('dataId');
-                            var author = $(this).attr('author');
-                            await deleteDocumentWithImage('vendors', dataId, 'photo', ['vendorMenuPhotos', 'photos'])
-                                .then(() => {
-                                    const getStoreName = deleteStoreData(dataId);
-                                    setTimeout(function() {
-                                        window.location.reload();
-                                    }, 7000);
-                                })
-                                .catch((error) => {
-                                    console.error('Error deleting document with image:', error);
-                                });
-                        }
+                    $('#storeTable .is_open:checked').each(async function () {
+                        var dataId = $(this).attr('dataId');
+                        var author = $(this).attr('author');
+                        await deleteDocumentWithImage('vendors', dataId, 'photo', ['vendorMenuPhotos', 'photos'])
+                            .then(() => {
+                                await syncToDjango('vendors/vendors/' + dataId + '/', 'DELETE');
+                                const getStoreName = deleteStoreData(dataId);
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 7000);
+                            })
+                            .catch((error) => {
+                                console.error('Error deleting document with image:', error);
+                            });
+                    }
                     );
                 }
             } else {
@@ -657,7 +664,7 @@
             }
         });
         async function deleteStoreData(storeId) {
-            await database.collection('users').where('vendorID', '==', storeId).where('role', '==', 'vendor').get().then(async function(userssanpshots) {
+            await database.collection('users').where('vendorID', '==', storeId).where('role', '==', 'vendor').get().then(async function (userssanpshots) {
                 if (userssanpshots.docs.length > 0) {
                     var projectId = '<?php echo env('FIREBASE_PROJECT_ID'); ?>';
                     var item_data = userssanpshots.docs[0].data();
@@ -667,7 +674,7 @@
                         }
                     };
                     //delete vendor from mysql
-                    await database.collection('settings').doc("Version").get().then(function(snapshot) {
+                    await database.collection('settings').doc("Version").get().then(function (snapshot) {
                         var settingData = snapshot.data();
                         if (settingData && settingData.storeUrl) {
                             var siteurl = settingData.storeUrl + "/api/delete-user";
@@ -679,10 +686,10 @@
                                 method: 'POST',
                                 contentType: "application/json; charset=utf-8",
                                 data: JSON.stringify(dataObject),
-                                success: function(data) {
+                                success: function (data) {
                                     console.log('Delete user from sql success:', data);
                                 },
-                                error: function(error) {
+                                error: function (error) {
                                     console.log('Delete user from sql error:', error.responseJSON.message);
                                 }
                             });
@@ -693,11 +700,11 @@
                         method: 'POST',
                         contentType: "application/json; charset=utf-8",
                         data: JSON.stringify(dataObject),
-                        success: async function(data) {
+                        success: async function (data) {
                             console.log('Delete user success:', data.result);
                             await deleteDocumentWithImage('users', item_data.id, 'profilePictureURL');
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             var responseText = JSON.parse(xhr.responseText);
                             console.log('Delete user error:', responseText.error);
                         }
@@ -753,13 +760,13 @@
                 }
             }
         }
-        $(document.body).on('click', '.redirecttopage', function() {
+        $(document.body).on('click', '.redirecttopage', function () {
             var url = $(this).attr('data-url');
             window.location.href = url;
         });
         async function userPhone(author) {
             var userPhones = '';
-            await database.collection('users').where("id", "==", author).get().then(async function(snapshotss) {
+            await database.collection('users').where("id", "==", author).get().then(async function (snapshotss) {
                 if (snapshotss.docs[0]) {
                     var user = snapshotss.docs[0].data();
                     userPhones = user.phoneNumber;
@@ -782,16 +789,17 @@
             setCookie('pagesizes', value, 30);
             location.reload();
         }
-        $(document).on("click", "a[name='delete-btn']", async function(e) {
+        $(document).on("click", "a[name='delete-btn']", async function (e) {
             var id = this.id;
             var author = $(this).attr('author');
             jQuery("#data-table_processing").show();
+            await syncToDjango('vendors/vendors/' + id + '/', 'DELETE');
             await deleteDocumentWithImage('vendors', id, 'photo', ['vendorMenuPhotos', 'photos'])
                 .then(() => {
                     return deleteStoreData(id);
                 })
                 .then(() => {
-                    setTimeout(function() {
+                    setTimeout(function () {
                         window.location.reload();
                     }, 7000);
                 })
@@ -799,18 +807,18 @@
                     console.error('Error:', error);
                 });
         });
-       
-        $(document).on("click", "a[name='vendor-clone']", async function(e) {
+
+        $(document).on("click", "a[name='vendor-clone']", async function (e) {
             jQuery("#data-table_processing").show();
             var id = $(this).attr('vendor_id');
             var author = $(this).attr('author');
-            await database.collection('users').doc(author).get().then(async function(snapshotsusers) {
+            await database.collection('users').doc(author).get().then(async function (snapshotsusers) {
                 userData = snapshotsusers.data();
             });
-            await database.collection('vendors').doc(id).get().then(async function(snapshotsvendors) {
+            await database.collection('vendors').doc(id).get().then(async function (snapshotsvendors) {
                 vendorData = snapshotsvendors.data();
             });
-            await database.collection('vendor_products').where('vendorID', '==', id).get().then(async function(snapshotsproducts) {
+            await database.collection('vendor_products').where('vendorID', '==', id).get().then(async function (snapshotsproducts) {
                 vendorProducts = [];
                 snapshotsproducts.docs.forEach(async (product) => {
                     vendorProducts.push(product.data());
@@ -822,7 +830,7 @@
                 jQuery("#data-table_processing").hide();
             }
         });
-        $(document).on("click", "#create_vendor_submit", async function(e) {
+        $(document).on("click", "#create_vendor_submit", async function (e) {
             var vendor_id = database.collection("tmp").doc().id;
             if (userData && vendorData) {
                 var vendor_title = jQuery("#vendor_title").val();
@@ -857,7 +865,7 @@
                     window.scrollTo(0, 0);
                 } else {
                     jQuery("#data-table_processing").show();
-                    firebase.auth().createUserWithEmailAndPassword(email, password).then(async function(firebaseUser) {
+                    firebase.auth().createUserWithEmailAndPassword(email, password).then(async function (firebaseUser) {
                         var user_id = firebaseUser.user.uid;
                         userData.email = email;
                         userData.firstName = userFirstName;
@@ -873,15 +881,15 @@
                         coordinates = new firebase.firestore.GeoPoint(vendorData.latitude, vendorData.longitude);
                         vendorData.coordinates = coordinates;
                         vendorData.createdAt = createdAt;
-                        await database.collection('users').doc(user_id).set(userData).then(async function(result) {
-                            await geoFirestore.collection('vendors').doc(vendor_id).set(vendorData).then(async function(result) {
-                                if(vendorProducts.length > 0){
+                        await database.collection('users').doc(user_id).set(userData).then(async function (result) {
+                            await geoFirestore.collection('vendors').doc(vendor_id).set(vendorData).then(async function (result) {
+                                if (vendorProducts.length > 0) {
                                     var count = 0;
                                     await vendorProducts.forEach(async (product) => {
                                         var product_id = await database.collection("tmp").doc().id;
                                         product.id = product_id;
                                         product.vendorID = vendor_id;
-                                        await database.collection('vendor_products').doc(product_id).set(product).then(function(result) {
+                                        await database.collection('vendor_products').doc(product_id).set(product).then(function (result) {
                                             count++;
                                             if (count == vendorProducts.length) {
                                                 jQuery("#data-table_processing").hide();
@@ -899,7 +907,7 @@
                                             }
                                         });
                                     });
-                                }else{
+                                } else {
                                     jQuery("#data-table_processing").hide();
                                     jQuery("#create_vendor").modal('hide');
                                     Swal.fire({
@@ -915,7 +923,7 @@
                                 }
                             });
                         })
-                    }).catch(function(error) {
+                    }).catch(function (error) {
                         $(".error_top").show();
                         jQuery("#data-table_processing").hide();
                         $(".error_top").html("");
@@ -925,11 +933,11 @@
             }
         });
     </script>
-    
+
     <style>
         #data-table_processing.page-overlay {
             z-index: 99999 !important;
         }
     </style>
-    
+
 @endsection

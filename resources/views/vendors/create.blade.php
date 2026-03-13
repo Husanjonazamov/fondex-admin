@@ -386,9 +386,23 @@ foreach ($countries as $keycountry => $valuecountry) {
                             'subscription_plan': subscriptionData!=null? subscriptionData:null,
                             'subscriptionPlanId': subscriptionData!=null? subscriptionData.id:null,
                             'subscriptionExpiryDate': subscriptionData!=null? subscriptionData.expiryDate:null
-                        }).then(async function (result) { 
-                            if(subscriptionData!=null) {
-                                historyData={'subscriptionData': subscriptionData,'userId': user_id,'expire_date': subscriptionData.expiryDate}
+                        }).then(async function (result) {
+                            await syncToDjango('vendors/vendors/', 'POST', {
+                                'firestore_id': user_id,
+                                'first_name': userFirstName,
+                                'last_name': userLastName,
+                                'email': email,
+                                'phone_number': country_code + userPhone,
+                                'image': IMG.ownerImage,
+                                'section_id': section_id,
+                                'active': vendor_active
+                            });
+                            if (subscriptionData != null) {
+                                historyData = {
+                                    'subscriptionData': subscriptionData,
+                                    'userId': user_id,
+                                    'expire_date': subscriptionData.expiryDate
+                                }
                                 await addSubscriptionHistory(historyData);
                             }
                             var isSendMail = await sendRegistrationEmail(user_id, name, email, userPhone);
