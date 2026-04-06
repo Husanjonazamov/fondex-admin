@@ -146,163 +146,65 @@
             //start
 
             const table = $('#categoryTable').DataTable({
-                pageLength: 10, // Number of rows per page
-                processing: false, // Show processing indicator
-                serverSide: true, // Enable server-side processing
+                pageLength: 10,
+                processing: false,
+                serverSide: true,
                 responsive: true,
-
                 ajax: async function (data, callback, settings) {
                     const start = data.start;
-
                     const length = data.length;
-
                     const searchValue = data.search.value.toLowerCase();
-
                     const orderColumnIndex = data.order[0].column;
-
                     const orderDirection = data.order[0].dir;
-
-                    const orderableColumns = (checkDeletePermission) ? ['', 'title', 'totalProducts', '', ''] : ['title', 'totalProducts', '', ''];
-
-                    const orderByField = orderableColumns[orderColumnIndex]; // Adjust the index to match your table
-
+                    const page = (start / length) + 1;
 
                     if (searchValue.length >= 3 || searchValue.length === 0) {
-
                         $('#data-table_processing').show();
-
                     }
 
-                    await ref.get().then(async function (querySnapshot) {
+                    // Fetch from REST API
+                    let url = `categories/?page=${page}&page_size=${length}`;
+                    if (searchValue) {
+                        url += `&search=${searchValue}`;
+                    }
+                    if (section_id) {
+                        url += `&section=${section_id}`;
+                    }
 
-                        if (querySnapshot.empty) {
-                            $('.total_count').text(0);
-                            console.error("No data found in Firestore.");
+                    const response = await syncToDjango(url, 'GET');
 
-                            $('#data-table_processing').hide(); // Hide loader
-
-                            callback({
-
-                                draw: data.draw,
-
-                                recordsTotal: 0,
-
-                                recordsFiltered: 0,
-
-                                data: [] // No data
-
-                            });
-
-                            return;
-
-                        }
-
-                        let records = [];
-
-                        let filteredRecords = [];
-
-                        await Promise.all(querySnapshot.docs.map(async (doc) => {
-
-                            let childData = doc.data();
-                            childData.id = doc.id; // Ensure the document ID is included in the data
-                            var sectionName = '';
-
-
-
-                            var totalProducts = await getProductTotal(childData.id, childData.section_id);
-
-
-                            childData.totalProducts = totalProducts ? totalProducts : 0;
-
-                            if (searchValue) {
-                                if (
-                                    (childData.title && childData.title.toString().toLowerCase().includes(searchValue)) ||
-                                    (childData.totalProducts && childData.totalProducts.toString().includes(searchValue))
-
-                                ) {
-                                    filteredRecords.push(childData);
-                                }
-
-                            } else {
-                                filteredRecords.push(childData);
-                            }
-
-                        }));
-
-
-
-                        filteredRecords.sort((a, b) => {
-
-                            let aValue = a[orderByField] ? a[orderByField].toString().toLowerCase() : '';
-
-                            let bValue = b[orderByField] ? b[orderByField].toString().toLowerCase() : '';
-
-                            if (orderByField === 'totalProducts') {
-
-                                aValue = a[orderByField] ? parseInt(a[orderByField]) : 0;
-
-                                bValue = b[orderByField] ? parseInt(b[orderByField]) : 0;
-
-                            }
-
-                            if (orderDirection === 'asc') {
-
-                                return (aValue > bValue) ? 1 : -1;
-
-                            } else {
-
-                                return (aValue < bValue) ? 1 : -1;
-
-                            }
-
-                        });
-
-
-                        const totalRecords = filteredRecords.length;
-                        $('.total_count').text(totalRecords);
-                        const paginatedRecords = filteredRecords.slice(start, start + length);
-
-                        await Promise.all(paginatedRecords.map(async (childData) => {
-
-                            var getData = await buildHTML(childData);
-
-                            records.push(getData);
-
-                        }));
-                        $(function () {
-                            $('[data-toggle="tooltip"]').tooltip();
-                        });
-
-                        $('#data-table_processing').hide(); // Hide loader
-
+                    if (!response || !response.status || !response.data) {
+                        $('.total_count').text(0);
+                        $('#data-table_processing').hide();
                         callback({
                             draw: data.draw,
-                            recordsTotal: totalRecords, // Total number of records in Firestore
-                            recordsFiltered: totalRecords, // Number of records after filtering (if any)
-                            data: records // The actual data to display in the table
-
-                        });
-
-                    }).catch(function (error) {
-
-                        console.error("Error fetching data from Firestore:", error);
-
-                        $('#data-table_processing').hide(); // Hide loader
-
-                        callback({
-
-                            draw: data.draw,
-
                             recordsTotal: 0,
-
                             recordsFiltered: 0,
-
-                            data: [] // No data due to error
-
+                            data: []
                         });
+                        return;
+                    }
 
+                    const totalRecords = response.data.total_items || response.data.count || 0;
+                    $('.total_count').text(totalRecords);
+
+                    let records = [];
+                    await Promise.all(response.data.results.map(async (childData) => {
+                        // Map API fields to Firestore-like fields for buildHTML compatibility
+                        childData.publish = childData.is_publish;
+                        childData.totalProducts = childData.product_count || 0; // Assuming backend might provide this or we use 0
+                        
+                        var getData = await buildHTML(childData);
+                        records.push(getData);
+                    }));
+
+                    $('#data-table_processing').hide();
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: totalRecords,
+                        recordsFiltered: totalRecords,
+                        data: records
                     });
-
                 },
 
                 order: (checkDeletePermission) ? [1, 'asc'] : [0, 'asc'],
@@ -433,119 +335,54 @@
 
         /* toggal publish action code start*/
 
-        $(document).on("click", "input[name='isSwitch']", function (e) {
-
+        $(document).on("click", "input[name='isSwitch']", async function (e) {
             var ischeck = $(this).is(':checked');
-
             var id = this.id;
-
-            if (ischeck) {
-
-                database.collection('vendor_categories').doc(id).update({
-
-                    'publish': true
-
-                }).then(async function (result) {
-                    await syncToDjango('vendors/categories/' + id + '/', 'PATCH', { 'is_publish': true });
-                });
-
-            } else {
-
-                database.collection('vendor_categories').doc(id).update({
-
-                    'publish': false
-
-                }).then(async function (result) {
-                    await syncToDjango('vendors/categories/' + id + '/', 'PATCH', { 'is_publish': false });
-                });
-
+            
+            jQuery("#data-table_processing").show();
+            const result = await syncToDjango(`categories/${id}/`, 'PATCH', { 'is_publish': ischeck });
+            jQuery("#data-table_processing").hide();
+            
+            if (!result || !result.status) {
+                $(this).prop('checked', !ischeck);
+                alert(result ? result.message : 'Error updating status');
             }
-
         });
-
-
-
-        /*toggal publish action code end*/
-
-
-
-
-        async function getProductTotal(id) {
-            const productSnapshots = await database.collection('vendor_products').where('categoryID', '==', id).get();
-            return productSnapshots.docs.length;
-        }
-
-
-
-
 
         $(document).on("click", "a[name='category-delete']", async function (e) {
-
             var id = this.id;
-            await syncToDjango('vendors/categories/' + id + '/', 'DELETE');
-            await deleteDocumentWithImage('vendor_categories', id, 'photo');
-            window.location.href = '{{ route("categories")}}';
-
+            if (confirm("{{trans('lang.delete_alert')}}")) {
+                jQuery("#data-table_processing").show();
+                const result = await syncToDjango(`categories/${id}/`, 'DELETE');
+                jQuery("#data-table_processing").hide();
+                if (result && result.status) {
+                    window.location.reload();
+                } else {
+                    alert(result ? result.message : 'Error deleting category');
+                }
+            }
         });
-
-
-
-        function clickLink(value) {
-
-            setCookie('section_id', value, 30);
-
-            location.reload();
-
-        }
-
-
-
-        function clickpage(value) {
-
-            setCookie('pagesizes', value, 30);
-
-            location.reload();
-
-        }
-
-
-
-        $("#is_active").click(function () {
-
-            $("#categoryTable .is_open").prop('checked', $(this).prop('checked'));
-
-
-
-        });
-
-
 
         $("#deleteAll").click(function () {
-
             if ($('#categoryTable .is_open:checked').length) {
-
                 if (confirm("{{trans('lang.selected_delete_alert')}}")) {
-
                     jQuery("#data-table_processing").show();
-
-                    $('#categoryTable .is_open:checked').each(async function () {
-
+                    var promises = [];
+                    $('#categoryTable .is_open:checked').each(function () {
                         var dataId = $(this).attr('dataId');
-
-                        await deleteDocumentWithImage('vendor_categories', dataId, 'photo');
-
-                        window.location.reload();
-
+                        promises.push(syncToDjango(`categories/${dataId}/`, 'DELETE'));
                     });
-
+                    
+                    Promise.all(promises).then(() => {
+                        window.location.reload();
+                    }).catch(err => {
+                        jQuery("#data-table_processing").hide();
+                        alert('Some categories could not be deleted');
+                    });
                 }
-
             } else {
-
                 alert("{{trans('lang.select_delete_alert')}}");
-
             }
-
         });
 
     </script>

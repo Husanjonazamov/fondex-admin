@@ -344,83 +344,33 @@ foreach ($countries as $keycountry => $valuecountry) {
 
             jQuery("#data-table_processing").show();
             
-            if(subscriptionPlanId && subscriptionPlanId !='') {
-                var subscriptionData=await getSubscriptionDetails(subscriptionPlanId);
-            } else {
-                var subscriptionData=null;
-            }
+            try {
+                const IMG = await storeImageData();
+                const profileImage = IMG.ownerImage || '';
 
-            var bankName = $("#bankName").val();
-            var branchName = $("#branchName").val();
-            var holderName = $("#holderName").val();
-            var accountNumber = $("#accountNumber").val();
-            var otherDetails = $("#otherDetails").val();
-            var userBankDetails = {
-                'bankName': bankName,
-                'branchName': branchName,
-                'holderName': holderName,
-                'accountNumber': accountNumber,
-                'accountNumber': accountNumber,
-                'otherDetails': otherDetails,
-            };
-
-           
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then(async function (firebaseUser) {
-                    user_id = firebaseUser.user.uid;
-                    await storeImageData().then(async (IMG) => {
-                        database.collection('users').doc(user_id).set({ 
-                            'firstName': userFirstName,
-                            'lastName': userLastName,
-                            'email': email,
-                            'phoneNumber': country_code+userPhone,
-                            'profilePictureURL': IMG.ownerImage,
-                            'role': 'vendor',
-                            'id': user_id,
-                            'active': vendor_active,
-                            'vendorID': null,
-                            'createdAt': createdAt,
-                            'userBankDetails': userBankDetails,
-                            'isDocumentVerify': false,
-                            'sectionId' : section_id,
-                            'subscription_plan': subscriptionData!=null? subscriptionData:null,
-                            'subscriptionPlanId': subscriptionData!=null? subscriptionData.id:null,
-                            'subscriptionExpiryDate': subscriptionData!=null? subscriptionData.expiryDate:null
-                        }).then(async function (result) {
-                            await syncToDjango('vendors/vendors/', 'POST', {
-                                'firestore_id': user_id,
-                                'first_name': userFirstName,
-                                'last_name': userLastName,
-                                'email': email,
-                                'phone_number': country_code + userPhone,
-                                'image': IMG.ownerImage,
-                                'section_id': section_id,
-                                'active': vendor_active
-                            });
-                            if (subscriptionData != null) {
-                                historyData = {
-                                    'subscriptionData': subscriptionData,
-                                    'userId': user_id,
-                                    'expire_date': subscriptionData.expiryDate
-                                }
-                                await addSubscriptionHistory(historyData);
-                            }
-                            var isSendMail = await sendRegistrationEmail(user_id, name, email, userPhone);
-                            if (isSendMail) {
-                                window.location.href = '{{ route("vendors")}}';
-                            }
-                        });
-
-                    }).catch(err => {
-                        jQuery("#data-table_processing").hide();
-                        $(".error_top").show();
-                        $(".error_top").html("");
-                        $(".error_top").append("<p>" + err + "</p>");
-                        window.scrollTo(0, 0);
-                    });
+                const result = await syncToDjango('vendors/', 'POST', {
+                    'first_name': userFirstName,
+                    'last_name': userLastName,
+                    'email': email,
+                    'password': password,
+                    'phone_number': country_code + userPhone,
+                    'image': profileImage,
+                    'active': vendor_active,
+                    'section': section_id,
+                    'bank_details': JSON.stringify(userBankDetails)
                 });
-        }
 
+                if (result && result.status) {
+                    window.location.href = '{{ route("vendors")}}';
+                } else {
+                    throw new Error(result ? result.message : 'Unknown error');
+                }
+            } catch (error) {
+                jQuery("#data-table_processing").hide();
+                $(".error_top").show().html("<p>" + error.message + "</p>");
+                window.scrollTo(0, 0);
+            }
+        }
     });
 
     function formatState(state) {

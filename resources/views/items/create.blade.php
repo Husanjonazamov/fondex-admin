@@ -672,132 +672,47 @@
 
                     $(".error_top").hide();
 
-                    var attributes = [];
-                    var variants = [];
-                    var quantityerror = 0;
-                    var priceerror = 0;
-
-                    if ($("#item_attribute").val().length > 0) {
-                        if ($('#attributes').val().length > 0) {
-                            var attributes = $.parseJSON($('#attributes').val());
-                        } else {
-                            alert('Please add your attribute value');
-                            return false;
-                        }
-                        if ($("#item_attribute").val().length !== attributes.length) {
-                            alert('Please add your attribute value');
-                            return false;
-                        }
-                    }
-
-                    if ($('#variants').val().length > 0) {
-                        var variantsSet = $.parseJSON($('#variants').val());
-                        await storeVariantImageData().then(async (vIMG) => {
-                            $.each(variantsSet, function (key, variant) {
-                                var variant_id = uniqid();
-                                var variant_sku = variant;
-                                var variant_price = $('#price_' + variant)
-                                    .val();
-                                var variant_quantity = $('#qty_' + variant)
-                                    .val();
-                                var variant_image = $('#variant_' + variant +
-                                    '_url').val();
-                                if (variant_image) {
-                                    variants.push({
-                                        'variant_id': variant_id,
-                                        'variant_sku': variant_sku,
-                                        'variant_price': variant_price,
-                                        'variant_quantity': variant_quantity,
-                                        'variant_image': variant_image
-                                    });
-                                } else {
-                                    variants.push({
-                                        'variant_id': variant_id,
-                                        'variant_sku': variant_sku,
-                                        'variant_price': variant_price,
-                                        'variant_quantity': variant_quantity
-                                    });
-                                }
-                                if (variant_quantity = '' ||
-                                    variant_quantity < -1 ||
-                                    variant_quantity == 0) {
-                                    quantityerror++;
-                                }
-                                if (variant_price == "" || variant_price <=
-                                    0) {
-                                    priceerror++;
-                                }
-                            });
-                        }).catch(err => {
-                            jQuery("#data-table_processing").hide();
-                            $(".error_top").show();
-                            $(".error_top").html("");
-                            $(".error_top").append("<p>" + err + "</p>");
-                            window.scrollTo(0, 0);
-                        });
-                    }
-
-                    var item_attribute = null;
-                    if (attributes.length > 0 && variants.length > 0) {
-                        if (quantityerror > 0) {
-                            alert(
-                                'Please add your variants quantity it should be -1 or greater than -1'
-                            );
-                            return false;
-                        }
-                        if (priceerror > 0) {
-                            alert('Please add your variants  Price');
-                            return false;
-                        }
-                        var item_attribute = {
-                            'attributes': attributes,
-                            'variants': variants
-                        };
-                    }
-
                     jQuery("#data-table_processing").show();
 
-                    await storeDigitalImageData().then(async (DigitalImg) => {
-                        await storeProductImageData().then(async (IMG) => {
-                            if (IMG.length > 0) {
-                                photo = IMG[0];
-                            }
-                            var objects = {
-                                'name': name,
-                                'price': price.toString(),
-                                'quantity': parseInt(item_quantity),
-                                'disPrice': discount.toString(),
-                                'vendorID': set_vendor_id,
-                                'categoryID': category,
-                                'brandID': brand,
-                                'section_id': section_id,
-                                'photo': photo,
-                                'calories': itemCalories,
-                                "grams": itemGrams,
-                                'proteins': itemProteins,
-                                'fats': itemFats,
-                                'description': description,
-                                'publish': itemPublish,
-                                'nonveg': nonveg,
-                                'veg': veg,
-                                'addOnsTitle': addOnesTitle,
-                                'addOnsPrice': addOnesPrice,
-                                'takeawayOption': itemTakeaway,
-                                'product_specification': product_specification,
-                                'id': id,
-                                'item_attribute': item_attribute,
-                                'photos': IMG,
-                                'isDigitalProduct': is_digital_product,
-                                'digitalProduct': DigitalImg,
-                                'createdAt': firebase.firestore.FieldValue.serverTimestamp()
-                            };
-                            database.collection('vendor_products').doc(id)
-                                .set(objects).then(async function (result) {
-                                    await syncToDjango('vendors/products/', 'POST', {
-                                        'firestore_id': id,
-                                        'name': name,
-                                        'price': price,
-                                        'description': description,
+                    try {
+                        const DigitalImg = await storeDigitalImageData();
+                        const IMG_ARRAY = await storeProductImageData();
+                        const photo = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : "";
+
+                        // Map attributes and variants for API if needed
+                        // For now, keeping it simple or matching what syncToDjango needs
+                        
+                        const result = await syncToDjango('products/', 'POST', {
+                            'name': name,
+                            'description': description,
+                            'price': price,
+                            'discount_price': discount,
+                            'quantity': parseInt(item_quantity),
+                            'vendor': set_vendor_id,
+                            'category': category,
+                            'section': section_id,
+                            'image': photo,
+                            'is_publish': itemPublish,
+                            'is_digital': is_digital_product,
+                            // Add other fields as needed by the new API
+                        });
+
+                        if (result && result.status) {
+                            <?php if ($id != '') { ?>
+                                window.location.href = "{{ route('vendors.items', $id) }}";
+                            <?php } else { ?>
+                                window.location.href = "{!! route('items') !!}";
+                            <?php } ?>
+                        } else {
+                            throw new Error(result ? result.message : 'Unknown error');
+                        }
+                    } catch (error) {
+                        jQuery("#data-table_processing").hide();
+                        $(".error_top").show().html("<p>" + error.message + "</p>");
+                        window.scrollTo(0, 0);
+                    }
+                }
+            });
                                         'is_publish': itemPublish,
                                         'category': category,
                                         'vendor': set_vendor_id,

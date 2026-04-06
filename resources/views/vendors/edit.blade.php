@@ -288,168 +288,97 @@ foreach ($countries as $keycountry => $valuecountry) {
     });
 
 
-    $(document).ready(function () {
-
         jQuery("#data-table_processing").show();
-        ref.get().then(async function (snapshots) {
-            if (!snapshots.empty) {
-                var user = snapshots.docs[0].data();
-               
-                if (user.subscriptionExpiryDate) {
-                   const expiresAt = new Date(user.subscriptionExpiryDate.toDate());
-                    const [year, month, day] = expiresAt.toISOString().slice(0, 10).split("-");
-                    const formattedDate = `${year}-${month}-${day}`;
-                    $('#change_expiry_date').val(formattedDate);
+        
+        // Fetch from REST API
+        syncToDjango(`vendors/${id}/`, 'GET').then(async function (response) {
+            if (response && response.status && response.data) {
+                var user = response.data;
+
+                ownerId = user.id;
+                ownerPhoto = user.image;
+                $(".user_first_name").val(user.first_name);
+                $(".user_last_name").val(user.last_name);
+                $(".user_email").val(user.email).prop('disabled', true);
+                $(".user_phone").val(user.phone_number).prop('disabled', true);
+
+                if (user.image) {
+                    photo = user.image;
+                    $(".uploaded_image_owner").html('<img id="uploaded_image_owner" src="' + photo + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'" width="150px" height="150px;">').show();
+                } else {
+                    $(".uploaded_image_owner").html('<img id="uploaded_image_owner" src="' + placeholderImage + '" width="150px" height="150px;">').show();
                 }
-                await database.collection('users').where("id", "==",id).get().then(async function (snapshots) {
-                    snapshots.docs.forEach((listval) => {
-                        var user = listval.data();
 
-                        ownerId = user.id;
-                        ownerPhoto = user.profilePictureURL
-                        $(".user_first_name").val(user.firstName);
-                        $(".user_last_name").val(user.lastName);
-                        $(".user_email").val(shortEmail(user.email)).prop('disabled',true);
-                        $(".user_phone").val(user.phoneNumber);
-                        $(".user_phone").attr('disabled',true);
-                                                
-
-                        if (user.profilePictureURL != '') {
-                            ownerPhoto = user.profilePictureURL
-                            ownerOldImageFile = user.profilePictureURL;
-                            if(user.profilePictureURL){
-                                photo=user.profilePictureURL;
-                            }else{
-                                photo=placeholderImage;
-                            }
-                            $(".uploaded_image_owner").html('<img id="uploaded_image_owner" src="' + photo + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'" width="150px" height="150px;">');
-                            $(".uploaded_image_owner").show();
-                        } else {
-                            $(".uploaded_image_owner").html('<img id="uploaded_image_owner" src="' + placeholderImage + '" width="150px" height="150px;">');
-                            $(".uploaded_image_owner").show();
-                        }
-
-                        if (user.active) {
-                            vendor_active = true;
-                            $("#is_active").prop("checked", true);
-                        }
-
-                        if (user.vendorID != null && user.vendorID != '') {
-                            $('.vendorRouteLi').show();
-                            var route1 = '{{ route('stores.edit', ':id') }}';
-                            route1 = route1.replace(':id', user.vendorID);
-                            $('.vendorRoute').attr('href', route1);
-                        }
-
-
-                        if (user.userBankDetails) {
-                            if (user.userBankDetails.bankName != undefined) {
-                                $("#bankName").val(user.userBankDetails.bankName);
-                            }
-                            if (user.userBankDetails.branchName != undefined) {
-                                $("#branchName").val(user.userBankDetails.branchName);
-                            }
-                            if (user.userBankDetails.holderName != undefined) {
-                                $("#holderName").val(user.userBankDetails.holderName);
-                            }
-                            if (user.userBankDetails.accountNumber != undefined) {
-                                $("#accountNumber").val(user.userBankDetails.accountNumber);
-                            }
-                            if (user.userBankDetails.otherDetails != undefined) {
-                                $("#otherDetails").val(user.userBankDetails.otherDetails);
-                            }
-                        }
-
-                    })
-                });
+                if (user.active) {
+                    $("#is_active").prop("checked", true);
+                }
+                
+                // Bank details
+                if (user.bank_details) {
+                    try {
+                        var bank = typeof user.bank_details === 'string' ? JSON.parse(user.bank_details) : user.bank_details;
+                        $("#bankName").val(bank.bankName);
+                        $("#branchName").val(bank.branchName);
+                        $("#holderName").val(bank.holderName);
+                        $("#accountNumber").val(bank.accountNumber);
+                        $("#otherDetails").val(bank.otherDetails);
+                    } catch (e) {
+                        console.error("Error parsing bank details", e);
+                    }
+                }
             }
-
             jQuery("#data-table_processing").hide();
-        })
+        });
 
         $(".edit-form-btn").click(async function () {
 
             var userFirstName = $(".user_first_name").val();
             var userLastName = $(".user_last_name").val();
-            var email = $(".user_email").val();
-            var userPhone = $(".user_phone").val();
-            var change_expiry_date = $('#change_expiry_date').val();
-            var vendor_active = false;
-
-            if ($("#is_active").is(':checked')) {
-                vendor_active = true;
-            }
-
-         
-            if (change_expiry_date != '' && change_expiry_date != null) {
-                var subscriptionPlanExpiryDate = firebase.firestore.Timestamp.fromDate(new Date(
-                    change_expiry_date));
-            } else {
-                var subscriptionPlanExpiryDate=null;
-
-            }
-
+            var vendor_active = $("#is_active").is(':checked');
 
             if (userFirstName == '') {
-                $(".error_top").show();
-                $(".error_top").html("");
-                $(".error_top").append("<p>{{trans('lang.enter_owners_name_error')}}</p>");
+                $(".error_top").show().html("<p>{{trans('lang.enter_owners_name_error')}}</p>");
                 window.scrollTo(0, 0);
-            }else if (userLastName == '') {
-                $(".error_top").show();
-                $(".error_top").html("");
-                $(".error_top").append("<p>{{trans('lang.enter_owners_lastname_error')}}</p>");
-                window.scrollTo(0, 0);
-            } else if (userPhone == '') {
-                $(".error_top").show();
-                $(".error_top").html("");
-                $(".error_top").append("<p>{{trans('lang.enter_owners_phone')}}</p>");
-                window.scrollTo(0, 0);
-            }
-             else {
+            } else {
                 jQuery("#data-table_processing").show();
+                try {
+                    let profileImage = ownerPhoto;
+                    // Check if ownerPhoto is base64 (newly uploaded)
+                    if (ownerPhoto && ownerPhoto.startsWith('data:image')) {
+                        const IMG = await storeImageData();
+                        profileImage = IMG.ownerImage || ownerPhoto;
+                    }
 
-                var bankName = $("#bankName").val();
-                var branchName = $("#branchName").val();
-                var holderName = $("#holderName").val();
-                var accountNumber = $("#accountNumber").val();
-                var otherDetails = $("#otherDetails").val();
-                var userBankDetails = {
-                    'bankName': bankName,
-                    'branchName': branchName,
-                    'holderName': holderName,
-                    'accountNumber': accountNumber,
-                    'accountNumber': accountNumber,
-                    'otherDetails': otherDetails,
-                };
-                await storeImageData().then(async (IMG) => {
-                    updateSubscriptionHistory(ownerId,
-                            subscriptionPlanExpiryDate,store_id).then(
-                            async function() {
-                        await database.collection('users').doc(ownerId).update({
-                            'firstName': userFirstName,
-                            'lastName': userLastName,
-                            'email': email,
-                            'phoneNumber': userPhone,
-                            'profilePictureURL': IMG.ownerImage,
-                            'active': vendor_active,
-                            'userBankDetails': userBankDetails
-                        }).then(async function (result) {
-                            if (store_id != null) {
-                                await geoFirestore.collection('vendors').doc(store_id).update({
-                                    'authorName': userFirstName +' ' +userLastName,
-                                    'authorProfilePic': IMG.ownerImage,
-                                    'subscriptionExpiryDate': subscriptionPlanExpiryDate,
-                                });
-                            }            
-                            jQuery("#data-table_processing").hide();
-                            Swal.fire('Update Complete!',`User updated.`,'success');
-                        });
+                    const bankDetails = {
+                        'bankName': $("#bankName").val(),
+                        'branchName': $("#branchName").val(),
+                        'holderName': $("#holderName").val(),
+                        'accountNumber': $("#accountNumber").val(),
+                        'otherDetails': $("#otherDetails").val(),
+                    };
+
+                    const result = await syncToDjango(`vendors/${id}/`, 'PATCH', {
+                        'first_name': userFirstName,
+                        'last_name': userLastName,
+                        'image': profileImage,
+                        'active': vendor_active,
+                        'bank_details': JSON.stringify(bankDetails)
                     });
-                });
-             }
-                
-        })
+
+                    if (result && result.status) {
+                        Swal.fire('Update Complete!', `Vendor updated.`, 'success').then(() => {
+                            window.location.href = '{{ route("vendors")}}';
+                        });
+                    } else {
+                        throw new Error(result ? result.message : 'Unknown error');
+                    }
+                } catch (error) {
+                    jQuery("#data-table_processing").hide();
+                    $(".error_top").show().html("<p>" + error.message + "</p>");
+                    window.scrollTo(0, 0);
+                }
+            }
+        });
     });
 
     function formatState(state) {

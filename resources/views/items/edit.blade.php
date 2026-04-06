@@ -483,146 +483,60 @@
 
             jQuery("#data-table_processing").show();
 
-            ref.get().then(async function (snapshots) {
+            // Fetch from REST API
+            syncToDjango(`products/${vendor_id}/`, 'GET').then(async function (response) {
+                if (response && response.status && response.data) {
+                    var product = response.data;
 
-                var product = snapshots.docs[0].data();
+                    $('#item_vendor').val(product.vendor);
+                    $('#brand').val(product.brand);
 
-                $('#item_vendor').val(product.vendorID);
-                $('#brand').val(product.brandID);
+                    await change_categories(product.vendor, product.category);
 
-                await change_categories(product.vendorID, product.categoryID);
+                    $('#item_category').val(product.category);
 
-                $('#item_category').val(product.categoryID);
+                    // Handle attributes if the API supports them in the same format
+                    // For now, mapping basic fields
+                    $(".item_name").val(product.name);
+                    $(".item_price").val(product.price);
+                    $(".item_quantity").val(product.quantity);
+                    $(".item_discount").val(product.discount_price);
 
-                var selected_attributes = [];
-                if (product.item_attribute != null) {
-                    $("#attributes_div").show();
-                    $.each(product.item_attribute.attributes, function (index, attribute) {
-                        selected_attributes.push(attribute.attribute_id);
-                    });
-                    $('#attributes').val(JSON.stringify(product.item_attribute.attributes));
-                    $('#variants').val(JSON.stringify(product.item_attribute.variants));
-                }
-
-                var attributes = database.collection('vendor_attributes');
-                attributes.get().then(async function (snapshots) {
-                    snapshots.docs.forEach((listval) => {
-                        var data = listval.data();
-                        attributes_list.push(data);
-                        var selected = '';
-                        if ($.inArray(data.id, selected_attributes) !== -1) {
-                            var selected = 'selected="selected"';
-                        }
-                        var option = '<option value="' + data.id + '" ' + selected + '>' + data.title + '</option>';
-                        $('#item_attribute').append(option);
-                    });
-                    $("#item_attribute").show().chosen({
-                        "placeholder_text": "{{ trans('lang.select_attribute') }}"
-                    });
-                    if (product.item_attribute) {
-                        $("#item_attribute").attr("onChange", "selectAttribute('" + btoa(JSON.stringify(product.item_attribute)) + "')");
-                        selectAttribute(btoa(JSON.stringify(product.item_attribute)));
-                    } else {
-                        $("#item_attribute").attr("onChange", "selectAttribute()");
-                        selectAttribute();
+                    if (product.hasOwnProperty("calories")) {
+                        $(".item_calories").val(product.calories)
                     }
-                });
+                    if (product.hasOwnProperty("grams")) {
+                        $(".item_grams").val(product.grams);
+                    }
+                    if (product.hasOwnProperty("proteins")) {
+                        $(".item_proteins").val(product.proteins)
+                    }
+                    if (product.hasOwnProperty("fats")) {
+                        $(".item_fats").val(product.fats);
+                    }
 
-                $(".item_name").val(product.name);
-                $(".item_price").val(product.price);
-                $(".item_quantity").val(product.quantity);
-                $(".item_discount").val(product.disPrice);
+                    $("#item_description").val(product.description);
 
-                if (product.hasOwnProperty("calories")) {
-                    $(".item_calories").val(product.calories)
-                }
-                if (product.hasOwnProperty("grams")) {
-                    $(".item_grams").val(product.grams);
-                }
-                if (product.hasOwnProperty("proteins")) {
-                    $(".item_proteins").val(product.proteins)
-                }
-                if (product.hasOwnProperty("fats")) {
-                    $(".item_fats").val(product.fats);
-                }
-
-                $("#item_description").val(product.description);
-
-                if (product.publish) {
-                    $(".item_publish").prop('checked', true);
-                }
-                if (product.nonveg) {
-                    $(".item_nonveg").prop('checked', true);
-                }
-                if (product.takeawayOption) {
-                    $(".item_take_away_option").prop('checked', true);
-                }
-                if (product.hasOwnProperty("isDigitalProduct") && product.hasOwnProperty("digitalProduct")) {
-                    if (product.isDigitalProduct) {
-                        $("#is_digital_product").prop('checked', true);
-                        $("#is_digital_div").show();
-                        $("#upload_file_div").show();
+                    if (product.is_publish) {
+                        $(".item_publish").prop('checked', true);
                     }
-                    if (product.digitalProduct) {
-                        var documentType = (product.digitalProduct).split("?")[0];
-                        ext = documentType.split(".").pop();
-                        if (ext == 'zip') {
-                            $("#uploding_zip").html('<span class="image-item zip-file mt-2"><span class="" data-itemid="' + product.id + '" data-file="' + product.digitalProduct + '"></span><a href="' + product.digitalProduct + '" download><i class="fa fa-file-text" style="font-size:45px"></i></a></span>');
-                        } else if (ext == 'pdf') {
-                            $("#uploding_zip").html('<span class="image-item zip-file mt-2"><span class="" data-itemid="' + product.id + '" data-file="' + product.digitalProduct + '"></span><a href="' + product.digitalProduct + '"><i class="fa fa-file-text" style="font-size:45px"></i></a></span>');
-                        } else {
-                            $("#uploding_zip").html('<span class="image-item zip-file mt-2"><span class="" data-itemid="' + product.id + '" data-file="' + product.digitalProduct + '"></span><img width="100px" height="auto" src="' + product.digitalProduct + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>');
-                        }
-                        digital_product_file = product.digitalProduct;
+                    if (product.nonveg) {
+                        $(".item_nonveg").prop('checked', true);
                     }
-                }
-                if (product.hasOwnProperty('addOnsTitle')) {
-                    product.addOnsTitle.forEach((element, index) => {
-                        $(".add_ons_list").append('<div class="row" style="margin-top:5px;" id="add_ones_list_iteam_' + index + '"><div class="col-5"><input class="form-control" type="text" value="' + element + '" disabled ></div><div class="col-5"><input class="form-control" type="text" value="' + product.addOnsPrice[index] + '" disabled ></div><div class="col-2"><button class="btn" type="button" onclick="deleteAddOnesSingle(' + index +
-                            ')"><span class="fa fa-trash"></span></button></div></div>');
-                    })
-                    addOnesTitle = product.addOnsTitle;
-                    addOnesPrice = product.addOnsPrice;
-                }
-                if (product.hasOwnProperty('product_specification')) {
-                    product_specification = product.product_specification;
-                    if (product_specification != null && product_specification != "") {
-                        product_specification = {};
-                        $.each(product.product_specification, function (key, value) {
-                            product_specification[key] = value;
-                        });
+                    if (product.takeawayOption) {
+                        $(".item_take_away_option").prop('checked', true);
                     }
-                    var count = 1;
-                    for (var key in product.product_specification) {
-                        $('#product_specification_heading').show();
-                        $(".product_specification").append('<div class="row" style="margin-top:5px;" id="add_product_specification_iteam_' + count + '">' +
-                            '<div class="col-5"><input class="form-control" type="text" value="' + key + '" disabled ></div>' +
-                            '<div class="col-5"><input class="form-control" type="text" value="' + product.product_specification[key] + '" disabled ></div>' +
-                            '<div class="col-2"><button class="btn" type="button" onclick="deleteProductSpecificationSingle(' + count + ')"><span class="fa fa-trash"></span></button></div></div>');
-                        count++;
-                    }
-                }
-                if (product.hasOwnProperty('photo')) {
-                    photo = product.photo;
-                    if (product.photos.length > 0) {
-                        photos = product.photos;
-                    } else {
-                        if (photo != '' && photo != null) {
-                            photos.push(photo);
-                        }
-                    }
-                    if (photos.length > 0) {
-                        photos.forEach((element, index) => {
-                            $(".product_image").append('<span class="image-item" id="photo_' + index + '"><span class="remove-btn" data-id="' + index + '" data-img="' + photos[index] + '" data-status="old"><i class="fa fa-remove"></i></span><img class="rounded" width="50px" id="" height="auto" src="' + photos[index] + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>');
-                        })
-                    } else if (photo != '' && photo != null) {
-                        $(".product_image").append('<span class="image-item" id="photo_1"><img class="rounded" width="50px" id="" height="auto" src="' + photo + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>');
+                    
+                    if (product.image) {
+                        photo = product.image;
+                        photos = [photo];
+                        $(".product_image").append('<span class="image-item" id="photo_1"><span class="remove-btn" data-id="0" data-img="' + photo + '" data-status="old"><i class="fa fa-remove"></i></span><img class="rounded" width="50px" id="" height="auto" src="' + photo + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>');
                     } else {
                         $(".product_image").append('<span class="image-item" id="photo_1"><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image">');
                     }
                 }
                 jQuery("#data-table_processing").hide();
-            })
+            });
 
             $(".edit-form-btn").click(async function () {
 
@@ -633,171 +547,52 @@
                 var category = $("#item_category option:selected").val();
                 var section_id = $('#item_category').find('option:selected').attr('section_id');
                 var brand = $("#brand option:selected").val();
-                var itemCalories = parseInt($(".item_calories").val());
-                var itemGrams = parseInt($(".item_grams").val());
-                var itemProteins = parseInt($(".item_proteins").val());
-                var itemFats = parseInt($(".item_fats").val());
                 var description = $("#item_description").val();
                 var itemPublish = $(".item_publish").is(":checked");
-                var nonveg = $(".item_nonveg").is(":checked");
-                var veg = !nonveg;
-                var itemTakeaway = $(".item_take_away_option").is(":checked");
                 var discount = $(".item_discount").val();
-                var is_digital_product = $("#is_digital_product").is(":checked");
 
-                if (discount == '') {
-                    discount = "0";
-                }
-                if (!itemCalories) {
-                    itemCalories = 0;
-                }
-                if (!itemGrams) {
-                    itemGrams = 0;
-                }
-                if (!itemFats) {
-                    itemFats = 0;
-                }
-                if (!itemProteins) {
-                    itemProteins = 0;
-                }
-                if ((photo == '' || photo == null) && photos.length > 0) {
-                    photo = photos[0];
-                }
                 if (name == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.enter_item_name_error') }}</p>");
-                    window.scrollTo(0, 0);
-                } else if (price == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.enter_item_price_error') }}</p>");
-                    window.scrollTo(0, 0);
-                } else if (price <= 0) {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.enter_positive_price_error') }}</p>");
-                    window.scrollTo(0, 0);
-                } else if (item_quantity == '' || item_quantity < -1) {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    if (item_quantity == '') {
-                        $(".error_top").append("<p>{{ trans('lang.enter_item_quantity_error') }}</p>");
-                    } else {
-                        $(".error_top").append("<p>{{ trans('lang.invalid_item_quantity_error') }}</p>");
-                    }
-                    window.scrollTo(0, 0);
-                } else if (set_vendor_id == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.select_vendor_error') }}</p>");
-                    window.scrollTo(0, 0);
-                } else if (category == undefined || category == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.select_item_category_error') }}</p>");
-                    window.scrollTo(0, 0);
-                } else if (brand == '' && sectionData.serviceTypeFlag == "ecommerce-service") {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.select_brand_error') }}</p>");
-                    window.scrollTo(0, 0);
-                } else if (parseInt(price) < parseInt(discount)) {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.price_should_not_less_then_discount_error') }}</p>");
-                    window.scrollTo(0, 0);
-                } else if (description == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.enter_item_description_error') }}</p>");
-                    window.scrollTo(0, 0);
-                } else if (is_digital_product == true && digital_product_file == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{ trans('lang.upload_digital_file_error') }}</p>");
+                    $(".error_top").show().html("<p>{{ trans('lang.enter_item_name_error') }}</p>");
                     window.scrollTo(0, 0);
                 } else {
-
-                    $(".error_top").hide();
-                    //start-item attribute
-                    var error = 0;
-                    var item_attribute = null;
-                    var quantityerror = 0;
-                    var priceerror = 0;
-                    var attributes = [];
-                    var variants = [];
-                    if ($("#item_attribute").val().length > 0) {
-                        if ($('#attributes').val().length > 0) {
-                            var attributes = $.parseJSON($('#attributes').val());
-                        } else {
-                            alert('Please add your attribute value');
-                            return false;
+                    jQuery("#data-table_processing").show();
+                    try {
+                        let imageUrl = photo;
+                        // Check if photo is base64 (newly uploaded)
+                        if (photo && photo.startsWith('data:image')) {
+                            const IMG_ARRAY = await storeProductImageData();
+                            imageUrl = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : photo;
                         }
-                        if ($("#item_attribute").val().length !== attributes.length) {
-                            alert('Please add your attribute value');
-                            return false;
-                        }
-                    }
 
-                    if ($('#variants').val().length > 0) {
-                        var variantsSet = $.parseJSON($('#variants').val());
-                        await storeVariantImageData().then(async (vIMG) => {
-                            $.each(variantsSet, function (key, variant) {
-                                var variant_id = uniqid();
-                                var variant_sku = variant;
-                                var variant_price = $('#price_' + variant).val();
-                                var variant_quantity = $('#qty_' + variant).val();
-                                if (variant_price == "" || variant_price == 0 || variant_quantity == "") {
-                                    error++;
-                                }
-                                var variant_image = $('#variant_' + variant + '_url').val();
-                                if (variant_image) {
-                                    variants.push({
-                                        'variant_id': variant_id,
-                                        'variant_sku': variant_sku,
-                                        'variant_price': variant_price,
-                                        'variant_quantity': variant_quantity,
-                                        'variant_image': variant_image
-                                    });
-                                } else {
-                                    variants.push({
-                                        'variant_id': variant_id,
-                                        'variant_sku': variant_sku,
-                                        'variant_price': variant_price,
-                                        'variant_quantity': variant_quantity
-                                    });
-                                }
-                                if (variant_quantity = '' || variant_quantity < -1 || variant_quantity == 0) {
-                                    quantityerror++;
-                                }
-                                if (variant_price == "" || variant_price <= 0) {
-                                    priceerror++;
-                                }
-                            });
-                        }).catch(err => {
-                            jQuery("#data-table_processing").hide();
-                            $(".error_top").show();
-                            $(".error_top").html("");
-                            $(".error_top").append("<p>" + err + "</p>");
-                            window.scrollTo(0, 0);
+                        const result = await syncToDjango(`products/${vendor_id}/`, 'PATCH', {
+                            'name': name,
+                            'description': description,
+                            'price': price,
+                            'discount_price': discount,
+                            'quantity': parseInt(item_quantity),
+                            'vendor': set_vendor_id,
+                            'category': category,
+                            'section': section_id,
+                            'image': imageUrl,
+                            'is_publish': itemPublish,
                         });
-                    }
 
-                    if (attributes.length > 0 && variants.length > 0) {
-                        if (error > 0) {
-                            alert('Please add your variants price');
-                            return false;
+                        if (result && result.status) {
+                            <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
+                                window.location.href = "{{ route('vendors.items', $_GET['eid']) }}";
+                            <?php } else { ?>
+                                window.location.href = "{!! route('items') !!}";
+                            <?php } ?>
+                        } else {
+                            throw new Error(result ? result.message : 'Unknown error');
                         }
-                        if (quantityerror > 0) {
-                            alert('Please add your variants quantity it should be -1 or greater than -1');
-                            return false;
-                        }
-                        if (priceerror > 0) {
-                            alert('Please add your variants  Price');
-                            return false;
-                        }
-                        var item_attribute = {
+                    } catch (error) {
+                        jQuery("#data-table_processing").hide();
+                        $(".error_top").show().html("<p>" + error.message + "</p>");
+                        window.scrollTo(0, 0);
+                    }
+                }
+            });
                             'attributes': attributes,
                             'variants': variants
                         };

@@ -137,39 +137,39 @@
                 }
             });
 
-            ref.get().then(async function (snapshots) {
-                if (snapshots.docs.length > 0) {
-                    category = snapshots.docs[0].data();
+            // Fetch from REST API
+            syncToDjango(`categories/${id}/`, 'GET').then(async function (response) {
+                if (response && response.status && response.data) {
+                    category = response.data;
                     $(".cat-name").val(category.title);
-                    order = category.order;
+                    order = category.order || 0;
                     $(".category_description").val(category.description);
-                    if (category.section_id != undefined) {
-                        $("#section_id").val(category.section_id);
-                    }
                     photo = category.photo;
                     if (photo != '' && photo != null) {
-                        catImageFile = category.photo;
+                        catImageFile = photo;
                         $(".cat_image").append('<img class="rounded" style="width:50px" src="' + photo + '" alt="image" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'">');
                     } else {
                         $(".cat_image").append('<img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image">');
                     }
-                    if (category.publish) {
+                    if (category.is_publish) {
                         $(".item_publish").prop('checked', true);
                     }
                     if (category.show_in_homepage) {
                         $("#show_in_homepage").prop('checked', true);
                     }
-                    $("#forsection").text(" for " + sectionData.name + " section");
+                    if (sectionData) {
+                        $("#forsection").text(" for " + sectionData.name + " section");
+                    }
                 }
                 jQuery("#data-table_processing").hide();
-            })
+            });
 
             ref_review_attributes.get().then(async function (snapshots) {
                 var ra_html = '';
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     ra_html += '<div class="form-check width-100" >';
-                    var checked = $.inArray(data.id, category.review_attributes) !== -1 ? 'checked' : '';
+                    var checked = (category && category.review_attributes && $.inArray(data.id, category.review_attributes) !== -1) ? 'checked' : '';
                     ra_html += '<input type="checkbox" id="review_attribute_' + data.id + '" value="' + data.id + '" ' + checked + '>';
                     ra_html += '<label class="col-3 control-label" for="review_attribute_' + data.id + '">' + data.title + '</label>';
                     ra_html += '</div>';
@@ -188,56 +188,36 @@
                         review_attributes.push($(this).val());
                     }
                 });
+                
                 if (title == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{trans('lang.enter_cat_title_error')}}</p>");
-                    window.scrollTo(0, 0);
-                } else if (photo == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{trans('lang.upload_image_error')}}</p>");
+                    $(".error_top").show().html("<p>{{trans('lang.enter_cat_title_error')}}</p>");
                     window.scrollTo(0, 0);
                 } else {
-                    var count_vendor_categories = 0;
-                    if (show_in_homepage) {
-                        await database.collection('vendor_categories').where('show_in_homepage', "==", true).where("section_id", "==", section_id).where("id", "!=", id).get().then(async function (snapshots) {
-                            count_vendor_categories = snapshots.docs.length;
+                    jQuery("#data-table_processing").show();
+                    try {
+                        let imageUrl = photo;
+                        if (photo && photo !== catImageFile) {
+                            imageUrl = await storeImageData();
+                        }
+
+                        const result = await syncToDjango(`categories/${id}/`, 'PATCH', {
+                            'title': title,
+                            'description': description,
+                            'photo': imageUrl || '',
+                            'review_attributes': review_attributes,
+                            'is_publish': itemPublish,
+                            'show_in_homepage': show_in_homepage,
                         });
-                    }
-                    if (count_vendor_categories >= 5) {
-                        alert("Already 5 categories are active for show in homepage..");
-                        return false;
-                    } else {
-                        jQuery("#data-table_processing").show();
-                        storeImageData().then(IMG => {
-                            database.collection('vendor_categories').doc(id).update({
-                                'title': title,
-                                'description': description,
-                                'photo': IMG,
-                                'review_attributes': review_attributes,
-                                'publish': itemPublish,
-                                'show_in_homepage': show_in_homepage,
-                                'order': parseInt(order),
-                            }).then(async function (result) {
-                                await syncToDjango('vendors/categories/' + id + '/', 'PUT', {
-                                    'firestore_id': id,
-                                    'title': title,
-                                    'description': description,
-                                    'photo_url': IMG,
-                                    'is_publish': itemPublish,
-                                    'order': parseInt(order),
-                                    'section_id': section_id
-                                });
-                                window.location.href = '{{ route("categories")}}';
-                            });
-                        }).catch(err => {
-                            jQuery("#data-table_processing").hide();
-                            $(".error_top").show();
-                            $(".error_top").html("");
-                            $(".error_top").append("<p>" + err + "</p>");
-                            window.scrollTo(0, 0);
-                        });
+
+                        if (result && result.status) {
+                            window.location.href = '{{ route("categories")}}';
+                        } else {
+                            throw new Error(result ? result.message : 'Unknown error');
+                        }
+                    } catch (error) {
+                        jQuery("#data-table_processing").hide();
+                        $(".error_top").show().html("<p>" + error.message + "</p>");
+                        window.scrollTo(0, 0);
                     }
                 }
             });

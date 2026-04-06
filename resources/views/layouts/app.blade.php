@@ -68,24 +68,79 @@
         }
 
         const BACKEND_API_URL = "{{ env('BACKEND_API_URL') }}";
+        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-        async function syncToDjango(endpoint, method, data) {
-            try {
-                const response = await fetch(`${BACKEND_API_URL}/${endpoint}`, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    body: JSON.stringify(data)
+        function waitForAuth() {
+            return new Promise((resolve) => {
+                if (firebase.auth().currentUser) {
+                    resolve(firebase.auth().currentUser);
+                    return;
+                }
+                const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+                    unsubscribe();
+                    resolve(user);
                 });
+                // Timeout after 5 seconds to avoid hanging indefinitely
+                setTimeout(() => {
+                    unsubscribe();
+                    resolve(null);
+                }, 5000);
+            });
+        }
+
+        async function syncToDjango(endpoint, method, data = null) {
+            try {
+                const url = endpoint.startsWith('http') ? endpoint : `${BACKEND_API_URL}/${endpoint.startsWith('/') ? endpoint.substring(1) : endpoint}`;
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+                
+                if (!url.includes('storage.fondex.uz')) {
+                    headers['X-CSRF-TOKEN'] = CSRF_TOKEN;
+                }
+
+                // Get Firebase ID Token
+                let user = firebase.auth().currentUser;
+                if (!user) {
+                    console.log("Auth: Current user null, waiting for auth...");
+                    user = await waitForAuth();
+                }
+                
+                if (user) {
+                    console.log("Auth: User found, getting token...");
+                    const token = await user.getIdToken();
+                    headers['Authorization'] = `Bearer ${token}`;
+                } else {
+                    console.warn("Auth: No Firebase user found, sending request without token.");
+                }
+
+                const options = {
+                    method: method,
+                    headers: headers
+                };
+                if (data && method !== 'GET') {
+                    options.body = JSON.stringify(data);
+                }
+                console.log(`API Call: ${method} ${url}`, { ...options }); 
+                const response = await fetch(url, options);
+                
+                if (response.status === 401) {
+                    console.error("API Error: 401 Unauthorized. User might not be signed into Firebase on the frontend.");
+                }
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`API Error Response: ${response.status}`, errorText);
+                    return { status: false, message: `HTTP ${response.status}: ${errorText}` };
+                }
+                
                 const result = await response.json();
-                console.log(`Sync to Django (${endpoint}):`, result);
+                console.log(`API Success: ${method} ${url}`, result);
                 return result;
             } catch (error) {
                 console.error(`Error syncing to Django (${endpoint}):`, error);
-                return null;
+                return { status: false, message: error.message };
             }
         }
     </script>

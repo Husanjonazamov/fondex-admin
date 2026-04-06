@@ -161,50 +161,39 @@
                 });
 
                 if (title == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{trans('lang.enter_cat_title_error')}}</p>");
-                    window.scrollTo(0, 0);
-                } else if (photo == '') {
-                    $(".error_top").show();
-                    $(".error_top").html("");
-                    $(".error_top").append("<p>{{trans('lang.upload_image_error')}}</p>");
+                    $(".error_top").show().html("<p>{{trans('lang.enter_cat_title_error')}}</p>");
                     window.scrollTo(0, 0);
                 } else {
-                    var count_vendor_categories = 0;
-                    if (show_in_homepage) {
-                        await database.collection('vendor_categories').where('show_in_homepage', "==", true).where("section_id", "==", section_id).get().then(async function (snapshots) {
-                            count_vendor_categories = snapshots.docs.length;
+                    jQuery("#data-table_processing").show();
+                    
+                    try {
+                        let imageUrl = '';
+                        if (photo) {
+                            imageUrl = await storeImageData();
+                        }
+
+                        const result = await syncToDjango('categories/', 'POST', {
+                            'title': title,
+                            'description': description,
+                            'photo': imageUrl || '',
+                            'is_publish': itemPublish,
+                            'section_id': section_id,
+                            'review_attributes': review_attributes
                         });
-                    }
-                    if (count_vendor_categories >= 5) {
-                        alert("{{trans('lang.max_category_alert')}}");
-                        return false;
-                    } else {
-                        jQuery("#data-table_processing").show();
-                        storeImageData().then(IMG => {
-                        }).then(async function (result) {
-                            await syncToDjango('vendors/categories/', 'POST', {
-                                'firestore_id': id_category,
-                                'title': title,
-                                'description': description,
-                                'photo_url': IMG,
-                                'is_publish': itemPublish,
-                                'section_id': section_id,
-                                'order': parseInt(order)
-                            });
+
+                        if (result && result.status) {
                             window.location.href = '{{ route("categories")}}';
-                        });
-                    }).catch(function (error) {
+                        } else {
+                            throw new Error(result ? result.message : 'Unknown error');
+                        }
+                    } catch (error) {
                         jQuery("#data-table_processing").hide();
-                        $(".error_top").show();
-                        $(".error_top").html("");
-                        $(".error_top").append("<p>" + error + "</p>");
-                    })
-        }
+                        $(".error_top").show().html("<p>" + error.message + "</p>");
+                        window.scrollTo(0, 0);
                     }
-                });
+                }
             });
+        });
         function handleFileSelect(evt) {
             var f = evt.target.files[0];
             var reader = new FileReader();
