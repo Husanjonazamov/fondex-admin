@@ -255,7 +255,7 @@
                 $('.category_selector').html('<option value="" selected>{{trans("lang.category_plural")}}</option>');
                 if (catData && catData.results) {
                     catData.results.forEach(function(cat) {
-                        $('.category_selector').append($("<option></option>").attr("value", cat.id).text(cat.title || cat.name));
+                        $('.category_selector').append($("<option></option>").attr("value", cat.firestore_id).text(cat.title || cat.name));
                     });
                 }
                 if (categoryID) {

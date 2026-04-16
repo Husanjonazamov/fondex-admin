@@ -288,7 +288,7 @@
             }
 
             var itemsUrl = '{{url("items?categoryID=id")}}';
-            itemsUrl = itemsUrl.replace("id", id);
+            itemsUrl = itemsUrl.replace("id", val.firestore_id);
 
             if (val.photo == '') {
                 html.push('<td><a href="' + itemsUrl + '"><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image"></a> <a href="' + itemsUrl + '" class="left_space">' + val.title + '</a>');
