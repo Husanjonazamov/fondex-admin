@@ -226,6 +226,21 @@ class UserController extends Controller
         return redirect()->back();
     }
 
+    public function hardDelete(Request $request)
+    {
+        $id = $request->id;
+        $user = User::where('id', $id)->first();
+        if ($user) {
+            $user->delete();
+            return response()->json(['status' => true, 'message' => 'User deleted from database successfully']);
+        }
+        
+        // If not found by ID, try searching by custom UUID (firebase UID) if applicable
+        // But the local User model seems to use auto-increment IDs.
+        
+        return response()->json(['status' => false, 'message' => 'User not found in local database']);
+    }
+
     public function shortEmail($email, $mask = "**********") {
         $atposition = strrpos($email, "@");
         $name = substr($email, 0, $atposition);

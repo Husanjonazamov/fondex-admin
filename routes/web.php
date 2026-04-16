@@ -41,6 +41,7 @@ Route::middleware(['permission:users,users.view'])->group(function () {
 });
 Route::get('/users/profile', [App\Http\Controllers\UserController::class, 'profile'])->name('users.profile');
 Route::post('/users/profile/update/{id}', [App\Http\Controllers\UserController::class, 'update'])->name('users.profile.update');
+Route::post('/users/hard-delete', [App\Http\Controllers\UserController::class, 'hardDelete'])->name('users.hard-delete');
 
 //vendors
 Route::middleware(['permission:vendors,vendors'])->group(function () {

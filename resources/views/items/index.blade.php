@@ -29,6 +29,11 @@
                             <div class="d-flex top-title-left align-self-center">
                             </div>
                             <div class="d-flex top-title-right align-self-center">
+                                <div class="select-box pl-3">
+                                    <select class="form-control section_selector">
+                                        <option value="" selected>{{trans("lang.section_plural")}} ({{trans("lang.ombor")}})</option>
+                                    </select>
+                                </div>
                                 <div class="select-box pl-3 item_type_selector_div" style="display:none;">
                                     <select class="form-control item_type_selector">
                                         <option value="" selected>{{trans("lang.type")}}</option>
@@ -40,6 +45,9 @@
                                     <select class="form-control category_selector">
                                         <option value="" selected>{{trans("lang.category_plural")}}</option>
                                     </select>
+                                </div>
+                                <div class="pl-3">
+                                    <button class="btn btn-secondary btn-sm" id="clear_filters">{{trans('lang.clear')}}</button>
                                 </div>
                             </div>
                         </div>
@@ -224,21 +232,43 @@
             }
         });
 
-        (async function loadCategories() {
-            let catUrl = `categories/?page=1&page_size=200`;
-            if (section_id) catUrl += `&section=${section_id}`;
-            const catResponse = await syncToDjango(catUrl, 'GET');
-            if (catResponse && catResponse.status && catResponse.data && catResponse.data.results) {
-                catResponse.data.results.forEach(function(cat) {
-                    $('.category_selector').append($("<option></option>")
-                        .attr("value", cat.id)
-                        .text(cat.title || cat.name));
+        (async function loadFilters() {
+            // Load Sections (Storages)
+            const sectionResponse = await syncToDjango('sections/?page=1&page_size=100', 'GET');
+            const sectionData = (sectionResponse && sectionResponse.status && sectionResponse.data) ? sectionResponse.data : null;
+            if (sectionData && sectionData.results) {
+                sectionData.results.forEach(function(sec) {
+                    $('.section_selector').append($("<option></option>").attr("value", sec.id).text(sec.name));
                 });
             }
-            if (categoryID) {
-                // Select2 orqali tanlab, jadvalga qayta yuklanishni triggerlash
-                $('.category_selector').val(categoryID).trigger('change');
+            if (section_id) {
+                $('.section_selector').val(section_id).trigger('change');
             }
+
+            // Load Categories
+            async function refreshCategories(sId = '') {
+                let catUrl = `categories/?page=1&page_size=300`;
+                if (sId) catUrl += `&section=${sId}`;
+                const catResponse = await syncToDjango(catUrl, 'GET');
+                const catData = (catResponse && catResponse.status && catResponse.data) ? catResponse.data : (catResponse && catResponse.results ? catResponse : null);
+                
+                $('.category_selector').html('<option value="" selected>{{trans("lang.category_plural")}}</option>');
+                if (catData && catData.results) {
+                    catData.results.forEach(function(cat) {
+                        $('.category_selector').append($("<option></option>").attr("value", cat.id).text(cat.title || cat.name));
+                    });
+                }
+                if (categoryID) {
+                    $('.category_selector').val(categoryID).trigger('change');
+                }
+            }
+            
+            await refreshCategories(section_id);
+
+            $('.section_selector').on('change', function() {
+                let sId = $(this).val();
+                refreshCategories(sId);
+            });
         })();
 
         $(document).ready(function () {
@@ -254,9 +284,19 @@
                 minimumResultsForSearch: Infinity,
                 allowClear: true
             });
+            $('.section_selector').select2({
+                placeholder: "{{trans('lang.section_plural')}}",
+                minimumResultsForSearch: Infinity,
+                allowClear: true
+            });
             
-            $('#brand_search_dropdown').hide();
-            $('#category_search_dropdown').hide();
+            $('#clear_filters').on('click', function() {
+                $('.section_selector').val('').trigger('change');
+                $('.category_selector').val('').trigger('change');
+                $('.item_type_selector').val('').trigger('change');
+                categoryID = ''; 
+                table.ajax.reload();
+            });
 
             // Firestore Section Data (Optional, don't block)
             if (section_id) {
@@ -285,10 +325,14 @@
                         let url = `products/?page=${page}&page_size=${length}`;
                         if (searchValue) url += `&search=${searchValue}`;
                         const selectedCategory = $('.category_selector').val() || '';
+                        const selectedSection = $('.section_selector').val() || '';
+
                         if (vendorID) url += `&vendor=${vendorID}`;
-                        else if (selectedCategory) url += `&category=${selectedCategory}`;
+                        if (selectedCategory) url += `&category=${selectedCategory}`;
                         else if (categoryID) url += `&category=${categoryID}`;
-                        else if (section_id) url += `&section=${section_id}`;
+                        
+                        if (selectedSection) url += `&section=${selectedSection}`;
+                        else if (section_id && !selectedCategory && !categoryID) url += `&section=${section_id}`;
 
                         const response = await syncToDjango(url, 'GET');
 

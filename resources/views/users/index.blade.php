@@ -464,12 +464,28 @@
                     contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(dataObject),
                     success: function (data) {
-                        console.log('Delete user from sql success:', data);
+                        console.log('Delete user from external sql success:', data);
                     },
                     error: function (error) {
                         console.log(error);
                     }
                 });
+            }
+        });
+
+        // Delete from local SQL database
+        jQuery.ajax({
+            url: '{{ route("users.hard-delete") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: userId
+            },
+            success: function(data) {
+                console.log('Delete user from local sql success:', data);
+            },
+            error: function(error) {
+                console.log('Delete user from local sql error:', error);
             }
         });
         //delete user from authentication    
