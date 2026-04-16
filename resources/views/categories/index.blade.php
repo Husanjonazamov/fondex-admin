@@ -189,14 +189,17 @@
                     $('.total_count').text(totalRecords);
 
                     let records = [];
-                    await Promise.all(response.data.results.map(async (childData) => {
-                        // Map API fields to Firestore-like fields for buildHTML compatibility
-                        childData.publish = childData.is_publish;
-                        childData.totalProducts = childData.product_count || 0; // Assuming backend might provide this or we use 0
-                        
-                        var getData = await buildHTML(childData);
-                        records.push(getData);
-                    }));
+                    if (response.data && response.data.results) {
+                        await Promise.all(response.data.results.map(async (childData) => {
+                            // Map API fields to Firestore-like fields for buildHTML compatibility
+                            childData.publish = childData.is_publish;
+                            // Check multiple common field names for item count
+                            childData.totalProducts = childData.items_count || childData.product_count || childData.total_items || childData.products_count || 0;
+                            
+                            var getData = await buildHTML(childData);
+                            records.push(getData);
+                        }));
+                    }
 
                     $('#data-table_processing').hide();
                     callback({

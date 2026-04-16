@@ -122,21 +122,21 @@
                 if (data && method !== 'GET') {
                     options.body = JSON.stringify(data);
                 }
-                console.log(`API Call: ${method} ${url}`, { ...options }); 
+                console.log(`[API Call] ${method} ${url}`, { ...options }); 
                 const response = await fetch(url, options);
                 
                 if (response.status === 401) {
-                    console.error("API Error: 401 Unauthorized. User might not be signed into Firebase on the frontend.");
+                    console.error("[API Error] 401 Unauthorized. check Firebase auth.");
                 }
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error(`API Error Response: ${response.status}`, errorText);
+                    console.error(`[API Error] ${response.status}`, errorText);
                     return { status: false, message: `HTTP ${response.status}: ${errorText}` };
                 }
                 
                 const result = await response.json();
-                console.log(`API Success: ${method} ${url}`, result);
+                console.log(`[API Response] ${method} ${url} ->`, result);
                 return result;
             } catch (error) {
                 console.error(`Error syncing to Django (${endpoint}):`, error);

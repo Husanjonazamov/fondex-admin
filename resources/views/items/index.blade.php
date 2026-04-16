@@ -320,7 +320,7 @@
                         const start = data.start;
                         const length = data.length;
                         const searchValue = data.search.value.toLowerCase();
-                        const page = (start / length) + 1;
+                        const page = Math.floor(start / length) + 1;
 
                         let url = `products/?page=${page}&page_size=${length}`;
                         if (searchValue) url += `&search=${searchValue}`;
@@ -331,8 +331,12 @@
                         if (selectedCategory) url += `&category=${selectedCategory}`;
                         else if (categoryID) url += `&category=${categoryID}`;
                         
-                        if (selectedSection) url += `&section=${selectedSection}`;
-                        else if (section_id && !selectedCategory && !categoryID) url += `&section=${section_id}`;
+                        // Try both section and section_id or ensure the correct one is used
+                        if (selectedSection) {
+                            url += `&section=${selectedSection}`;
+                        } else if (section_id && !selectedCategory && !categoryID) {
+                            url += `&section=${section_id}`;
+                        }
 
                         const response = await syncToDjango(url, 'GET');
 
@@ -347,17 +351,21 @@
                         let records = [];
                         if (response.data.results) {
                             for (const item of response.data.results) {
-                                // Map fields for buildHTML
-                                item.publish = item.is_publish;
-                                item.photo = item.image; 
-                                item.foodName = item.name;
+                                // Map fields for buildHTML compatibility with both old and new API formats
+                                item.publish = item.hasOwnProperty('is_publish') ? item.is_publish : item.publish;
+                                item.photo = item.image || item.photo || ''; 
+                                item.foodName = item.name || item.title || '';
                                 item.finalPrice = parseFloat(item.price) || 0;
-                                item.store = item.vendor_name || ''; 
-                                item.category = item.category_name || '';
+                                item.store = item.vendor_name || item.vendor_title || item.vendor || ''; 
+                                item.category = item.category_name || item.category_title || item.category || '';
                                 
                                 var htmlRows = await buildHTML(item);
                                 records.push(htmlRows);
                             }
+                        }
+
+                        if (records.length === 0 && totalRecords > 0) {
+                            console.warn("API returned total records but results array is empty or malformed.");
                         }
 
                         callback({
