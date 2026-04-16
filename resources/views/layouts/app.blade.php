@@ -295,8 +295,8 @@
                 let sectionId = $(this).data('section-id');
                 let sectionType = $(this).data('section-type');
                 if(sectionId && sectionType){
-                    setCookie('section_id', sectionId, 1);
-                    setCookie('service_type', sectionType, 1);
+                    setCookie('section_id', sectionId, 30);
+                    setCookie('service_type', sectionType, 30);
                 }
                 window.location.href = sectionUrl;
                 /*window.location.reload();*/

@@ -495,12 +495,15 @@
     }
     $(document).on("click", "a[name='user-delete']", async function(e) {
         var id = this.id;
+        if (!confirm("{{trans('lang.delete_alert')}}")) {
+            return;
+        }
         jQuery("#data-table_processing").show();
-            await deleteDocumentWithImage('users', id, 'profilePictureURL');
-            const getStoreName = deleteUserData(id);
-            setTimeout(function() {
-                window.location.reload();
-            }, 7000);
+        await deleteDocumentWithImage('users', id, 'profilePictureURL');
+        const getStoreName = deleteUserData(id);
+        setTimeout(function() {
+            window.location.reload();
+        }, 7000);
     });
     $(document).on("click", "input[name='isActive']", function(e) {
         var ischeck = $(this).is(':checked');

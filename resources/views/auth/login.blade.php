@@ -241,8 +241,8 @@
                     const firstSection = snapshots.docs[0].data();
                     const firstSectionId = snapshots.docs[0].id;
                     const firstServiceType = firstSection.serviceTypeFlag;
-                    setCookie('section_id', firstSectionId, 1);
-                    setCookie('service_type', firstServiceType, 1);
+                    setCookie('section_id', firstSectionId, 30);
+                    setCookie('service_type', firstServiceType, 30);
                 })
         });
 

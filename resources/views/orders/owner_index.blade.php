@@ -725,7 +725,10 @@
             if (products) {
                 products.forEach((product) => {
                     var val = product;
-                    price_item = parseFloat(val.price).toFixed(decimal_degits);
+                    var effectivePrice = (val.discount_price && parseFloat(val.discount_price) > 0)
+                        ? val.discount_price
+                        : val.price;
+                    price_item = parseFloat(effectivePrice).toFixed(decimal_degits);
                     extras_price_item = (parseFloat(val.extras_price) * parseInt(val.quantity)).toFixed(decimal_degits);
                     totalProductPrice = parseFloat(price_item) * parseInt(val.quantity);
                     var extras_price = 0;

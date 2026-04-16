@@ -219,7 +219,9 @@
         $(document).on('click', '#create_vendor .close, #create_vendor [data-dismiss="modal"], #create_vendor [data-bs-dismiss="modal"]', function () {
             $('#create_vendor').modal('hide');
         });
-        var refData = database.collection('vendors').where('section_id', '==', active_id);
+        var refData = active_id
+            ? database.collection('vendors').where('section_id', '==', active_id)
+            : database.collection('vendors');
         var ref = refData.orderBy('createdAt', 'desc');
         var userData = [];
         var vendorData = [];
@@ -340,9 +342,10 @@
                         let filteredRecords = [];
                         await Promise.all(querySnapshot.docs.map(async (doc) => {
                             let childData = doc.data();
-                            childData.phone = (childData.phonenumber != '' && childData.phonenumber != null && childData.phonenumber.slice(0, 1) == '+') ? childData.phonenumber.slice(1) : childData.phonenumber;
+                            var rawPhone = childData.phonenumber || '';
+                            childData.phone = (rawPhone && rawPhone.slice(0, 1) == '+') ? rawPhone.slice(1) : rawPhone;
                             childData.maskedPhone = EditPhoneNumber(childData.phone);
-                            childData.hasPlusSign = childData.phonenumber.startsWith('+');
+                            childData.hasPlusSign = rawPhone.startsWith('+');
                             childData.exportPhone = childData.hasPlusSign ? `+${childData.maskedPhone}` : childData.maskedPhone;
                             childData.id = doc.id; // Ensure the document ID is included in the data
                             if (childData.id) {

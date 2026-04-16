@@ -15,9 +15,12 @@ class LangController extends Controller
     */
     public function change(Request $request)
     {
-        App::setLocale($request->lang);
-        session()->put('locale', $request->lang);
-  
+        $lang = $request->lang;
+        App::setLocale($lang);
+        session()->put('locale', $lang);
+        // Also store in cookie so language persists after session expiry
+        \Cookie::queue('locale', $lang, 60 * 24 * 365); // 1 year
+
         return redirect()->back();
     }
 }

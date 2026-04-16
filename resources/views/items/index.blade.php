@@ -224,14 +224,21 @@
             }
         });
 
-        database.collection('vendor_categories').where('section_id', '==', section_id).get().then(async function (snapshots) {
-            snapshots.docs.forEach((listval) => {
-                var data = listval.data();
-                $('.category_selector').append($("<option></option>")
-                    .attr("value", data.id)
-                    .text(data.title));
-            })
-        });
+        (async function loadCategories() {
+            let catUrl = `categories/?page=1&page_size=200`;
+            if (section_id) catUrl += `&section=${section_id}`;
+            const catResponse = await syncToDjango(catUrl, 'GET');
+            if (catResponse && catResponse.status && catResponse.data && catResponse.data.results) {
+                catResponse.data.results.forEach(function(cat) {
+                    $('.category_selector').append($("<option></option>")
+                        .attr("value", cat.id)
+                        .text(cat.title || cat.name));
+                });
+            }
+            if (categoryID) {
+                $('.category_selector').val(categoryID);
+            }
+        })();
 
         $(document).ready(function () {
             
@@ -276,7 +283,9 @@
 
                         let url = `products/?page=${page}&page_size=${length}`;
                         if (searchValue) url += `&search=${searchValue}`;
+                        const selectedCategory = $('.category_selector').val() || '';
                         if (vendorID) url += `&vendor=${vendorID}`;
+                        else if (selectedCategory) url += `&category=${selectedCategory}`;
                         else if (categoryID) url += `&category=${categoryID}`;
                         else if (section_id) url += `&section=${section_id}`;
 

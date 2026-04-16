@@ -284,12 +284,15 @@
 
             }
 
+            var itemsUrl = '{{url("items?categoryID=id")}}';
+            itemsUrl = itemsUrl.replace("id", id);
+
             if (val.photo == '') {
-                html.push('<td><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image"></td>  <a href="' + route1 + '" class="left_space">' + val.title + '</a>');
+                html.push('<td><a href="' + itemsUrl + '"><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image"></a> <a href="' + itemsUrl + '" class="left_space">' + val.title + '</a>');
 
             } else {
 
-                html.push('<td><img class="rounded" style="width:50px" src="' + val.photo + '" alt="image" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></td>  <a href="' + route1 + '" class="left_space">' + val.title + '</a>');
+                html.push('<td><a href="' + itemsUrl + '"><img class="rounded" style="width:50px" src="' + val.photo + '" alt="image" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></a> <a href="' + itemsUrl + '" class="left_space">' + val.title + '</a>');
 
             }
 
