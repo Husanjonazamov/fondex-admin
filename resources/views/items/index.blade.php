@@ -345,12 +345,25 @@
                             return;
                         }
 
-                        const totalRecords = response.data.total_items || response.data.count || (response.data.results ? response.data.results.length : 0);
+                        let totalRecords = response.data.total_items || response.data.count || 0;
+                        const results = response.data.results || [];
+                        
+                        // If API uses CursorPagination (no total count), we must provide a fallback for DataTables
+                        if (!totalRecords && results.length > 0) {
+                            if (response.data.next) {
+                                // If there is a next page, set total to current offset + page size + 1
+                                totalRecords = start + length + 1;
+                            } else {
+                                // If there is no next page, we are at the end
+                                totalRecords = start + results.length;
+                            }
+                        }
+                        
                         $('.total_count').text(totalRecords);
 
                         let records = [];
-                        if (response.data.results) {
-                            for (const item of response.data.results) {
+                        if (results) {
+                            for (const item of results) {
                                 // Map fields for buildHTML compatibility with both old and new API formats
                                 item.publish = item.hasOwnProperty('is_publish') ? item.is_publish : item.publish;
                                 item.photo = item.image || item.photo || ''; 
@@ -365,7 +378,7 @@
                         }
 
                         if (records.length === 0 && totalRecords > 0) {
-                            console.warn("API returned total records but results array is empty or malformed.");
+                            console.warn("API returned records but results array is empty or malformed.");
                         }
 
                         callback({
