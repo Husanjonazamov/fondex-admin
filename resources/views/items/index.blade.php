@@ -236,7 +236,8 @@
                 });
             }
             if (categoryID) {
-                $('.category_selector').val(categoryID);
+                // Select2 orqali tanlab, jadvalga qayta yuklanishni triggerlash
+                $('.category_selector').val(categoryID).trigger('change');
             }
         })();
 

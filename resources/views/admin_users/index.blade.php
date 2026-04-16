@@ -91,10 +91,15 @@
                                             <a href="{{route('admin.users.edit', ['id' => $user->id])}}" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.edit') }}"><i
                                                     class="mdi mdi-lead-pencil"></i></a>
                                             @if($user->id != 1)
-                                            @if(in_array('role.delete', json_decode(@session('user_permissions'))))
-
-                                            <a href="{{route('admin.users.delete', ['id' => $user->id])}}" class="delete-btn" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.delete') }}"><i
-                                                    class="mdi mdi-delete"></i></a>
+                                            @if(in_array('admin.users.delete', json_decode(@session('user_permissions'))))
+                                            <a href="javascript:void(0)"
+                                               data-id="{{ $user->id }}"
+                                               data-url="{{ route('admin.users.delete', ['id' => $user->id]) }}"
+                                               class="delete-btn admin-user-delete"
+                                               data-toggle="tooltip"
+                                               data-bs-original-title="{{ trans('lang.delete') }}">
+                                               <i class="mdi mdi-delete"></i>
+                                            </a>
                                             @endif
                                             @endif
                                         </span></td>
@@ -152,22 +157,26 @@
 
     $("#deleteAll").click(function () {
         if ($('#adminTable .is_open:checked').length) {
-            if (confirm('Are You Sure want to Delete Selected Data ?')) {
+            if (confirm("{{trans('lang.selected_delete_alert')}}")) {
                 var arrayUsers = [];
                 $('#adminTable .is_open:checked').each(function () {
-                    var dataId = $(this).attr('dataId');
+                    var dataId = $(this).attr('dataid');
                     arrayUsers.push(dataId);
-
                 });
-
                 arrayUsers = JSON.stringify(arrayUsers);
                 var url = "{{url('admin-users/delete', 'id')}}";
                 url = url.replace('id', arrayUsers);
-
-                $(this).attr('href', url);
+                window.location.href = url;
             }
         } else {
-            alert('Please Select Any One Record .');
+            alert("{{trans('lang.select_delete_alert')}}");
+        }
+    });
+
+    $(document).on('click', '.admin-user-delete', function () {
+        if (confirm("{{trans('lang.delete_alert')}}")) {
+            var url = $(this).data('url');
+            window.location.href = url;
         }
     });
 
