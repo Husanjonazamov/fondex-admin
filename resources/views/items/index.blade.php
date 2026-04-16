@@ -255,11 +255,21 @@
                 $('.category_selector').html('<option value="" selected>{{trans("lang.category_plural")}}</option>');
                 if (catData && catData.results) {
                     catData.results.forEach(function(cat) {
-                        $('.category_selector').append($("<option></option>").attr("value", cat.firestore_id).text(cat.title || cat.name));
+                        $('.category_selector').append($("<option></option>").attr("value", cat.firestore_id).attr("data-id", cat.id).text(cat.title || cat.name));
                     });
                 }
                 if (categoryID) {
-                    $('.category_selector').val(categoryID).trigger('change');
+                    if ($('.category_selector option[value="' + categoryID + '"]').length > 0) {
+                        $('.category_selector').val(categoryID).trigger('change');
+                    } else {
+                        let matchingOption = $('.category_selector option').filter(function() {
+                            return $(this).attr('data-id') == categoryID;
+                        });
+                        if (matchingOption.length > 0) {
+                            categoryID = matchingOption.val();
+                            $('.category_selector').val(categoryID).trigger('change');
+                        }
+                    }
                 }
             }
             
