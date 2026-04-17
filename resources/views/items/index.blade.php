@@ -168,7 +168,7 @@
                                                 <?php if ($id == '') { ?>
                                                 <th>{{trans('lang.item_vendor_id')}}</th>
                                                 <?php } ?>
-                                                <th>{{trans('lang.item_category_id')}}</th>
+                                                <th>{{trans('lang.category')}}</th>
 
                                                 <th>{{trans('lang.item_publish')}}</th>
                                                 <th>{{trans('lang.actions')}}</th>
@@ -225,6 +225,7 @@
         });
 
         var placeholderImage = '';
+        var categoryNameMap = {};
         database.collection('settings').doc('placeHolderImage').get().then(async function (snapshotsimage) {
             if (snapshotsimage.exists) {
                 var placeholderImageData = snapshotsimage.data();
@@ -255,7 +256,11 @@
                 $('.category_selector').html('<option value="" selected>{{trans("lang.category_plural")}}</option>');
                 if (catData && catData.results) {
                     catData.results.forEach(function(cat) {
-                        $('.category_selector').append($("<option></option>").attr("value", cat.firestore_id).attr("data-id", cat.id).text(cat.title || cat.name));
+                        var name = cat.title || cat.name || '';
+                        // Map by both Django ID and Firestore ID for lookup
+                        if (cat.id) categoryNameMap[cat.id] = name;
+                        if (cat.firestore_id) categoryNameMap[cat.firestore_id] = name;
+                        $('.category_selector').append($("<option></option>").attr("value", cat.firestore_id).attr("data-id", cat.id).text(name));
                     });
                 }
                 if (categoryID) {
@@ -385,7 +390,9 @@
                                 item.finalPrice = parseFloat(item.price) || 0;
                                 item.sku = item.sku || item.item_sku || item.code || '';
                                 item.store = item.vendor_name || item.vendor_title || item.vendor || ''; 
-                                item.category = item.category_name || item.category_title || item.category || '';
+                                const rawCat = item.category_name || item.category_title || '';
+                                const catId = item.category || item.category_id || '';
+                                item.category = rawCat || categoryNameMap[catId] || catId || '';
                                 
                                 var htmlRows = await buildHTML(item);
                                 records.push(htmlRows);
