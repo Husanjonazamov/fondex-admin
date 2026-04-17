@@ -355,7 +355,7 @@
                             return;
                         }
 
-                        let totalRecords = response.data.total_items || response.data.count || 0;
+                        let totalRecords = response.data.total_items || response.data.count || response.data.total || response.data.total_records || 0;
                         const results = response.data.results || [];
                         
                         // If API uses CursorPagination (no total count), we must provide a fallback for DataTables
@@ -379,6 +379,7 @@
                                 item.photo = item.image || item.photo || ''; 
                                 item.foodName = item.name || item.title || '';
                                 item.finalPrice = parseFloat(item.price) || 0;
+                                item.sku = item.sku || item.item_sku || item.code || '';
                                 item.store = item.vendor_name || item.vendor_title || item.vendor || ''; 
                                 item.category = item.category_name || item.category_title || item.category || '';
                                 

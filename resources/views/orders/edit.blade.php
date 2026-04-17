@@ -2029,8 +2029,9 @@
                     html = html + '<div class="type"><span>{{ trans('lang.type') }} :</span><span class="ext-size">' + product.size + '</span></div>';
                 }
 
-                var effectivePrice = (val.discount_price && parseFloat(val.discount_price) > 0)
-                    ? val.discount_price
+                var effectivePrice = (val.discount_price || val.disPrice || val.discountPrice || val.dis_price) 
+                    && (parseFloat(val.discount_price || val.disPrice || val.discountPrice || val.dis_price) > 0)
+                    ? (val.discount_price || val.disPrice || val.discountPrice || val.dis_price)
                     : val.price;
                 price_item = parseFloat(effectivePrice).toFixed(decimal_degits);
 

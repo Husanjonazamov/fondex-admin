@@ -1042,7 +1042,7 @@
                     if (attribute_options) {
                         var attribute_options = attribute_options.split(',');
                         attribute_options = $.map(attribute_options, function (value) {
-                            return value.replace(/[^a-zA-Z0-9]/g, '');
+                            return value.trim();
                         });
                         attributeSet.push(attribute_options);
                         attributes.push({

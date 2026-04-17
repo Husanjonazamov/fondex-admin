@@ -202,13 +202,11 @@
 @section('scripts')
 
     <script type="text/javascript">
-        var database = firebase.firestore();
+        var active_id = getCookie('section_id') || '';
         var user_permissions = '<?php echo @session('user_permissions'); ?>';
-        user_permissions = JSON.parse(user_permissions);
+        user_permissions = JSON.parse(user_permissions || '[]');
         var checkDeletePermission = false;
         var checkCopyPermission = false;
-        var active_id = getCookie('section_id');
-        var createdAt = firebase.firestore.FieldValue.serverTimestamp();
 
         if ($.inArray('stores.delete', user_permissions) >= 0) {
             checkDeletePermission = true;
@@ -216,46 +214,39 @@
         if ($.inArray('stores.copy', user_permissions) >= 0) {
             checkCopyPermission = true;
         }
-        $(document).on('click', '#create_vendor .close, #create_vendor [data-dismiss="modal"], #create_vendor [data-bs-dismiss="modal"]', function () {
-            $('#create_vendor').modal('hide');
-        });
-        var refData = active_id
-            ? database.collection('vendors').where('section_id', '==', active_id)
-            : database.collection('vendors');
-        var ref = refData.orderBy('createdAt', 'desc');
-        var userData = [];
-        var vendorData = [];
-        var vendorProducts = [];
+
         var placeholderImage = '';
-        var placeholder = database.collection('settings').doc('placeHolderImage');
-        var ref_sections = database.collection('sections');
-        placeholder.get().then(async function (snapshotsimage) {
-            var placeholderImageData = snapshotsimage.data();
-            placeholderImage = placeholderImageData.image;
-        })
-        database.collection('vendor_categories').where('section_id', '==', active_id).where('publish', '==', true).get().then(async function (snapshots) {
-            snapshots.docs.forEach((listval) => {
-                var data = listval.data();
-                $('.cuisine_selector').append($("<option></option>")
-                    .attr("value", data.id)
-                    .text(data.title));
-            })
-        });
-
-        var initialRef = ref;
-        $('select').change(async function () {
-            var businessModelValue = $('.business_model_selector').val();
-            var cuisineValue = $('.cuisine_selector').val();
-            console.log(cuisineValue);
-            refData = initialRef;
-            console.log(refData);
-
-            if (cuisineValue) {
-                refData = refData.where('categoryID', 'array-contains', cuisineValue);
+        database.collection('settings').doc('placeHolderImage').get().then(function (snapshotsimage) {
+            if (snapshotsimage.exists) {
+                placeholderImage = snapshotsimage.data().image;
             }
-            ref = refData;
-            $('#storeTable').DataTable().ajax.reload();
         });
+
+        $(document).ready(function () {
+            $('.cuisine_selector').select2({
+                placeholder: "{{ trans('lang.select_categoty') }}",
+                minimumResultsForSearch: Infinity,
+                allowClear: true
+            });
+
+            // Initialize categories dropdown from Django
+            (async function() {
+                let catUrl = `categories/?page=1&page_size=300`;
+                if (active_id) catUrl += `&section=${active_id}`;
+                const catResponse = await syncToDjango(catUrl, 'GET');
+                const catData = (catResponse && catResponse.status && catResponse.data) ? catResponse.data : null;
+                
+                if (catData && catData.results) {
+                    $('.cuisine_selector').html('<option value="" selected>{{ trans("lang.select_categoty") }}</option>');
+                    catData.results.forEach(function(cat) {
+                        $('.cuisine_selector').append($("<option></option>").attr("value", cat.id).text(cat.title || cat.name));
+                    });
+                }
+            })();
+
+            $('.cuisine_selector').change(function () {
+                $('#storeTable').DataTable().ajax.reload();
+            });
 
         $(document).on('click', '.dt-button-collection .dt-button', function () {
             $('.dt-button-collection').hide();
@@ -317,147 +308,48 @@
                     const start = data.start;
                     const length = data.length;
                     const searchValue = data.search.value.toLowerCase();
-                    const orderColumnIndex = data.order[0].column;
-                    const orderDirection = data.order[0].dir;
-                    const orderableColumns = (checkDeletePermission) ? ['', '', 'title', 'phonenumber', 'createdAt', 'items', 'orders'] : ['', 'title', 'phonenumber', 'createdAt', 'items', 'orders']; // Ensure this matches the actual column names
-                    const orderByField = orderableColumns[orderColumnIndex]; // Adjust the index to match your table
-                    if (searchValue.length >= 3 || searchValue.length === 0) {
-                        $('#data-table_processing').show();
+                    const page = Math.floor(start / length) + 1;
+
+                    let url = `vendors/?page=${page}&page_size=${length}`;
+                    if (searchValue) url += `&search=${searchValue}`;
+                    if (active_id) url += `&section=${active_id}`;
+                    
+                    const cuisineValue = $('.cuisine_selector').val();
+                    if (cuisineValue) url += `&category=${cuisineValue}`;
+
+                    const response = await syncToDjango(url, 'GET');
+
+                    if (!response || !response.status || !response.data) {
+                        callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
+                        return;
                     }
-                    await ref.get().then(async function (querySnapshot) {
-                        if (querySnapshot.empty) {
-                            $('.total_count').text(0);
-                            console.error("No data found in Firestore.");
-                            $('#data-table_processing').hide(); // Hide loader
-                            callback({
-                                draw: data.draw,
-                                recordsTotal: 0,
-                                recordsFiltered: 0,
-                                data: [] // No data
-                            });
-                            return;
+
+                    const totalRecords = response.data.total_items || response.data.count || 0;
+                    $('.total_count').text(totalRecords);
+                    $('.rest_count').text(totalRecords);
+
+                    let records = [];
+                    if (response.data.results) {
+                        for (const vendor of response.data.results) {
+                            vendor.id = vendor.id;
+                            vendor.title = vendor.store_name || '';
+                            vendor.photo = vendor.profile_picture || '';
+                            vendor.phonenumber = vendor.phone_number || '';
+                            vendor.createdAt = vendor.created_at;
+                            vendor.items = vendor.products_count || 0;
+                            vendor.orders = vendor.orders_count || 0;
+                            vendor.author = vendor.id; // Fallback for action buttons
+                            
+                            var htmlRows = await buildHTML(vendor);
+                            records.push(htmlRows);
                         }
+                    }
 
-                        let records = [];
-                        let filteredRecords = [];
-                        await Promise.all(querySnapshot.docs.map(async (doc) => {
-                            let childData = doc.data();
-                            var rawPhone = childData.phonenumber || '';
-                            childData.phone = (rawPhone && rawPhone.slice(0, 1) == '+') ? rawPhone.slice(1) : rawPhone;
-                            childData.maskedPhone = EditPhoneNumber(childData.phone);
-                            childData.hasPlusSign = rawPhone.startsWith('+');
-                            childData.exportPhone = childData.hasPlusSign ? `+${childData.maskedPhone}` : childData.maskedPhone;
-                            childData.id = doc.id; // Ensure the document ID is included in the data
-                            if (childData.id) {
-                                childData.orders = await getTotalOrders(childData.id);
-                                childData.items = await getTotalProduct(childData.id);
-                            } else {
-                                childData.orders = 0;
-                                childData.items = 0;
-                                childData.foods = 0;
-                            }
-                            if (searchValue) {
-                                var date = '';
-                                var time = '';
-                                if (childData.hasOwnProperty("createdAt")) {
-                                    try {
-                                        date = childData.createdAt.toDate().toDateString();
-                                        time = childData.createdAt.toDate().toLocaleTimeString('en-US');
-                                    } catch (err) {
-                                    }
-                                }
-                                var createdAt = date + '<br> ' + time;
-                                if (
-                                    (childData.title && childData.title.toLowerCase().toString().includes(searchValue)) ||
-                                    (createdAt && createdAt.toString().toLowerCase().indexOf(searchValue) > -1) ||
-                                    (childData.email && childData.email.toLowerCase().toString().includes(searchValue)) ||
-                                    (childData.phone && childData.phone.toLowerCase().toString().includes(searchValue))
-
-                                ) {
-                                    if (childData.title != '') {
-                                        filteredRecords.push(childData);
-                                    }
-                                }
-                            } else {
-                                if (childData.title != '') {
-                                    filteredRecords.push(childData);
-                                }
-                            }
-                        }));
-                        filteredRecords.sort((a, b) => {
-                            let aValue = a[orderByField] ? a[orderByField].toString().toLowerCase().trim() : '';
-                            let bValue = b[orderByField] ? b[orderByField].toString().toLowerCase().trim() : '';
-                            if (orderByField === 'createdAt') {
-                                try {
-                                    aValue = a[orderByField] ? new Date(a[orderByField].toDate()).getTime() : 0;
-                                    bValue = b[orderByField] ? new Date(b[orderByField].toDate()).getTime() : 0;
-                                } catch (err) {
-                                }
-                            }
-                            if (orderByField === 'items') {
-                                aValue = a[orderByField] ? parseFloat(String(a[orderByField]).replace(/[^0-9.]/g, '')) || 0 : 0;
-                                bValue = b[orderByField] ? parseFloat(String(b[orderByField]).replace(/[^0-9.]/g, '')) || 0 : 0;
-                            }
-                            if (orderByField === 'orders') {
-                                aValue = a[orderByField] ? parseFloat(String(a[orderByField]).replace(/[^0-9.]/g, '')) || 0 : 0;
-                                bValue = b[orderByField] ? parseFloat(String(b[orderByField]).replace(/[^0-9.]/g, '')) || 0 : 0;
-                            }
-                            if (orderDirection === 'asc') {
-                                return (aValue > bValue) ? 1 : -1;
-                            } else {
-                                return (aValue < bValue) ? 1 : -1;
-                            }
-                        });
-                        const totalRecords = filteredRecords.length;
-                        $('.total_count').text(totalRecords);
-                        let active_rest = 0;
-                        let inactive_rest = 0;
-                        let new_joined_rest = 0;
-                        const today = new Date().setHours(0, 0, 0, 0);
-                        await Promise.all(filteredRecords.map(async (childData) => {
-                            var isActive = false;
-                            if (childData.author) {
-                                const user_id = childData.author;
-                                isActive = await vendorStatus(user_id);
-                            }
-                            if (isActive) {
-                                active_rest += 1;
-                            } else {
-                                inactive_rest += 1;
-                            }
-                            if (childData.createdAt && new Date(childData.createdAt.seconds * 1000).setHours(0, 0, 0, 0) === today) {
-                                new_joined_rest += 1;
-                            }
-                        }));
-                        $('.rest_count').text(totalRecords);
-                        $('.rest_active_count').text(active_rest);
-                        $('.rest_inactive_count').text(inactive_rest);
-                        $('.new_joined_rest').text(new_joined_rest);
-                        const paginatedRecords = filteredRecords.slice(start, start + length);
-                        await Promise.all(paginatedRecords.map(async (childData) => {
-                            var getData = await buildHTML(childData);
-                            records.push(getData);
-                        }));
-                        $(function () {
-                            $('[data-toggle="tooltip"]').tooltip();
-                        });
-                        $('#data-table_processing').hide(); // Hide loader
-                        callback({
-                            draw: data.draw,
-                            recordsTotal: totalRecords, // Total number of records in Firestore
-                            recordsFiltered: totalRecords, // Number of records after filtering (if any)
-                            filteredData: filteredRecords,
-                            data: records // The actual data to display in the table
-                        });
-                    }).catch(function (error) {
-                        console.error("Error fetching data from Firestore:", error);
-                        $('#data-table_processing').hide(); // Hide loader
-                        callback({
-                            draw: data.draw,
-                            recordsTotal: 0,
-                            recordsFiltered: 0,
-                            data: [] // No data due to error
-                        });
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: totalRecords,
+                        recordsFiltered: totalRecords,
+                        data: records
                     });
                 },
                 order: (checkDeletePermission) ? [
@@ -588,14 +480,9 @@
             } else {
                 html.push('');
             }
-            var date = '';
-            var time = '';
-            if (val.hasOwnProperty("createdAt")) {
-                try {
-                    date = val.createdAt.toDate().toDateString();
-                    time = val.createdAt.toDate().toLocaleTimeString('en-US');
-                } catch (err) {
-                }
+            if (val.createdAt) {
+                let date = new Date(val.createdAt).toDateString();
+                let time = new Date(val.createdAt).toLocaleTimeString();
                 html.push('<span class="dt-time">' + date + '<br> ' + time + '</span>');
             } else {
                 html.push('');
@@ -641,31 +528,19 @@
         $("#is_active").click(function () {
             $("#storeTable .is_open").prop('checked', $(this).prop('checked'));
         });
-        $("#deleteAll").click(async function () {
-            if ($('#storeTable .is_open:checked').length) {
-                if (confirm("{{ trans('lang.selected_delete_alert') }}")) {
-                    jQuery("#data-table_processing").show();
-                    $('#storeTable .is_open:checked').each(async function () {
-                        var dataId = $(this).attr('dataId');
-                        var author = $(this).attr('author');
-                        await deleteDocumentWithImage('vendors', dataId, 'photo', ['vendorMenuPhotos', 'photos'])
-                            .then(() => {
-                                await syncToDjango('vendors/vendors/' + dataId + '/', 'DELETE');
-                                const getStoreName = deleteStoreData(dataId);
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 7000);
-                            })
-                            .catch((error) => {
-                                console.error('Error deleting document with image:', error);
-                            });
+                    if (confirm("{{ trans('lang.selected_delete_alert') }}")) {
+                        jQuery("#data-table_processing").show();
+                        $('#storeTable .is_open:checked').each(async function () {
+                            var dataId = $(this).attr('dataId');
+                            const result = await syncToDjango('vendors/' + dataId + '/', 'DELETE');
+                            if (result && result.status) {
+                                console.log('Deleted vendor:', dataId);
+                            }
+                        });
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
                     }
-                    );
-                }
-            } else {
-                alert("{{ trans('lang.select_delete_alert') }}");
-            }
-        });
         async function deleteStoreData(storeId) {
             await database.collection('users').where('vendorID', '==', storeId).where('role', '==', 'vendor').get().then(async function (userssanpshots) {
                 if (userssanpshots.docs.length > 0) {
@@ -794,10 +669,17 @@
         }
         $(document).on("click", "a[name='delete-btn']", async function (e) {
             var id = this.id;
-            var author = $(this).attr('author');
-            jQuery("#data-table_processing").show();
-            await syncToDjango('vendors/vendors/' + id + '/', 'DELETE');
-            await deleteDocumentWithImage('vendors', id, 'photo', ['vendorMenuPhotos', 'photos'])
+            if (confirm("{{ trans('lang.delete_alert') }}")) {
+                jQuery("#data-table_processing").show();
+                const result = await syncToDjango('vendors/' + id + '/', 'DELETE');
+                if (result && result.status) {
+                    window.location.reload();
+                } else {
+                    alert('Error deleting vendor');
+                    jQuery("#data-table_processing").hide();
+                }
+            }
+        });
                 .then(() => {
                     return deleteStoreData(id);
                 })

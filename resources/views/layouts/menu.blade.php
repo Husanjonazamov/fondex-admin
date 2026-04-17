@@ -18,6 +18,14 @@ $service_type = @$_COOKIE['service_type'];
             </a>
         </li>
 
+        @if (in_array('users', $role_has_permission))
+        <li>
+            <a class="waves-effect waves-dark" href="{!! url('users') !!}" aria-expanded="false">
+                <i class="ri-group-fill"></i><span class="hide-menu">{{ trans('lang.user_plural') }}</span>
+            </a>
+        </li>
+        @endif
+
         @if($service_type == "delivery-service")
         @if (
         in_array('god-eye', $role_has_permission)

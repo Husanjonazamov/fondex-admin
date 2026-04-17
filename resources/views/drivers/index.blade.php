@@ -107,7 +107,7 @@
             var type = "{{ $type }}";
             var sectionType = getCookie('service_type') || '';        
             var user_permissions = '<?php echo @session('user_permissions'); ?>';
-            user_permissions = JSON.parse(user_permissions);
+            user_permissions = JSON.parse(user_permissions || '[]');
             var checkDeletePermission = false;
 
             if (
@@ -118,94 +118,12 @@
                 checkDeletePermission = true;
             }
 
-            $('.status_selector').select2({
-                placeholder: '{{ trans('lang.status') }}',
-                minimumResultsForSearch: Infinity,
-                allowClear: true
-            });
-            
-            $('select').on("select2:unselecting", function(e) {
-                var self = $(this);
-                setTimeout(function() {
-                    self.select2('close');
-                }, 0);
-            });
-
-            function setDate() {
-                $('#daterange span').html('{{ trans('lang.select_range') }}');
-                $('#daterange').daterangepicker({
-                    autoUpdateInput: false,
-                }, function(start, end) {
-                    $('#daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-                    $('.filteredRecords').trigger('change');
-                });
-                $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-                    $('#daterange span').html(picker.startDate.format('MMMM D, YYYY') + ' - ' + picker.endDate.format('MMMM D, YYYY'));
-                    $('.filteredRecords').trigger('change');
-                });
-                $('#daterange').on('cancel.daterangepicker', function(ev, picker) {
-                    $('#daterange span').html('{{ trans('lang.select_range') }}');
-                    $('.filteredRecords').trigger('change');
-                });
-            }
-
-            setDate();
-            $('.filteredRecords').change(async function() {
-                var status = $('.status_selector').val();
-                var daterangepicker = $('#daterange').data('daterangepicker');
-                ref = database.collection('users').where("role", "==", "driver").where('isOwner','==',false);               
-                if(sectionType && sectionType == 'delivery-service'){
-                    ref = ref.where('serviceType', '==', sectionType);
-                }else if(section_id){
-                    ref = ref.where('sectionId', '==', section_id);
-                }                
-                if (status) {
-                    ref = (status == "active") ? ref.where('active', '==', true) : ref.where('active', '==', false);
-                }
-                if ($('#daterange span').html() != '{{ trans('lang.select_range') }}' && daterangepicker) {
-                    var from = moment(daterangepicker.startDate).toDate();
-                    var to = moment(daterangepicker.endDate).toDate();
-                    if (from && to) {
-                        var fromDate = firebase.firestore.Timestamp.fromDate(new Date(from));
-                        ref = ref.where('createdAt', '>=', fromDate);
-                        var toDate = firebase.firestore.Timestamp.fromDate(new Date(to));
-                        ref = ref.where('createdAt', '<=', toDate);
-                    }
-                }
-                $('#driverTable').DataTable().ajax.reload();
-            });
-
-            var ref = database.collection('users').where("role", "==", "driver").where('isOwner','==',false);
-            if (type == 'pending') {
-                ref = database.collection('users').where("role", "==", "driver").where('isOwner','==',false).where("isDocumentVerify", "==", false);
-            } else if (type == 'approved') {
-                ref = database.collection('users').where("role", "==", "driver").where('isOwner','==',false).where("isDocumentVerify", "==", true);
-            }
-
-            if(sectionType && sectionType == 'delivery-service'){
-                ref = ref.where('serviceType', '==', sectionType);
-            }else if(section_id){
-                ref = ref.where('sectionId', '==', section_id);
-            }
-           /*  if(sectionType){
-                ref = ref.where('serviceType', '==', sectionType);
-            } */
-            ref = ref.orderBy('createdAt', 'desc');
-
-            var alldriver = database.collection('users').where("role", "==", "driver").where('isOwner','==',false)/* .orderBy('createdAt', 'desc') */;
-            if(sectionType && sectionType == 'delivery-service'){
-                alldriver = alldriver.where('serviceType', '==', sectionType);
-            }else if(section_id){
-                alldriver = alldriver.where('sectionId', '==', section_id);
-            }
-            alldriver = alldriver.orderBy('createdAt', 'desc');
-
             var placeholderImage = '';
-            var placeholder = database.collection('settings').doc('placeHolderImage');
-            placeholder.get().then(async function(snapshotsimage) {
-                var placeholderImageData = snapshotsimage.data();
-                placeholderImage = placeholderImageData.image;
-            })
+            database.collection('settings').doc('placeHolderImage').get().then(function(snapshotsimage) {
+                if (snapshotsimage.exists) {
+                    placeholderImage = snapshotsimage.data().image;
+                }
+            });
 
             var append_list = '';
             var serviceRef = database.collection('services');
@@ -257,131 +175,50 @@
                     processing: false, // Show processing indicator
                     serverSide: true, // Enable server-side processing
                     responsive: true,
-                    ajax: function(data, callback, settings) {
+                    ajax: async function(data, callback, settings) {
                         const start = data.start;
                         const length = data.length;
                         const searchValue = data.search.value.toLowerCase();
-                        const orderColumnIndex = data.order[0].column;
-                        const orderDirection = data.order[0].dir;
+                        const page = Math.floor(start / length) + 1;
 
-                        const orderableColumns = (checkDeletePermission) ? ['', '', 'name', '', '', 'createdAt', '','', '', ''] : ['', 'name', '', '', 'createdAt', '', '','', '']; // Ensure this matches the actual column names
+                        let url = `drivers/?page=${page}&page_size=${length}`;
+                        if (searchValue) url += `&search=${searchValue}`;
+                        if (section_id) url += `&section=${section_id}`;
+                        if (type === 'pending') url += `&is_document_verify=false`;
+                        else if (type === 'approved') url += `&is_document_verify=true`;
 
-                        const orderByField = orderableColumns[orderColumnIndex]; // Adjust the index to match your table
+                        const response = await syncToDjango(url, 'GET');
 
-                        if (searchValue.length >= 3 || searchValue.length === 0) {
-                            $('#data-table_processing').show();
+                        if (!response || !response.status || !response.data) {
+                            callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
+                            return;
                         }
 
-                        ref.get().then(async function(querySnapshot) {
-                            if (querySnapshot.empty) {
-                                $('.total_count').text(0);
-                                $('#data-table_processing').hide(); // Hide loader
-                                callback({
-                                    draw: data.draw,
-                                    recordsTotal: 0,
-                                    recordsFiltered: 0,
-                                    data: [] // No data
-                                });
-                                return;
+                        const totalRecords = response.data.total_items || response.data.count || 0;
+                        $('.total_count').text(totalRecords);
+
+                        let records = [];
+                        if (response.data.results) {
+                            for (const driver of response.data.results) {
+                                // Map fields for buildHTML compatibility
+                                driver.firstName = driver.first_name || '';
+                                driver.lastName = driver.last_name || '';
+                                driver.profilePictureURL = driver.profile_picture || '';
+                                driver.active = driver.is_active;
+                                driver.isActive = driver.is_active; // online status fallback
+                                driver.createdAt = driver.created_at;
+                                driver.totalOrders = driver.orders_count || 0;
+                                
+                                var htmlRows = await buildHTML(driver);
+                                records.push(htmlRows);
                             }
+                        }
 
-                            let records = [];
-                            let filteredRecords = [];
-                            let serviceNames = {};
-                            // Fetch service names
-                            const serviceDocs = await serviceRef.get();
-                            serviceDocs.forEach(doc => {
-                                serviceNames[doc.data().flag] = doc.data().name;
-                            });
-
-                            querySnapshot.docs.map(async doc => {
-
-                                let childData = doc.data();
-                                // if (!childData.hasOwnProperty('vendorID') || (childData.hasOwnProperty('vendorID') && (childData.vendorID == '' || childData.vendorID == null))) {
-
-                                    childData.id = doc.id; // Ensure the document ID is included in the data
-                                    childData.name = childData.firstName + ' ' + childData.lastName;
-                                    childData.serviceName = serviceNames[childData.serviceType] || '-';
-
-                                    if (searchValue) {
-                                        var date = '';
-                                        var time = '';
-                                        if (childData.hasOwnProperty("createdAt")) {
-                                            try {
-                                                date = childData.createdAt.toDate().toDateString();
-                                                time = childData.createdAt.toDate().toLocaleTimeString('en-US');
-                                            } catch (err) {}
-                                        }
-                                        var createdAt = date + ' ' + time;
-                                        if (
-                                            (childData.name && childData.name.toString().toLowerCase().includes(searchValue)) ||
-                                            (childData.serviceName && childData.serviceName.toString().toLowerCase().includes(searchValue)) ||
-                                            (createdAt && createdAt.toString().toLowerCase().indexOf(searchValue) > -1) /* || (childData.totalOrders && childData.totalOrders.toString().toLowerCase().includes(searchValue)) */
-                                        ) {
-                                            filteredRecords.push(childData);
-                                        }
-                                    } else {
-                                        filteredRecords.push(childData);
-                                    }
-                                // }
-                            });
-
-
-                            filteredRecords.sort((a, b) => {
-                                let aValue = a[orderByField];
-                                let bValue = b[orderByField];
-
-                                if (orderByField === 'createdAt' && a[orderByField] != '' && b[orderByField] != '' && a[orderByField] != null && b[orderByField] != null) {
-
-                                    aValue = a[orderByField] ? new Date(a[orderByField].toDate()).getTime() : 0;
-                                    bValue = b[orderByField] ? new Date(b[orderByField].toDate()).getTime() : 0;
-                                } else if (orderByField === 'totalOrders') {
-                                    aValue = parseInt(a[orderByField]) || 0;
-                                    bValue = parseInt(b[orderByField]) || 0;
-                                } else {
-                                    aValue = a[orderByField] ? a[orderByField].toString().toLowerCase().trim() : '';
-                                    bValue = b[orderByField] ? b[orderByField].toString().toLowerCase().trim() : ''
-                                }
-
-                                if (orderDirection === 'asc') {
-                                    return (aValue > bValue) ? 1 : -1;
-                                } else {
-                                    return (aValue < bValue) ? 1 : -1;
-                                }
-
-                            });
-
-                            const totalRecords = filteredRecords.length;
-                            $('.total_count').text(totalRecords);
-                            const paginatedRecords = filteredRecords.slice(start, start + length);
-
-                            await Promise.all(paginatedRecords.map(async (childData) => {
-                                childData.totalOrders = await orderDetails(childData.id, childData.serviceType);
-                                var getData = await buildHTML(childData);
-                                records.push(getData);
-                            }));
-
-                            $(function () {
-                                $('[data-toggle="tooltip"]').tooltip();
-                            });
-
-                            $('#data-table_processing').hide(); // Hide loader
-                            callback({
-                                draw: data.draw,
-                                recordsTotal: totalRecords, // Total number of records in Firestore
-                                recordsFiltered: totalRecords, // Number of records after filtering (if any)
-                                filteredData: filteredRecords,
-                                data: records // The actual data to display in the table
-                            });
-                        }).catch(function(error) {
-                            console.error("Error fetching data from Firestore:", error);
-                            $('#data-table_processing').hide(); // Hide loader
-                            callback({
-                                draw: data.draw,
-                                recordsTotal: 0,
-                                recordsFiltered: 0,
-                                data: [] // No data due to error
-                            });
+                        callback({
+                            draw: data.draw,
+                            recordsTotal: totalRecords,
+                            recordsFiltered: totalRecords,
+                            data: records
                         });
                     },
                     order: (checkDeletePermission) ? [5, 'desc'] : [4, 'desc'],
@@ -571,15 +408,9 @@ async function getDocumentStatusIcon(driverId) {
                     html.push('<td><label class="switch"><input type="checkbox" id="' + val.id + '" name="isOnline"><span class="slider round"></span></label></td>');
                 }
 
-                var date = '';
-                var time = '';
-                if (val.hasOwnProperty("createdAt")) {
-                    try {
-                        date = val.createdAt.toDate().toDateString();
-                        time = val.createdAt.toDate().toLocaleTimeString('en-US');
-                    } catch (err) {
-
-                    }
+                if (val.createdAt) {
+                    let date = new Date(val.createdAt).toDateString();
+                    let time = new Date(val.createdAt).toLocaleTimeString();
                     html.push('<td class="dt-time">' + date + '<br> ' + time + '</td>');
                 } else {
                     html.push('');
@@ -683,39 +514,21 @@ async function getDocumentStatusIcon(driverId) {
 
             $("#deleteAll").click(function() {
                 if ($('#driverTable .is_open:checked').length) {
-                    if (confirm("{{ trans('lang.selected_delete_alert') }}")) {
-                        jQuery("#data-table_processing").show();
-                        $('#driverTable .is_open:checked').each(async function() {
-                            var dataId = $(this).attr('dataId');
-                            const car_info = database.collection('users').doc(dataId).get()
-                                .then(async function(querySnapshot) {
-                                    const data = querySnapshot.data();
-                                    if(data.carInfo != null){
-                                        const car_image = data.carInfo.car_image;
-                                        if (car_image.length > 0) {
-                                            for (var i = 0; i < car_image.length; i++) {
-                                                deleteImageFromBucket(car_image[i]);
-                                            }
-                                        }
-                                    }
-                                });
-
-                            deleteDocumentWithImage('users', dataId, 'carPictureURL', '', 'profilePictureURL', 'carProofPictureURL', 'driverProofPictureURL')
-                                .then(() => {
-                                    return deleteDriverData(dataId);
-                                })
-                                .then(result => {
-                                    setTimeout(function() {
-                                        window.location.reload();
-                                    }, 7000);
-                                })
-                                .catch(error => {
-                                    console.error("Error occurred:", error);
-                                });
-
-                        });
-                    }
-                } else {
+                if (confirm("{{ trans('lang.selected_delete_alert') }}")) {
+                    jQuery("#data-table_processing").show();
+                    $('#driverTable .is_open:checked').each(async function() {
+                        var dataId = $(this).attr('dataId');
+                        const result = await syncToDjango('drivers/' + dataId + '/', 'DELETE');
+                        if (result && result.status) {
+                            console.log('Deleted driver:', dataId);
+                        }
+                    });
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 2000);
+                }
+        }
+                else {
                     alert("{{ trans('lang.select_delete_alert') }}");
                 }
             });
@@ -778,26 +591,19 @@ async function getDocumentStatusIcon(driverId) {
             });
 
 
-            $(document).on("click", "a[name='driver-delete']", function(e) {
+            $(document).on("click", "a[name='driver-delete']", async function(e) {
                 var id = this.id;
-                jQuery("#data-table_processing").show();
-                const car_info = database.collection('users').doc(id).get()
-                    .then(async function(querySnapshot) {
-                        const data = querySnapshot.data();
-                        if(data.carInfo != null){
-                            const car_image = data.carInfo.car_image;
-                            if (car_image.length > 0) {
-                                for (var i = 0; i < car_image.length; i++) {
-                                    deleteImageFromBucket(car_image[i]);
-                                }
-                            }
-                        }
-                    });
-
-                deleteDocumentWithImage('users', id, 'carPictureURL', '', 'profilePictureURL', 'carProofPictureURL', 'driverProofPictureURL')
-                    .then(() => {
-                        return deleteDriverData(id);
-                    })
+                if (confirm("{{ trans('lang.delete_alert') }}")) {
+                    jQuery("#data-table_processing").show();
+                    const result = await syncToDjango('drivers/' + id + '/', 'DELETE');
+                    if (result && result.status) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting driver');
+                        jQuery("#data-table_processing").hide();
+                    }
+                }
+            });
                     .then(result => {
                         setTimeout(function() {
                             window.location.reload();

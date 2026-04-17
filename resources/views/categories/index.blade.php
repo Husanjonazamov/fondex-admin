@@ -194,7 +194,7 @@
                             // Map API fields to Firestore-like fields for buildHTML compatibility
                             childData.publish = childData.is_publish;
                             // Check multiple common field names for item count
-                            childData.totalProducts = childData.items_count || childData.product_count || childData.total_items || childData.products_count || 0;
+                            childData.totalProducts = childData.items_count || childData.product_count || childData.total_items || childData.products_count || childData.total_products || childData.total || 0;
                             
                             var getData = await buildHTML(childData);
                             records.push(getData);

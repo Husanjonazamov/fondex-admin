@@ -33,6 +33,13 @@
                                     </select>
                                 </div>
                                 <div class="select-box pl-3">
+                                    <select class="form-control language_selector filteredRecords">
+                                        <option value="">{{trans("lang.language")}}</option>
+                                        <option value="uz">Uzbek</option>
+                                        <option value="ru">Russian</option>
+                                    </select>
+                                </div>
+                                <div class="select-box pl-3">
                                     <div id="daterange"><i class="fa fa-calendar"></i>&nbsp;
                                         <span></span>&nbsp; <i class="fa fa-caret-down"></i>
                                     </div>
@@ -71,6 +78,7 @@
                                     <th>{{trans('lang.user_info')}}</th>
                                     <th>{{trans('lang.contact_info')}}</th>
                                     <th>{{trans('lang.date')}}</th>
+                                    <th>{{trans('lang.languages')}}</th>
                                     <th>{{trans('lang.active')}}</th>
                                     <th>{{trans('lang.actions')}}</th>
                                 </tr>
@@ -105,6 +113,12 @@
         minimumResultsForSearch: Infinity,
         allowClear: true 
     });
+
+    $('.language_selector').select2({
+        placeholder: '{{trans("lang.languages")}}',  
+        minimumResultsForSearch: Infinity,
+        allowClear: true 
+    });
     
     $('select').on("select2:unselecting", function(e) {
         var self = $(this);
@@ -135,22 +149,35 @@
 
     $('.filteredRecords').change(async function() {
         var status = $('.status_selector').val();
+        var language = $('.language_selector').val();
         var daterangepicker = $('#daterange').data('daterangepicker');
-        ref = database.collection('users').where("role", "in", ["customer"]);
+
+        var refData = database.collection('users').where("role", "in", ["customer"]);
+
+        if (status != "") {
+            if (status == "active") {
+                refData = refData.where("active", "==", true);
+            } else {
+                refData = refData.where("active", "==", false);
+            }
+        }
+        
+        if (language != "") {
+             refData = refData.where("appLanguage", "==", language);
+        }
+
         if ($('#daterange span').html() != '{{trans("lang.select_range")}}' && daterangepicker) {
             var from = moment(daterangepicker.startDate).toDate();
             var to = moment(daterangepicker.endDate).toDate();
             if (from && to) { 
                 var fromDate = firebase.firestore.Timestamp.fromDate(new Date(from));
-                ref = ref.where('createdAt', '>=', fromDate);
                 var toDate = firebase.firestore.Timestamp.fromDate(new Date(to));
-                ref = ref.where('createdAt', '<=', toDate);
+                refData = refData.where('createdAt', '>=', fromDate).where('createdAt', '<=', toDate);
             }
         }
-        if (status) {
-            ref = (status == "active") ? ref.where('active', '==', true) : ref.where('active', '==', false);
-        }
-        $('#userTable').DataTable().ajax.reload();
+
+        ref = refData.orderBy('createdAt', 'desc');
+        $('#userTable').DataTable().ajax.reload(null, false);
     });
 
     $(document).ready(function() {
@@ -404,8 +431,17 @@
             }
             html.push('<td class="dt-time">' + date + '<br> ' + time + '</td>');
         } else {
-            html.push('');
+            html.push('<td></td>');
         }
+
+        var userLanguage = '';
+        if (val.hasOwnProperty("appLanguage") && val.appLanguage != undefined) {
+            userLanguage = val.appLanguage;
+        } else if (val.hasOwnProperty("languageCode") && val.languageCode != undefined) {
+            userLanguage = val.languageCode;
+        }
+        html.push('<td>' + userLanguage + '</td>');
+
         if (val.active) {
             html.push('<td><label class="switch"><input type="checkbox" checked id="' + val.id + '" name="isActive"><span class="slider round"></span></label></td>');
         } else {
@@ -417,6 +453,7 @@
         actionHtml = actionHtml + '<a href="' + user_view + '" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.view') }}"><i class="mdi mdi-eye"></i></a><a href="' + route1 + '" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.edit') }}"><i class="mdi mdi-lead-pencil"></i></a>';
         if (checkDeletePermission) {
             actionHtml = actionHtml+'<a id="' + val.id + '" class="delete-btn" name="user-delete" href="javascript:void(0)" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.delete') }}"><i class="mdi mdi-delete"></i></a>';
+            actionHtml = actionHtml+'<a id="' + val.id + '" class="hard-delete-btn" name="user-hard-delete" href="javascript:void(0)" data-toggle="tooltip" data-bs-original-title="Hard Delete" style="color:red"><i class="mdi mdi-delete-forever"></i></a>';
         }
         actionHtml = actionHtml + '</span>';
         html.push(actionHtml);
@@ -509,19 +546,44 @@
             }
         });
     }
-    $(document).on("click", "a[name='user-delete']", async function(e) {
+    $(document).on("click", "a[name='user-delete']", async function (e) {
         var id = this.id;
-        if (!confirm("{{trans('lang.delete_alert')}}")) {
-            return;
-        }
-        jQuery("#data-table_processing").show();
-        await deleteDocumentWithImage('users', id, 'profilePictureURL');
-        const getStoreName = deleteUserData(id);
-        setTimeout(function() {
+        if (confirm("{{trans('lang.delete_alert')}}")) {
+            jQuery("#data-table_processing").show();
+            await deleteDocumentWithImage('users', id, 'profilePictureURL');
+            await deleteUserData(id);
             window.location.reload();
-        }, 7000);
+        }
     });
-    $(document).on("click", "input[name='isActive']", function(e) {
+
+    $(document).on("click", "a[name='user-hard-delete']", async function (e) {
+        var id = this.id;
+        if (confirm("ARE YOU SURE? This will PERMANENTLY delete the user and all their data! This cannot be undone.")) {
+            jQuery("#data-table_processing").show();
+            // Call the hard-delete route explicitly
+            await jQuery.ajax({
+                url: '{{ route("users.hard-delete") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    id: id
+                },
+                success: async function(data) {
+                    console.log('Hard delete success:', data);
+                    // Also delete from Firebase and Django if possible
+                    await deleteDocumentWithImage('users', id, 'profilePictureURL');
+                    await syncToDjango('users/users/hard-delete/' + id + '/', 'DELETE');
+                    window.location.reload();
+                },
+                error: function(error) {
+                    alert('Error performing hard delete');
+                    jQuery("#data-table_processing").hide();
+                }
+            });
+        }
+    });
+
+    async function deleteDocumentWithImage(collection, id, field) {
         var ischeck = $(this).is(':checked');
         var id = this.id;
         if (ischeck) {
