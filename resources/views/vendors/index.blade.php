@@ -135,9 +135,9 @@
             responsive: true,
             ajax: async function (data, callback, settings) {
                 try {
-                    const start = data.start;
-                    const length = data.length;
-                    const searchValue = data.search.value.toLowerCase();
+                    const start = data.start || 0;
+                    const length = data.length || 10;
+                    const searchValue = data.search.value || '';
                     const page = Math.floor(start / length) + 1;
 
                     let url = `vendors/?page=${page}&page_size=${length}`;

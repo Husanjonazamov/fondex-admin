@@ -100,7 +100,7 @@
 <script type="text/javascript">
     
     var database = firebase.firestore();
-    var ref = database.collection('users');
+    var ref = database.collection('users').orderBy('createdAt', 'desc');
     var user_permissions = '<?php echo @session('user_permissions') ?>';
     user_permissions = JSON.parse(user_permissions);
     var checkDeletePermission = false;

@@ -222,74 +222,42 @@
             }
         });
 
-        $(document).ready(function () {
-            $('.cuisine_selector').select2({
-                placeholder: "{{ trans('lang.select_categoty') }}",
-                minimumResultsForSearch: Infinity,
-                allowClear: true
-            });
-
-            // Initialize categories dropdown from Django
-            (async function() {
-                let catUrl = `categories/?page=1&page_size=300`;
-                if (active_id) catUrl += `&section=${active_id}`;
-                const catResponse = await syncToDjango(catUrl, 'GET');
-                const catData = (catResponse && catResponse.status && catResponse.data) ? catResponse.data : null;
-                
-                if (catData && catData.results) {
-                    $('.cuisine_selector').html('<option value="" selected>{{ trans("lang.select_categoty") }}</option>');
-                    catData.results.forEach(function(cat) {
-                        $('.cuisine_selector').append($("<option></option>").attr("value", cat.id).text(cat.title || cat.name));
-                    });
-                }
-            })();
-
-            $('.cuisine_selector').change(function () {
-                $('#storeTable').DataTable().ajax.reload();
-            });
-
-        $(document).on('click', '.dt-button-collection .dt-button', function () {
-            $('.dt-button-collection').hide();
-            $('.dt-button-background').hide();
-        });
-
-        $(document).on('click', function (event) {
-            if (!$(event.target).closest('.dt-button-collection, .dt-buttons').length) {
-                $('.dt-button-collection').hide();
-                $('.dt-button-background').hide();
+        // Initialize categories dropdown
+        (async function() {
+            let catUrl = `categories/?page=1&page_size=300`;
+            if (active_id) catUrl += `&section=${active_id}`;
+            const catResponse = await syncToDjango(catUrl, 'GET');
+            const catData = (catResponse && catResponse.status && catResponse.data)
+                ? catResponse.data
+                : (catResponse && catResponse.results !== undefined ? catResponse : null);
+            if (catData && catData.results) {
+                $('.cuisine_selector').html('<option value="" selected>{{ trans("lang.select_categoty") }}</option>');
+                catData.results.forEach(function(cat) {
+                    $('.cuisine_selector').append($("<option></option>").attr("value", cat.id).text(cat.title || cat.name));
+                });
             }
-        });
+        })();
+
         var fieldConfig = {
             columns: [
-                {
-                    key: 'title',
-                    header: "{{ trans('lang.store_info') }}"
-                },
-                {
-                    key: 'exportPhone',
-                    header: "{{ trans('lang.phone') }}",
-                    cell: row => (row.hasPlusSign ? `+${row.maskedPhone}` : row.maskedPhone)
-                },
-                {
-                    key: 'createdAt',
-                    header: "{{ trans('lang.date') }}"
-                },
-                {
-                    key: 'items',
-                    header: "{{ trans('lang.item') }}"
-                },
-                {
-                    key: 'orders',
-                    header: "{{ trans('lang.order_plural') }}"
-                },
+                { key: 'title', header: "{{ trans('lang.store_info') }}" },
+                { key: 'exportPhone', header: "{{ trans('lang.phone') }}" },
+                { key: 'createdAt', header: "{{ trans('lang.date') }}" },
+                { key: 'items', header: "{{ trans('lang.item') }}" },
+                { key: 'orders', header: "{{ trans('lang.order_plural') }}" },
             ],
             fileName: "{{ trans('lang.vendor_table') }}",
         };
+
         $(document).ready(function () {
             $('.cuisine_selector').select2({
                 placeholder: "{{ trans('lang.select_categoty') }}",
                 minimumResultsForSearch: Infinity,
                 allowClear: true
+            });
+
+            $('.cuisine_selector').change(function () {
+                $('#storeTable').DataTable().ajax.reload();
             });
 
             $('select').on("select2:unselecting", function (e) {
@@ -464,7 +432,8 @@
                     table.search('').draw();
                 }
             }, 300));
-        })
+        });
+
         async function buildHTML(val) {
             var html = [];
             newdate = '';
