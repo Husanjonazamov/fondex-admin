@@ -15,6 +15,8 @@ return [
 
 'active' => 'Faol',
 
+'add_variant' => "Variant qo'shish",
+
 'add_item_size' => "O‘lcham qo‘shish",
 
 'add_new_option' => "Yangi variant qo‘shish",

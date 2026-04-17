@@ -116,7 +116,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group row width-100" id="attributes_div" style="display:none">
+                             <div class="form-group row width-100" id="attributes_div" style="display:none">
                                 <label class="col-3 control-label">{{ trans('lang.item_attribute_id') }}</label>
                                 <div class="col-7">
                                     <select id='item_attribute' class="form-control chosen-select" required
@@ -124,8 +124,13 @@
                                 </div>
                             </div>
                             <div class="form-group row width-100">
-                                <div class="item_attributes" id="item_attributes"></div>
-                                <div class="item_variants" id="item_variants"></div>
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-primary add_variant_btn"><i class="fa fa-plus"></i> {{ trans('lang.add_variant') }}</button>
+                                </div>
+                                <div class="col-7">
+                                    <div class="item_attributes" id="item_attributes"></div>
+                                    <div class="item_variants" id="item_variants"></div>
+                                </div>
                                 <input type="hidden" id="attributes" value="" />
                                 <input type="hidden" id="variants" value="" />
                             </div>
@@ -481,13 +486,29 @@
                 })
             });
 
-            jQuery("#data-table_processing").show();
+            // Fetch attributes first, then product to avoid race conditions
+            async function initializeData() {
+                var attributes = database.collection('vendor_attributes');
+                const attributesSnapshot = await attributes.get();
+                attributesSnapshot.docs.forEach((listval) => {
+                    var data = listval.data();
+                    attributes_list.push(data);
+                    $('#item_attribute').append($("<option></option>")
+                        .attr("value", data.id)
+                        .text(data.title));
+                });
+                $("#item_attribute").show().chosen({
+                    "placeholder_text": "{{ trans('lang.select_attribute') }}"
+                });
 
-            // Fetch from REST API
-            syncToDjango(`products/${vendor_id}/`, 'GET').then(async function (response) {
-                console.log("Product response:", response);
-                if (response && response.status && response.data) {
-                    var product = response.data;
+                jQuery("#data-table_processing").show();
+
+                // Fetch from REST API
+                try {
+                    const response = await syncToDjango(`products/${vendor_id}/`, 'GET');
+                    console.log("Product response:", response);
+                    if (response && response.status && response.data) {
+                        var product = response.data;
 
                     $('#item_vendor').val(product.vendor);
                     $('#brand').val(product.brand);
@@ -532,22 +553,89 @@
                     
                     if (product.image) {
                         photo = product.image;
-                        photos = [photo];
+                    }
+
+                    if (product.photos_json && product.photos_json.length > 0) {
+                        photos = product.photos_json;
                         $(".product_image").empty();
-                        $(".product_image").append('<span class="image-item" id="photo_1"><span class="remove-btn" data-id="0" data-img="' + photo + '" data-status="old"><i class="fa fa-remove"></i></span><img class="rounded" width="50px" id="" height="auto" src="' + photo + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>');
+                        photos.forEach((img, index) => {
+                            productImagesCount++;
+                            $(".product_image").append('<span class="image-item" id="photo_' + productImagesCount + '"><span class="remove-btn" data-id="' + productImagesCount + '" data-img="' + img + '" data-status="old"><i class="fa fa-remove"></i></span><img class="rounded" width="50px" id="" height="auto" src="' + img + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>');
+                        });
+                    } else if (photo) {
+                         photos = [photo];
+                         $(".product_image").empty();
+                         $(".product_image").append('<span class="image-item" id="photo_1"><span class="remove-btn" data-id="1" data-img="' + photo + '" data-status="old"><i class="fa fa-remove"></i></span><img class="rounded" width="50px" id="" height="auto" src="' + photo + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>');
                     } else {
                         $(".product_image").empty();
                         $(".product_image").append('<span class="image-item" id="photo_1"><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image">');
+                    }
+
+                    if (product.variants && product.variants.length > 0) {
+                        $("#attributes_div").show();
+                        var attributes_data = [];
+                        var variants_data = [];
+                        var selected_attributes = [];
+
+                        product.variants.forEach(variant => {
+                            if (variant.attribute_data) {
+                                variant.attribute_data.forEach(attr => {
+                                    if (!selected_attributes.includes(attr.attribute_id)) {
+                                        selected_attributes.push(attr.attribute_id);
+                                        attributes_data.push({
+                                            'attribute_id': attr.attribute_id,
+                                            'attribute_options': attr.attribute_options
+                                        });
+                                    } else {
+                                        var existing = attributes_data.find(a => a.attribute_id == attr.attribute_id);
+                                        if (existing) {
+                                            attr.attribute_options.forEach(opt => {
+                                                if (!existing.attribute_options.includes(opt)) {
+                                                    existing.attribute_options.push(opt);
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                            variants_data.push({
+                                'variant_sku': variant.sku,
+                                'variant_price': variant.price,
+                                'variant_quantity': variant.quantity,
+                                'variant_image': variant.image
+                            });
+                        });
+
+                        $("#item_attribute").val(selected_attributes).trigger("chosen:updated");
+                        
+                        var b64_data = btoa(JSON.stringify({
+                            'attributes': attributes_data,
+                            'variants': variants_data
+                        }));
+                        
+                        selectAttribute(b64_data);
+                        variants_update(b64_data);
                     }
                 } else {
                     console.error("Failed to fetch product or empty data:", response);
                     $(".error_top").show().html("<p>Failed to load product data from API.</p>");
                 }
                 jQuery("#data-table_processing").hide();
-            }).catch(error => {
-                console.error("Error fetching product:", error);
-                jQuery("#data-table_processing").hide();
-                $(".error_top").show().html("<p>Error connecting to API: " + error.message + "</p>");
+                } catch (error) {
+                    console.error("Error fetching product:", error);
+                    jQuery("#data-table_processing").hide();
+                    $(".error_top").show().html("<p>Error connecting to API: " + error.message + "</p>");
+                }
+            }
+
+            initializeData();
+
+            $(document).on("click", ".add_variant_btn", function () {
+                $("#attributes_div").show();
+                $("#item_attribute").trigger("chosen:open");
+                $('html, body').animate({
+                    scrollTop: $("#attributes_div").offset().top - 100
+                }, 500);
             });
 
             $(".edit-form-btn").click(async function () {
@@ -569,11 +657,44 @@
                 } else {
                     jQuery("#data-table_processing").show();
                     try {
-                        let imageUrl = photo;
-                        // Check if photo is base64 (newly uploaded)
-                        if (photo && photo.startsWith('data:image')) {
-                            const IMG_ARRAY = await storeProductImageData();
-                            imageUrl = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : photo;
+                        const IMG_ARRAY = await storeImageData();
+                        await storeVariantImageData();
+                        const photo = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : "";
+                        const photos_json = IMG_ARRAY;
+
+                        // Variants processing
+                        var attributes = [];
+                        var variants = [];
+                        
+                        if ($('#attributes').length > 0 && $('#attributes').val()) {
+                            attributes = JSON.parse($('#attributes').val());
+                        }
+                        
+                        if ($('#variants').length > 0 && $('#variants').val()) {
+                            var variantSkus = JSON.parse($('#variants').val());
+                            variantSkus.forEach(sku => {
+                                var variantPrice = $('#price_' + sku).val();
+                                var variantQty = $('#qty_' + sku).val();
+                                var variantImage = $('#variant_' + sku + '_url').val() || null;
+                                
+                                var variantAttrData = [];
+                                // Each sku is like "Red-Large" or just "23"
+                                var options = sku.split('-');
+                                attributes.forEach((attr, idx) => {
+                                    variantAttrData.push({
+                                        'attribute_id': attr.attribute_id,
+                                        'attribute_options': [options[idx]]
+                                    });
+                                });
+
+                                variants.push({
+                                    'price': variantPrice,
+                                    'sku': sku,
+                                    'quantity': parseInt(variantQty),
+                                    'image': variantImage,
+                                    'attribute_data': variantAttrData
+                                });
+                            });
                         }
 
                         const result = await syncToDjango(`products/${vendor_id}/`, 'PATCH', {
@@ -585,7 +706,8 @@
                             'vendor': set_vendor_id,
                             'category': category,
                             'section': section_id || getCookie('section_id'),
-                            'image': imageUrl,
+                            'image': photo,
+                            'photos_json': photos_json,
                             'is_publish': itemPublish,
                             'calories': $(".item_calories").val(),
                             'grams': $(".item_grams").val(),
@@ -593,6 +715,7 @@
                             'fats': $(".item_fats").val(),
                             'nonveg': $(".item_nonveg").is(":checked"),
                             'takeawayOption': $(".item_take_away_option").is(":checked"),
+                            'variants': variants
                         });
 
                         if (result && result.status) {
@@ -601,8 +724,7 @@
                             <?php } else { ?>
                                 window.location.href = "{!! route('items') !!}";
                             <?php } ?>
-                        }
- else {
+                        } else {
                             throw new Error(result ? result.message : 'Unknown error');
                         }
                     } catch (error) {
@@ -1019,9 +1141,7 @@
                 var item_attributeX = $.parseJSON(atob(item_attributeX));
             }
             var html = '';
-            var item_attribute = $("#item_attribute").map(function (idx, ele) {
-                return $(ele).val();
-            }).get();
+            var item_attribute = $("#item_attribute").val() || [];
             if (item_attribute.length > 0) {
                 var attributes = [];
                 var attributeSet = [];
@@ -1059,7 +1179,9 @@
                         var variant_image = variant_image_url = '';
                         if (item_attributeX) {
                             var variant_info = $.map(item_attributeX.variants, function (v, i) {
-                                if (v.variant_sku == variant) {
+                                var v_sku = v.variant_sku ? v.variant_sku.toString().toLowerCase() : '';
+                                var target_variant = variant ? variant.toString().toLowerCase() : '';
+                                if (v_sku == target_variant) {
                                     return v;
                                 }
                             });

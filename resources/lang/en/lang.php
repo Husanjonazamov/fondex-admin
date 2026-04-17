@@ -8,6 +8,7 @@ return [
     //---------------------------------------AAAA---------------------------------------
     'actions' => 'Actions',
     'active' => 'Active',
+    'add_variant' => 'Add Variant',
     'add_item_size' => "Add size",
     'add_new_option' => "Add New Option",
     'add_option' => "Add Option",

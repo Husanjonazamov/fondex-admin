@@ -5,6 +5,7 @@ return [
     'actions' => 'الإجراءات',
     'active' => 'نشط',
     'add_item_size' => "إضافة حجم",
+    'add_variant' => "إضافة متغير",
     'add_new_option' => "إضافة خيار جديد",
     'add_option' => "إضافة خيار",
     'admin_area' => 'إعدادات المسؤول',
