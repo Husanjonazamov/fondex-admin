@@ -149,17 +149,21 @@
 
                     const response = await syncToDjango(url, 'GET');
 
-                    if (!response || !response.status || !response.data) {
+                    const responseData = (response && response.status && response.data)
+                        ? response.data
+                        : (response && response.results !== undefined ? response : null);
+
+                    if (!responseData) {
                         callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
                         return;
                     }
 
-                    const totalRecords = response.data.total_items || response.data.count || 0;
+                    const totalRecords = responseData.total_items || responseData.count || 0;
                     $('.total_count').text(totalRecords);
 
                     let records = [];
-                    if (response.data.results) {
-                        for (const vendor of response.data.results) {
+                    if (responseData.results) {
+                        for (const vendor of responseData.results) {
                             // Map API fields to buildHTML compatibility
                             vendor.firstName = vendor.first_name || '';
                             vendor.lastName = vendor.last_name || '';

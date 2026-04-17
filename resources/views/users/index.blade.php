@@ -595,17 +595,24 @@
     });
 
     async function deleteDocumentWithImage(collection, id, field) {
-        var ischeck = $(this).is(':checked');
-        var id = this.id;
-        if (ischeck) {
-            database.collection('users').doc(id).update({
-                'active': true
-            }).then(function(result) {});
-        } else {
-            database.collection('users').doc(id).update({
-                'active': false
-            }).then(function(result) {});
+        try {
+            const doc = await database.collection(collection).doc(id).get();
+            if (doc.exists) {
+                const data = doc.data();
+                const imageUrl = data[field];
+                if (imageUrl) {
+                    try {
+                        const storageRef = firebase.storage().refFromURL(imageUrl);
+                        await storageRef.delete();
+                    } catch (imgErr) {
+                        console.log('Image delete error (non-fatal):', imgErr);
+                    }
+                }
+                await database.collection(collection).doc(id).delete();
+            }
+        } catch (err) {
+            console.error('deleteDocumentWithImage error:', err);
         }
-    });
+    }
 </script>
 @endsection

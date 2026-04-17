@@ -350,17 +350,21 @@
 
                         const response = await syncToDjango(url, 'GET');
 
-                        if (!response || !response.status || !response.data) {
+                        const responseData = (response && response.status && response.data)
+                            ? response.data
+                            : (response && response.results !== undefined ? response : null);
+
+                        if (!responseData) {
                             callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
                             return;
                         }
 
-                        let totalRecords = response.data.total_items || response.data.count || response.data.total || response.data.total_records || 0;
-                        const results = response.data.results || [];
+                        let totalRecords = responseData.total_items || responseData.count || responseData.total || responseData.total_records || 0;
+                        const results = responseData.results || [];
                         
                         // If API uses CursorPagination (no total count), we must provide a fallback for DataTables
                         if (!totalRecords && results.length > 0) {
-                            if (response.data.next) {
+                            if (responseData.next) {
                                 // If there is a next page, set total to current offset + page size + 1
                                 totalRecords = start + length + 1;
                             } else {
