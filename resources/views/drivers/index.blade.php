@@ -127,6 +127,7 @@
 
             var append_list = '';
             var serviceRef = database.collection('services');
+            var alldriver = database.collection('users').where('role', '==', 'driver');
 
             $(document).ready(function() {
 
@@ -179,46 +180,96 @@
                         const start = data.start;
                         const length = data.length;
                         const searchValue = data.search.value.toLowerCase();
-                        const page = Math.floor(start / length) + 1;
+                        const orderColumnIndex = data.order[0].column;
+                        const orderDirection = data.order[0].dir;
+                        
+                        // Define sortable fields mapping
+                        const orderableColumns = (checkDeletePermission) ? ['', 'actions', 'name', 'active', 'isActive', 'createdAt', 'totalOrders'] : ['actions', 'name', 'active', 'isActive', 'createdAt', 'totalOrders'];
+                        const orderByField = orderableColumns[orderColumnIndex];
 
-                        let url = `drivers/?page=${page}&page_size=${length}`;
-                        if (searchValue) url += `&search=${searchValue}`;
-                        if (section_id) url += `&section=${section_id}`;
-                        if (type === 'pending') url += `&is_document_verify=false`;
-                        else if (type === 'approved') url += `&is_document_verify=true`;
-
-                        const response = await syncToDjango(url, 'GET');
-
-                        if (!response || !response.status || !response.data) {
-                            callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
-                            return;
+                        if (searchValue.length >= 3 || searchValue.length === 0) {
+                            $('#data-table_processing').show();
                         }
 
-                        const totalRecords = response.data.total_items || response.data.count || 0;
-                        $('.total_count').text(totalRecords);
+                        await alldriver.get().then(async function(querySnapshot) {
+                            if (querySnapshot.empty) {
+                                $('.total_count').text(0);
+                                $('#data-table_processing').hide();
+                                callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
+                                return;
+                            }
 
-                        let records = [];
-                        if (response.data.results) {
-                            for (const driver of response.data.results) {
+                            let filteredRecords = [];
+                            querySnapshot.docs.forEach((doc) => {
+                                let childData = doc.data();
+                                childData.id = doc.id;
+                                childData.firstName = childData.firstName || '';
+                                childData.lastName = childData.lastName || '';
+                                childData.name = (childData.firstName + ' ' + childData.lastName).toLowerCase();
+                                childData.email = (childData.email || '').toLowerCase();
+                                
+                                // Mapping for status filters if present in current UI (though select boxes are for Active/Inactive)
+                                var isMatch = true;
+                                if (searchValue) {
+                                    if (!childData.name.includes(searchValue) && !childData.email.includes(searchValue) && !(childData.phoneNumber && childData.phoneNumber.includes(searchValue))) {
+                                        isMatch = false;
+                                    }
+                                }
+                                
+                                if (type == 'pending' && childData.isDocumentVerify !== false) isMatch = false;
+                                if (type == 'approved' && childData.isDocumentVerify !== true) isMatch = false;
+
+                                if (isMatch) {
+                                    filteredRecords.push(childData);
+                                }
+                            });
+
+                            // Sorting
+                            filteredRecords.sort((a, b) => {
+                                let aValue = a[orderByField] || '';
+                                let bValue = b[orderByField] || '';
+                                
+                                if (orderByField === 'createdAt') {
+                                    aValue = a[orderByField] ? a[orderByField].toDate().getTime() : 0;
+                                    bValue = b[orderByField] ? b[orderByField].toDate().getTime() : 0;
+                                } else if (orderByField === 'name') {
+                                    aValue = a.firstName + ' ' + a.lastName;
+                                    bValue = b.firstName + ' ' + b.lastName;
+                                } else if (orderByField === 'totalOrders') {
+                                    aValue = a.orderCompleted || 0;
+                                    bValue = b.orderCompleted || 0;
+                                }
+
+                                if (orderDirection === 'asc') {
+                                    return (aValue > bValue) ? 1 : -1;
+                                } else {
+                                    return (aValue < bValue) ? 1 : -1;
+                                }
+                            });
+
+                            const totalRecords = filteredRecords.length;
+                            $('.total_count').text(totalRecords);
+
+                            const paginatedRecords = filteredRecords.slice(start, start + length);
+                            let records = [];
+                            for (const driver of paginatedRecords) {
                                 // Map fields for buildHTML compatibility
-                                driver.firstName = driver.first_name || '';
-                                driver.lastName = driver.last_name || '';
-                                driver.profilePictureURL = driver.profile_picture || '';
-                                driver.active = driver.is_active;
-                                driver.isActive = driver.is_active; // online status fallback
-                                driver.createdAt = driver.created_at;
-                                driver.totalOrders = driver.orders_count || 0;
+                                driver.profilePictureURL = driver.profilePictureURL || '';
+                                driver.active = driver.active || false;
+                                driver.isActive = driver.isActive || false; // online status fallback
+                                driver.totalOrders = driver.orderCompleted || 0;
                                 
                                 var htmlRows = await buildHTML(driver);
                                 records.push(htmlRows);
                             }
-                        }
 
-                        callback({
-                            draw: data.draw,
-                            recordsTotal: totalRecords,
-                            recordsFiltered: totalRecords,
-                            data: records
+                            $('#data-table_processing').hide();
+                            callback({
+                                draw: data.draw,
+                                recordsTotal: totalRecords,
+                                recordsFiltered: totalRecords,
+                                data: records
+                            });
                         });
                     },
                     order: (checkDeletePermission) ? [5, 'desc'] : [4, 'desc'],
@@ -298,18 +349,16 @@
                 }, 300));
 
                 alldriver.get().then(async function(snapshotsdriver) {
-
+                    console.log("Total drivers in Firestore:", snapshotsdriver.size);
+                    
                     snapshotsdriver.docs.forEach((listval) => {
                         database.collection('vendor_orders').where('driverID', '==', listval.id).where("status", "in", ["Order Completed"]).get().then(async function(orderSnapshots) {
                             var count_order_complete = orderSnapshots.docs.length;
                             database.collection('users').doc(listval.id).update({
                                 'orderCompleted': count_order_complete
                             }).then(function(result) {
-
                             });
-
                         });
-
                     });
                 });
 
@@ -603,15 +652,6 @@ async function getDocumentStatusIcon(driverId) {
                         jQuery("#data-table_processing").hide();
                     }
                 }
-            });
-                    .then(result => {
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 7000);
-                    })
-                    .catch(error => {
-                        console.error("Error occurred:", error);
-                    });
             });
 
             var rows = document.getElementsByTagName("table")[0].rows;

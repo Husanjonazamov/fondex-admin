@@ -593,6 +593,75 @@
             }
         };
 
+        const deleteUserData = async (userId) => {
+            // 1. Delete user wallet data from Firestore
+            try {
+                const snapshotsItem = await database.collection('wallet').where('user_id', '==', userId).get();
+                if (!snapshotsItem.empty) {
+                    const deletePromises = snapshotsItem.docs.map(doc => doc.ref.delete());
+                    await Promise.all(deletePromises);
+                    console.log('Wallet data deleted from Firestore');
+                }
+            } catch (err) {
+                console.error('Error deleting wallet data:', err);
+            }
+
+            // 2. Delete from external MySQL if exists
+            try {
+                const versionSnap = await database.collection('settings').doc("Version").get();
+                const settingData = versionSnap.data();
+                if (settingData && settingData.websiteUrl) {
+                    const siteurl = settingData.websiteUrl + "/api/delete-user";
+                    await jQuery.ajax({
+                        url: siteurl,
+                        method: 'POST',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({ "uuid": userId })
+                    });
+                    console.log('User deleted from external MySQL');
+                }
+            } catch (err) {
+                console.log('External MySQL delete failed (skipping):', err);
+            }
+
+            // 3. Delete from local MySQL database
+            try {
+                await jQuery.ajax({
+                    url: '{{ route("users.hard-delete") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: userId
+                    }
+                });
+                console.log('User deleted from local MySQL');
+            } catch (err) {
+                console.error('Local MySQL delete failed:', err);
+            }
+
+            // 4. Delete user from Firebase Authentication
+            try {
+                const projectId = '<?php echo env('FIREBASE_PROJECT_ID') ?>';
+                await jQuery.ajax({
+                    url: 'https://us-central1-' + projectId + '.cloudfunctions.net/deleteUser',
+                    method: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({ "data": { "uid": userId } })
+                });
+                console.log('User deleted from Firebase Authentication');
+            } catch (err) {
+                console.error('Firebase Authentication delete failed:', err);
+            }
+
+            // 5. Sync to Django
+            try {
+                await syncToDjango('users/users/hard-delete/' + userId + '/', 'DELETE');
+                console.log('User deleted from Django');
+            } catch (err) {
+                console.log('Django delete failed (skipping):', err);
+            }
+        };
+
         function exportData(dt, format, config) {
             const {
                 columns,

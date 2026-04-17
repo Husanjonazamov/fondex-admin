@@ -100,7 +100,7 @@
 <script type="text/javascript">
     
     var database = firebase.firestore();
-    var ref = database.collection('users').orderBy('createdAt', 'desc');
+    var ref = database.collection('users');
     var user_permissions = '<?php echo @session('user_permissions') ?>';
     user_permissions = JSON.parse(user_permissions);
     var checkDeletePermission = false;
@@ -490,73 +490,6 @@
             alert("{{trans('lang.select_delete_alert')}}");
         }
     });
-    async function deleteUserData(userId) {
-        await database.collection('wallet').where('user_id', '==', userId).get().then(async function(snapshotsItem) {
-            if (snapshotsItem.docs.length > 0) {
-                snapshotsItem.docs.forEach((temData) => {
-                    var item_data = temData.data();
-                    database.collection('wallet').doc(item_data.id).delete().then(function() {
-                    });
-                });
-            }
-        });
-          //delete user from mysql
-          await database.collection('settings').doc("Version").get().then(function (snapshot) {
-            var settingData = snapshot.data();
-            if (settingData && settingData.websiteUrl){
-                var siteurl = settingData.websiteUrl + "/api/delete-user"; 
-                var dataObject = { "uuid": userId };         
-                jQuery.ajax({
-                    url: siteurl, 
-                    method: 'POST',
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify(dataObject),
-                    success: function (data) {
-                        console.log('Delete user from external sql success:', data);
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            }
-        });
-
-        // Delete from local SQL database
-        jQuery.ajax({
-            url: '{{ route("users.hard-delete") }}',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                id: userId
-            },
-            success: function(data) {
-                console.log('Delete user from local sql success:', data);
-            },
-            error: function(error) {
-                console.log('Delete user from local sql error:', error);
-            }
-        });
-        //delete user from authentication    
-        var dataObject = {
-            "data": {
-                "uid": userId
-            }
-        };
-        var projectId = '<?php echo env('FIREBASE_PROJECT_ID') ?>';
-        jQuery.ajax({
-            url: 'https://us-central1-' + projectId + '.cloudfunctions.net/deleteUser',
-            method: 'POST',
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(dataObject),
-            success: function(data) {
-                console.log('Delete user success:', data.result);
-            },
-            error: function(xhr, status, error) {
-                var responseText = JSON.parse(xhr.responseText);
-                console.log('Delete user from sql error:', error.responseJSON.message);
-            }
-        });
-    }
     $(document).on("click", "a[name='user-delete']", async function (e) {
         var id = this.id;
         if (confirm("{{trans('lang.delete_alert')}}")) {
@@ -569,50 +502,14 @@
 
     $(document).on("click", "a[name='user-hard-delete']", async function (e) {
         var id = this.id;
-        if (confirm("ARE YOU SURE? This will PERMANENTLY delete the user and all their data! This cannot be undone.")) {
+        if (confirm("ARE YOU SURE? This will PERMANENTLY delete the user from ALL systems (Database, Firebase Auth, Firestore, Django). This cannot be undone.")) {
             jQuery("#data-table_processing").show();
-            // Call the hard-delete route explicitly
-            await jQuery.ajax({
-                url: '{{ route("users.hard-delete") }}',
-                method: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    id: id
-                },
-                success: async function(data) {
-                    console.log('Hard delete success:', data);
-                    // Also delete from Firebase and Django if possible
-                    await deleteDocumentWithImage('users', id, 'profilePictureURL');
-                    await syncToDjango('users/users/hard-delete/' + id + '/', 'DELETE');
-                    window.location.reload();
-                },
-                error: function(error) {
-                    alert('Error performing hard delete');
-                    jQuery("#data-table_processing").hide();
-                }
-            });
+            await deleteDocumentWithImage('users', id, 'profilePictureURL');
+            await deleteUserData(id);
+            window.location.reload();
         }
     });
 
-    async function deleteDocumentWithImage(collection, id, field) {
-        try {
-            const doc = await database.collection(collection).doc(id).get();
-            if (doc.exists) {
-                const data = doc.data();
-                const imageUrl = data[field];
-                if (imageUrl) {
-                    try {
-                        const storageRef = firebase.storage().refFromURL(imageUrl);
-                        await storageRef.delete();
-                    } catch (imgErr) {
-                        console.log('Image delete error (non-fatal):', imgErr);
-                    }
-                }
-                await database.collection(collection).doc(id).delete();
-            }
-        } catch (err) {
-            console.error('deleteDocumentWithImage error:', err);
-        }
-    }
+
 </script>
 @endsection

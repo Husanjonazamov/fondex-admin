@@ -485,18 +485,21 @@
 
             // Fetch from REST API
             syncToDjango(`products/${vendor_id}/`, 'GET').then(async function (response) {
+                console.log("Product response:", response);
                 if (response && response.status && response.data) {
                     var product = response.data;
 
                     $('#item_vendor').val(product.vendor);
                     $('#brand').val(product.brand);
 
-                    await change_categories(product.vendor, product.category);
+                    if (product.vendor) {
+                        await change_categories(product.vendor, product.category);
+                    }
 
-                    $('#item_category').val(product.category);
+                    if (product.category) {
+                        $('#item_category').val(product.category);
+                    }
 
-                    // Handle attributes if the API supports them in the same format
-                    // For now, mapping basic fields
                     $(".item_name").val(product.name);
                     $(".item_price").val(product.price);
                     $(".item_quantity").val(product.quantity);
@@ -530,12 +533,21 @@
                     if (product.image) {
                         photo = product.image;
                         photos = [photo];
+                        $(".product_image").empty();
                         $(".product_image").append('<span class="image-item" id="photo_1"><span class="remove-btn" data-id="0" data-img="' + photo + '" data-status="old"><i class="fa fa-remove"></i></span><img class="rounded" width="50px" id="" height="auto" src="' + photo + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>');
                     } else {
+                        $(".product_image").empty();
                         $(".product_image").append('<span class="image-item" id="photo_1"><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image">');
                     }
+                } else {
+                    console.error("Failed to fetch product or empty data:", response);
+                    $(".error_top").show().html("<p>Failed to load product data from API.</p>");
                 }
                 jQuery("#data-table_processing").hide();
+            }).catch(error => {
+                console.error("Error fetching product:", error);
+                jQuery("#data-table_processing").hide();
+                $(".error_top").show().html("<p>Error connecting to API: " + error.message + "</p>");
             });
 
             $(".edit-form-btn").click(async function () {
@@ -572,9 +584,15 @@
                             'quantity': parseInt(item_quantity),
                             'vendor': set_vendor_id,
                             'category': category,
-                            'section': section_id,
+                            'section': section_id || getCookie('section_id'),
                             'image': imageUrl,
                             'is_publish': itemPublish,
+                            'calories': $(".item_calories").val(),
+                            'grams': $(".item_grams").val(),
+                            'proteins': $(".item_proteins").val(),
+                            'fats': $(".item_fats").val(),
+                            'nonveg': $(".item_nonveg").is(":checked"),
+                            'takeawayOption': $(".item_take_away_option").is(":checked"),
                         });
 
                         if (result && result.status) {
@@ -583,7 +601,8 @@
                             <?php } else { ?>
                                 window.location.href = "{!! route('items') !!}";
                             <?php } ?>
-                        } else {
+                        }
+ else {
                             throw new Error(result ? result.message : 'Unknown error');
                         }
                     } catch (error) {
@@ -593,85 +612,6 @@
                     }
                 }
             });
-                            'attributes': attributes,
-                            'variants': variants
-                        };
-                    }
-
-                    if ($.isEmptyObject(product_specification)) {
-                        product_specification = null;
-                    }
-
-                    jQuery("#data-table_processing").show();
-
-                    await storeDigitalImageData().then(async (DigitalImg) => {
-                        await storeImageData().then(async (IMG) => {
-                            if (IMG.length > 0) {
-                                photo = IMG[0];
-                            }
-                            var objects = {
-                                'name': name,
-                                'price': price.toString(),
-                                'quantity': parseInt(item_quantity),
-                                'disPrice': discount,
-                                'vendorID': set_vendor_id,
-                                'categoryID': category,
-                                'brandID': brand,
-                                'section_id': section_id,
-                                'photo': photo,
-                                'calories': itemCalories,
-                                "grams": itemGrams,
-                                'proteins': itemProteins,
-                                'fats': itemFats,
-                                'description': description,
-                                'publish': itemPublish,
-                                'nonveg': nonveg,
-                                'veg': veg,
-                                'addOnsTitle': addOnesTitle,
-                                'addOnsPrice': addOnesPrice,
-                                'takeawayOption': itemTakeaway,
-                                'product_specification': product_specification,
-                                'item_attribute': item_attribute,
-                                'photos': IMG,
-                                'isDigitalProduct': is_digital_product,
-                                'digitalProduct': DigitalImg ? DigitalImg : '',
-                            };
-                            database.collection('vendor_products').doc(vendor_id).update(objects).then(async function (result) {
-                                await syncToDjango('vendors/products/' + vendor_id + '/', 'PUT', {
-                                    'firestore_id': vendor_id,
-                                    'vendor': set_vendor_id,
-                                    'category': category,
-                                    'section': section_id,
-                                    'name': name,
-                                    'description': description,
-                                    'price': price,
-                                    'discount_price': discount,
-                                    'quantity': item_quantity,
-                                    'is_publish': itemPublish,
-                                    'photos_json': IMG
-                                });
-                                <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
-                                window.location.href = "{{ route('vendors.items', $_GET['eid']) }}";
-                                <?php } else { ?>
-                                window.location.href = '{{ route('items') }}';
-                                <?php } ?>
-                            });
-                        }).catch(err => {
-                            jQuery("#data-table_processing").hide();
-                            $(".error_top").show();
-                            $(".error_top").html("");
-                            $(".error_top").append("<p>" + err + "</p>");
-                            window.scrollTo(0, 0);
-                        });
-                    }).catch(err => {
-                        jQuery("#data-table_processing").hide();
-                        $(".error_top").show();
-                        $(".error_top").html("");
-                        $(".error_top").append("<p>" + err + "</p>");
-                        window.scrollTo(0, 0);
-                    });
-                }
-            })
         })
 
         var storageRef = firebase.storage().ref('images');

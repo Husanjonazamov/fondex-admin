@@ -10,4 +10,9 @@ var firebaseConfig = {
     measurementId: $.decrypt($.cookie('XSRF-TOKEN-MI'))
 }
 
-firebase.initializeApp(firebaseConfig); 
+if (!firebaseConfig.apiKey) {
+    console.error("Firebase Config Error: API Key is missing. Check your cookies or .env file.");
+} else {
+    firebase.initializeApp(firebaseConfig);
+    console.log("Firebase initialized successfully for project:", firebaseConfig.projectId);
+}   user

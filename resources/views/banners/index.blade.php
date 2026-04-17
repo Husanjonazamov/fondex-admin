@@ -57,6 +57,7 @@
                                         <?php }?>
                                         <th>{{trans('lang.banner_info')}}</th>
                                         <th>{{trans('lang.banner_position')}}</th>
+                                        <th>{{trans('lang.section')}}</th>
                                         <th>{{trans('lang.item_publish')}}</th>
                                         <th>{{trans('lang.actions')}}</th>
                                     </tr>
@@ -92,10 +93,6 @@
     var start = null;
     var user_number = [];
     var refData = database.collection('banner_items');
-
-    if(section_id){
-        refData = refData.where('sectionId', '==', section_id);
-    }
     
     var append_list = '';
     var placeholderImage = '';
@@ -126,14 +123,11 @@
                 }
                 var table =  $('#example24').DataTable({
                 order: [],
-                columnDefs: [{
-                         targets: (checkDeletePermission==true) ? 3 : 2,
-                         type: 'date',
-                        render: function(data) {
-                            return data;
-                        }
+                columnDefs: [
+                    {
+                        orderable: false, 
+                        targets: (checkDeletePermission==true) ? [0, 4, 5] : [3, 4]
                     },
-                    {orderable: false, targets: (checkDeletePermission==true) ? [0,3, 4] : [0,2,3]},
                 ],
                 order: (checkDeletePermission==true) ? [1,"asc"] : [0,"asc"],
                 "language": {
@@ -183,11 +177,12 @@
                 html = html + '<td><img alt="" width="100%" style="width:70px;height:70px;" src="' + placeholderImage + '" alt="image"><a class="left_space" href="'+route1+'">'+val.title+'</a></td>';
             }
             html=html+'<td>'+val.position+'</td>';
-            var sectionName = ';'
+            var sectionName = '';
             if(val.sectionId != null && val.sectionId != ""){
                 sectionName = await getSectionName(val.sectionId);
             }
-            
+            html=html+'<td>'+sectionName+'</td>';
+
             if (val.is_publish) {
               html = html + '<td><label class="switch"><input type="checkbox" checked id="' + val.id + '" name="isSwitch"><span class="slider round"></span></label></td>';
             } else {

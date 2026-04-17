@@ -182,11 +182,9 @@ foreach ($countries as $keycountry => $valuecountry) {
             </div>
         </div>
         <div class="form-group col-12 text-center btm-btn">
-            <button type="button" class="btn btn-primary  edit-form-btn"><i class="fa fa-save"></i> {{
-                trans('lang.save')}}
-            </button>
-            <a href="{!! route('users') !!}" class="btn btn-default"><i class="fa fa-undo"></i>{{
-                trans('lang.cancel')}}</a>
+            <button type="button" class="btn btn-primary edit-form-btn"><i class="fa fa-save"></i> {{ trans('lang.save')}} </button>
+            <button type="button" class="btn btn-danger delete-user-btn"><i class="fa fa-trash"></i> DELETE USER PERMANENTLY </button>
+            <a href="{!! route('users') !!}" class="btn btn-default"><i class="fa fa-undo"></i>{{ trans('lang.cancel')}}</a>
         </div>
     </div>
 </div>
@@ -308,6 +306,25 @@ foreach ($countries as $keycountry => $valuecountry) {
                     .catch((error) => {
                         console.log('Error password reset: ', error);
                     });
+            }
+        });
+
+        $(".delete-user-btn").click(async function () {
+            if (confirm("ARE YOU SURE? This will PERMANENTLY delete the user from ALL systems (Database, Firebase Auth, Firestore, Django). This cannot be undone.")) {
+                jQuery("#data-table_processing").show();
+                try {
+                    // 1. Delete Firestore document and image
+                    await deleteDocumentWithImage('users', id, 'profilePictureURL');
+                    // 2. Delete from MySQL, Firebase Auth, Wallet, etc.
+                    await deleteUserData(id);
+                    
+                    alert("User deleted successfully.");
+                    window.location.href = '{{ route("users")}}';
+                } catch (err) {
+                    console.error('Hard delete error:', err);
+                    jQuery("#data-table_processing").hide();
+                    alert("Error performing hard delete. Check console.");
+                }
             }
         });
 
