@@ -355,25 +355,25 @@
 
                         const response = await syncToDjango(url, 'GET');
 
-                        const responseData = (response && response.status && response.data)
-                            ? response.data
-                            : (response && response.results !== undefined ? response : null);
+                        // Support both wrapped response and direct DRF response
+                        const responseData = (response && response.results !== undefined)
+                            ? response
+                            : (response && response.data && response.data.results !== undefined ? response.data : null);
 
                         if (!responseData) {
+                            console.error("No valid response data found:", response);
                             callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
                             return;
                         }
 
-                        let totalRecords = responseData.total_items || responseData.count || responseData.total || responseData.total_records || 0;
+                        let totalRecords = responseData.count || responseData.total_items || responseData.total || responseData.total_records || 0;
                         const results = responseData.results || [];
                         
                         // If API uses CursorPagination (no total count), we must provide a fallback for DataTables
                         if (!totalRecords && results.length > 0) {
                             if (responseData.next) {
-                                // If there is a next page, set total to current offset + page size + 1
                                 totalRecords = start + length + 1;
                             } else {
-                                // If there is no next page, we are at the end
                                 totalRecords = start + results.length;
                             }
                         }
@@ -383,24 +383,22 @@
                         let records = [];
                         if (results) {
                             for (const item of results) {
-                                // Map fields for buildHTML compatibility with both old and new API formats
-                                item.publish = item.hasOwnProperty('is_publish') ? item.is_publish : item.publish;
+                                // Normalize fields for buildHTML compatibility
+                                item.publish = item.hasOwnProperty('is_publish') ? item.is_publish : (item.publish === 'Yes' || item.publish === true);
                                 item.photo = item.image || item.photo || ''; 
                                 item.foodName = item.name || item.title || '';
                                 item.finalPrice = parseFloat(item.price) || 0;
                                 item.sku = item.sku || item.item_sku || item.code || '';
-                                item.store = item.vendor_name || item.vendor_title || item.vendor || ''; 
+                                item.vendor = item.vendor || item.vendor_id || '';
+                                item.store = item.vendor_name || item.vendor_title || ''; 
+                                
                                 const rawCat = item.category_name || item.category_title || '';
                                 const catId = item.category || item.category_id || '';
-                                item.category = rawCat || categoryNameMap[catId] || catId || '';
+                                item.category = rawCat || categoryNameMap[catId] || catId || 'N/A';
                                 
                                 var htmlRows = await buildHTML(item);
                                 records.push(htmlRows);
                             }
-                        }
-
-                        if (records.length === 0 && totalRecords > 0) {
-                            console.warn("API returned records but results array is empty or malformed.");
                         }
 
                         callback({
