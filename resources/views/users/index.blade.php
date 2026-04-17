@@ -249,12 +249,15 @@
                         let childData = doc.data();
                         console.log("Found user document ID:", doc.id, "Data:", childData);
                         childData.id = doc.id; // Ensure the document ID is included in the data
-                        childData.name = childData.firstName + ' ' + childData.lastName;                                 
-                        childData.phone = (childData.phoneNumber != '' && childData.phoneNumber != null && childData.phoneNumber.slice(0, 1) == '+') ? childData.phoneNumber.slice(1) : childData.phoneNumber;     
-                        childData.maskedPhone = EditPhoneNumber(childData.phone);                       
-                        childData.hasPlusSign = childData.phoneNumber.startsWith('+');                        
+                        childData.firstName = childData.firstName || '';
+                        childData.lastName = childData.lastName || '';
+                        childData.name = childData.firstName + ' ' + childData.lastName;
+                        childData.phoneNumber = childData.phoneNumber || '';
+                        childData.phone = (childData.phoneNumber != '' && childData.phoneNumber != null && childData.phoneNumber.slice(0, 1) == '+') ? childData.phoneNumber.slice(1) : childData.phoneNumber;
+                        childData.maskedPhone = EditPhoneNumber(childData.phone);
+                        childData.hasPlusSign = childData.phoneNumber && childData.phoneNumber.startsWith && childData.phoneNumber.startsWith('+');
                         childData.exportPhone = childData.hasPlusSign ? `+${childData.maskedPhone}` : childData.maskedPhone;
-                        childData.contactInfo = `${childData.email} ${childData.phoneNumber}`;
+                        childData.contactInfo = (childData.email || '') + ' ' + (childData.phoneNumber || '');
                         if (searchValue) {
                             var date = '';
                             var time = '';
@@ -421,12 +424,14 @@
         html.push('<td class="delete-all"><input type="checkbox" id="is_open_' + id + '" class="is_open" dataId="' + id + '"><label class="col-3 control-label"\n' +
             'for="is_open_' + id + '" ></label></td>');
         }
-       if (!val.profilePictureURL || val.profilePictureURL.trim() === '') {
-            html.push('<td><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image"><a href="' + user_view + '" class="redirecttopage left_space">' + val.firstName + ' ' + val.lastName + '</a></td>');
+        if (!val.profilePictureURL || val.profilePictureURL.trim() === '') {
+            html.push('<td><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image"><a href="' + user_view + '" class="redirecttopage left_space">' + (val.firstName || '') + ' ' + (val.lastName || '') + '</a></td>');
         } else {
-            html.push('<td><img class="rounded" style="width:50px" src="' + val.profilePictureURL + '"  onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"  alt="image"> <a href="' + user_view + '" class="redirecttopage left_space">' + val.firstName + ' ' + val.lastName + '</a></td>');
+            html.push('<td><img class="rounded" style="width:50px" src="' + val.profilePictureURL + '"  onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"  alt="image"> <a href="' + user_view + '" class="redirecttopage left_space">' + (val.firstName || '') + ' ' + (val.lastName || '') + '</a></td>');
         }
-       html.push('<td>' + shortEmail(val.email) + '<br>' + (val.phoneNumber && val.phoneNumber.includes('+') ? '+' + EditPhoneNumber(val.phoneNumber.slice(1)) : EditPhoneNumber(val.phoneNumber)) + '</td>');
+        var email = val.email ? shortEmail(val.email) : '';
+        var phone = val.phoneNumber ? (val.phoneNumber.includes('+') ? '+' + EditPhoneNumber(val.phoneNumber.slice(1)) : EditPhoneNumber(val.phoneNumber)) : '';
+        html.push('<td>' + email + '<br>' + phone + '</td>');
         var date = '';
         var time = '';
         if (val.hasOwnProperty("createdAt")) {
