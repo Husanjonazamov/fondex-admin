@@ -34,7 +34,7 @@
                                 </div>
                                 <div class="select-box pl-3">
                                     <select class="form-control language_selector filteredRecords">
-                                        <option value="">{{trans("lang.language")}}</option>
+                                        <option value="">{{trans("lang.languages")}}</option>
                                         <option value="uz">Uzbek</option>
                                         <option value="ru">Russian</option>
                                     </select>
@@ -100,7 +100,7 @@
 <script type="text/javascript">
     
     var database = firebase.firestore();
-    var ref = database.collection('users').where("role", "in", ["customer"]).orderBy('createdAt', 'desc');
+    var ref = database.collection('users');
     var user_permissions = '<?php echo @session('user_permissions') ?>';
     user_permissions = JSON.parse(user_permissions);
     var checkDeletePermission = false;
@@ -152,7 +152,7 @@
         var language = $('.language_selector').val();
         var daterangepicker = $('#daterange').data('daterangepicker');
 
-        var refData = database.collection('users').where("role", "in", ["customer"]);
+        var refData = database.collection('users');
 
         if (status != "") {
             if (status == "active") {
@@ -225,7 +225,7 @@
                 const searchValue = data.search.value.toLowerCase();
                 const orderColumnIndex = data.order[0].column;
                 const orderDirection = data.order[0].dir;
-                const orderableColumns = (checkDeletePermission) ? ['', 'name', 'contactInfo', 'createdAt', '', ''] : ['name', 'contactInfo', 'createdAt', '', ''];
+                const orderableColumns = (checkDeletePermission) ? ['', 'name', 'contactInfo', 'createdAt', '', '', ''] : ['name', 'contactInfo', 'createdAt', '', '', ''];
                 const orderByField = orderableColumns[orderColumnIndex]; // Adjust the index to match your table
                 if (searchValue.length >= 3 || searchValue.length === 0) {
                     $('#data-table_processing').show();
@@ -247,6 +247,7 @@
                     let filteredRecords = [];
                     await Promise.all(querySnapshot.docs.map(async (doc) => {
                         let childData = doc.data();
+                        console.log("Found user document ID:", doc.id, "Data:", childData);
                         childData.id = doc.id; // Ensure the document ID is included in the data
                         childData.name = childData.firstName + ' ' + childData.lastName;                                 
                         childData.phone = (childData.phoneNumber != '' && childData.phoneNumber != null && childData.phoneNumber.slice(0, 1) == '+') ? childData.phoneNumber.slice(1) : childData.phoneNumber;     
@@ -314,6 +315,11 @@
                     });
                 }).catch(function (error) {
                     console.error("Error fetching data from Firestore:", error);
+                    if (error.code === 'failed-precondition') {
+                        alert("Missing Firestore Index! Please check the console for the index creation link.");
+                    } else {
+                        alert("Firestore Error: " + error.message);
+                    }
                     $('#data-table_processing').hide(); // Hide loader
                     callback({
                         draw: data.draw,
@@ -327,7 +333,7 @@
             columnDefs: [
                 {
                     orderable: false,
-                    targets: (checkDeletePermission) ? [0, 3, 4, 5] : [0, 2, 3, 4],
+                    targets: (checkDeletePermission) ? [0, 4, 5, 6] : [4, 5],
                 },
                 {
                     type: 'date',
