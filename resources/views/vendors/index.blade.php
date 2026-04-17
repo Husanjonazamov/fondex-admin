@@ -85,8 +85,7 @@
                                     class="do_not_delete" href="javascript:void(0)"><i class="mdi mdi-delete"></i> {{trans('lang.all')}}</a></label></th>
                                     @endif
                                     <th>{{trans('lang.vendor_info')}}</th>
-                                    <th>{{trans('lang.store')}}</th>
-                                    <th>{{trans('lang.contact_info')}}</th>
+                                    <th>{{trans('lang.vendor_phone')}}</th>
                                     <th>{{trans('lang.current_plan')}}</th>
                                     <th>{{trans('lang.expiry_date')}}</th>
                                     <th>{{trans('lang.date')}}</th>
@@ -164,15 +163,13 @@
                     let records = [];
                     if (responseData.results) {
                         for (const vendor of responseData.results) {
-                            // Map API fields to buildHTML compatibility
-                            vendor.firstName = vendor.first_name || '';
-                            vendor.lastName = vendor.last_name || '';
-                            vendor.profilePictureURL = vendor.profile_picture || '';
-                            vendor.vendorData = { id: vendor.id, title: vendor.store_name || '' };
-                            vendor.contactInfo = (vendor.email || '') + '<br>' + (vendor.phone_number || '');
+                            vendor.firestoreId = vendor.firestore_id || '';
+                            vendor.storeName = vendor.title || '';
+                            vendor.photo = vendor.photo || vendor.photo_url || '';
+                            vendor.phone = vendor.phone || '';
                             vendor.active = vendor.is_active;
-                            vendor.createdAt = vendor.created_at; 
-                            
+                            vendor.createdAt = vendor.created_at || null;
+
                             var htmlRows = await buildHTML(vendor);
                             records.push(htmlRows);
                         }
@@ -189,9 +186,9 @@
                     callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
                 }
             },
-            order: (checkDeletePermission) ? [6, 'desc'] : [5, 'desc'],
+            order: (checkDeletePermission) ? [5, 'desc'] : [4, 'desc'],
             columnDefs: [
-                { orderable: false, targets: (checkDeletePermission) ? [0, 7, 8] : [6, 7] }
+                { orderable: false, targets: (checkDeletePermission) ? [0, 6, 7] : [5, 6] }
             ],
             language: {
                 zeroRecords: "{{trans('lang.no_record_found')}}",
@@ -209,34 +206,35 @@
 
     async function buildHTML(val) {
         var html = [];
-        var id = val.id;
-        var routeEdit = '{{route("vendors.edit", ":id")}}'.replace(':id', id);
-        var routeView = val.vendorData ? '{{ route('stores.view', ':id') }}'.replace(':id', id) : '#';
+        var djangoId = val.id;
+        var firestoreId = val.firestoreId || '';
+        var routeEdit = firestoreId ? '{{route("vendors.edit", ":id")}}'.replace(':id', firestoreId) : '#';
+        var routeView = firestoreId ? '{{ route('stores.view', ':id') }}'.replace(':id', firestoreId) : '#';
+        var routeDoc = firestoreId ? '{{ route('vendors.document', ':id') }}'.replace(':id', firestoreId) : '#';
 
         if (checkDeletePermission) {
-            html.push('<td class="delete-all"><input type="checkbox" id="is_open_' + id + '" class="is_open" dataId="' + id + '"><label class="col-3 control-label" for="is_open_' + id + '"></label></td>');
+            html.push('<td class="delete-all"><input type="checkbox" id="is_open_' + djangoId + '" class="is_open" dataId="' + djangoId + '" data-firestore-id="' + firestoreId + '"><label class="col-3 control-label" for="is_open_' + djangoId + '"></label></td>');
         }
 
-        let photo = val.profilePictureURL || placeholderImage;
-        html.push('<td><img class="rounded" style="width:50px" src="' + photo + '" alt="image" onerror="this.src=\'' + placeholderImage + '\'"> <a href="' + routeEdit + '">' + val.firstName + ' ' + val.lastName + '</a></td>');
-        
-        html.push('<td><a href="' + routeView + '">' + (val.vendorData ? val.vendorData.title : '') + '</a></td>');
-        html.push('<td>' + val.contactInfo + '</td>');
+        let photo = val.photo || placeholderImage;
+        html.push('<td><img class="rounded" style="width:50px;height:50px;object-fit:cover" src="' + photo + '" alt="image" onerror="this.src=\'' + placeholderImage + '\'"> <a href="' + routeView + '">' + val.storeName + '</a></td>');
+
+        html.push('<td>' + (val.phone || '') + '</td>');
         html.push('<td>' + (val.subscription_plan_name || '') + '</td>');
         html.push('<td>' + (val.subscription_expiry_date || '{{trans("lang.unlimited")}}') + '</td>');
-        
+
         let date = val.createdAt ? new Date(val.createdAt).toDateString() : '';
         let time = val.createdAt ? new Date(val.createdAt).toLocaleTimeString() : '';
         html.push('<td class="dt-time"><span class="wrap-word">' + date + '<br>' + time + '</span></td>');
 
         let checked = val.active ? 'checked' : '';
-        html.push('<td><label class="switch"><input type="checkbox" ' + checked + ' id="' + id + '" name="isActive"><span class="slider round"></span></label></td>');
+        html.push('<td><label class="switch"><input type="checkbox" ' + checked + ' id="active_' + djangoId + '" data-id="' + djangoId + '" name="isActive"><span class="slider round"></span></label></td>');
 
         var action = '<td class="action-btn"><span>';
-        action += '<a href="' + '{{ route('vendors.document', ':id') }}'.replace(':id', id) + '" title="{{ trans('lang.document') }}"><i class="fa fa-file"></i></a>';
+        action += '<a href="' + routeDoc + '" title="{{ trans('lang.document') }}"><i class="fa fa-file"></i></a>';
         action += '<a href="' + routeEdit + '" title="{{ trans('lang.edit') }}"><i class="mdi mdi-lead-pencil"></i></a>';
         if (checkDeletePermission) {
-            action += '<a id="' + id + '" class="delete-btn" name="user-delete" href="javascript:void(0)" title="{{ trans('lang.delete') }}"><i class="mdi mdi-delete"></i></a>';
+            action += '<a id="' + djangoId + '" data-firestore-id="' + firestoreId + '" class="delete-btn" name="user-delete" href="javascript:void(0)" title="{{ trans('lang.delete') }}"><i class="mdi mdi-delete"></i></a>';
         }
         action += '</span></td>';
         html.push(action);
@@ -246,8 +244,8 @@
 
     $(document).on("click", "input[name='isActive']", async function (e) {
         var ischeck = $(this).is(':checked');
-        var id = this.id;
-        const result = await syncToDjango(`vendors/${id}/`, 'PATCH', { 'is_active': ischeck });
+        var djangoId = $(this).data('id');
+        const result = await syncToDjango(`vendors/${djangoId}/`, 'PATCH', { 'is_active': ischeck });
         if (!result || !result.status) {
             $(this).prop('checked', !ischeck);
             alert('Error updating status');
@@ -255,10 +253,14 @@
     });
 
     $(document).on("click", "a[name='user-delete']", async function (e) {
-        var id = this.id;
+        var djangoId = this.id;
+        var firestoreId = $(this).data('firestore-id');
         if (confirm("{{trans('lang.delete_alert')}}")) {
-            const result = await syncToDjango(`vendors/${id}/`, 'DELETE');
-            if (result && result.status) {
+            const result = await syncToDjango(`vendors/${djangoId}/`, 'DELETE');
+            if (result && (result.status || result.status === undefined)) {
+                if (firestoreId) {
+                    await database.collection('vendors').doc(firestoreId).delete().catch(e => {});
+                }
                 window.location.reload();
             } else {
                 alert('Error deleting vendor');

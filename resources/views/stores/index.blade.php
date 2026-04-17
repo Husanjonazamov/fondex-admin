@@ -305,52 +305,84 @@
                 serverSide: true, // Enable server-side processing
                 responsive: true,
                 ajax: async function (data, callback, settings) {
-                    const start = data.start;
-                    const length = data.length;
-                    const searchValue = data.search.value.toLowerCase();
-                    const page = Math.floor(start / length) + 1;
+                    try {
+                        const start = data.start;
+                        const length = data.length;
+                        const searchValue = data.search.value.toLowerCase();
 
-                    let url = `vendors/?page=${page}&page_size=${length}`;
-                    if (searchValue) url += `&search=${searchValue}`;
-                    if (active_id) url += `&section=${active_id}`;
-                    
-                    const cuisineValue = $('.cuisine_selector').val();
-                    if (cuisineValue) url += `&category=${cuisineValue}`;
+                        let refData = active_id
+                            ? database.collection('vendors').where('section_id', '==', active_id)
+                            : database.collection('vendors');
 
-                    const response = await syncToDjango(url, 'GET');
+                        await refData.get().then(async function(querySnapshot) {
+                            if (querySnapshot.empty) {
+                                $('.total_count').text(0);
+                                jQuery('#data-table_processing').hide();
+                                callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
+                                return;
+                            }
 
-                    if (!response || !response.status || !response.data) {
+                            let filteredRecords = [];
+                            querySnapshot.docs.forEach((doc) => {
+                                let childData = doc.data();
+                                childData.id = doc.id;
+                                childData.title = childData.title || '';
+                                childData.phonenumber = childData.phonenumber || childData.phone_number || '';
+                                childData.photo = childData.photo || childData.photoURL || '';
+                                childData.items = childData.products_count || 0;
+                                childData.orders = childData.orders_count || 0;
+                                childData.author = childData.author || doc.id;
+                                childData.firestoreId = doc.id;
+
+                                if (searchValue) {
+                                    if (
+                                        (childData.title && childData.title.toLowerCase().includes(searchValue)) ||
+                                        (childData.phonenumber && childData.phonenumber.toString().toLowerCase().includes(searchValue))
+                                    ) {
+                                        filteredRecords.push(childData);
+                                    }
+                                } else {
+                                    filteredRecords.push(childData);
+                                }
+                            });
+
+                            filteredRecords.sort((a, b) => {
+                                const aTime = a.createdAt ? a.createdAt.toDate().getTime() : 0;
+                                const bTime = b.createdAt ? b.createdAt.toDate().getTime() : 0;
+                                return bTime - aTime;
+                            });
+
+                            const totalRecords = filteredRecords.length;
+                            const activeCount = filteredRecords.filter(v => v.isActive === true || v.active === true).length;
+                            $('.total_count').text(totalRecords);
+                            $('.rest_count').text(totalRecords);
+                            $('.rest_active_count').text(activeCount);
+                            $('.rest_inactive_count').text(totalRecords - activeCount);
+
+                            const paginatedRecords = filteredRecords.slice(start, start + length);
+                            let records = [];
+                            for (const childData of paginatedRecords) {
+                                var htmlRows = await buildHTML(childData);
+                                records.push(htmlRows);
+                            }
+
+                            jQuery('#data-table_processing').hide();
+                            callback({
+                                draw: data.draw,
+                                recordsTotal: totalRecords,
+                                recordsFiltered: totalRecords,
+                                data: records
+                            });
+                        }).catch(function(error) {
+                            console.error('Firestore error:', error);
+                            jQuery('#data-table_processing').hide();
+                            callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
+                        });
+                    } catch (e) {
+                        console.error('AJAX error:', e);
+                        jQuery('#data-table_processing').hide();
                         callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
-                        return;
                     }
-
-                    const totalRecords = response.data.total_items || response.data.count || 0;
-                    $('.total_count').text(totalRecords);
-                    $('.rest_count').text(totalRecords);
-
-                    let records = [];
-                    if (response.data.results) {
-                        for (const vendor of response.data.results) {
-                            vendor.id = vendor.id;
-                            vendor.title = vendor.store_name || '';
-                            vendor.photo = vendor.profile_picture || '';
-                            vendor.phonenumber = vendor.phone_number || '';
-                            vendor.createdAt = vendor.created_at;
-                            vendor.items = vendor.products_count || 0;
-                            vendor.orders = vendor.orders_count || 0;
-                            vendor.author = vendor.id; // Fallback for action buttons
-                            
-                            var htmlRows = await buildHTML(vendor);
-                            records.push(htmlRows);
-                        }
-                    }
-
-                    callback({
-                        draw: data.draw,
-                        recordsTotal: totalRecords,
-                        recordsFiltered: totalRecords,
-                        data: records
-                    });
                 },
                 order: (checkDeletePermission) ? [
                     [4, 'desc']
@@ -442,8 +474,7 @@
             var route_view = '{{ route('stores.view', ':id') }}';
             route_view = route_view.replace(':id', id);
             if (checkDeletePermission) {
-                html.push('<span class="delete-all"><input type="checkbox" id="is_open_' + id + '" class="is_open" dataId="' + id + '" author="' + val.author + '"><label class="col-3 control-label"\n' +
-                    'for="is_open_' + id + '" ></label></span>');
+                html.push('<span class="delete-all"><input type="checkbox" id="is_open_' + id + '" class="is_open" dataId="' + id + '" author="' + val.author + '"><label class="col-3 control-label" for="is_open_' + id + '"></label></span>');
             }
             var actionHtml = '';
             actionHtml = actionHtml + '<span class="action-btn">';
@@ -456,7 +487,7 @@
             }
             actionHtml = actionHtml + '<a href="' + route_view + '" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.view') }}"><i class="mdi mdi-eye"></i></a><a href="' + route1 + '" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.edit') }}"><i class="mdi mdi-lead-pencil"></i></a>';
             if (checkDeletePermission) {
-                actionHtml = actionHtml + '<a id="' + val.id + '" author="' + val.author + '" name="delete-btn" class="do_not_delete" href="javascript:void(0)" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.delete') }}"><i class="mdi mdi-delete"></i></a>';
+                actionHtml = actionHtml + '<a id="' + id + '" author="' + val.author + '" name="delete-btn" class="do_not_delete" href="javascript:void(0)" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.delete') }}"><i class="mdi mdi-delete"></i></a>';
             }
             actionHtml = actionHtml + '</span>';
             html.push(actionHtml);
@@ -471,7 +502,7 @@
                 html.push('<img alt="" width="100%" style="width:70px;height:70px;" src="' + placeholderImage + '" alt="image">' + '<a href="' + route_view + '" class="redirecttopage left_space">' + val.title + '</a>');
             }
 
-            if (val.hasOwnProperty('phonenumber')) {
+            if (val.phonenumber) {
                 if (val.phonenumber.includes('+')) {
                     html.push('+' + EditPhoneNumber(val.phonenumber.slice(1)));
                 } else {
@@ -480,22 +511,24 @@
             } else {
                 html.push('');
             }
-            if (val.createdAt) {
-                let date = new Date(val.createdAt).toDateString();
-                let time = new Date(val.createdAt).toLocaleTimeString();
+            if (val.createdAt || val.created_at) {
+                const rawDate = val.createdAt || val.created_at;
+                const dateObj = rawDate && rawDate.toDate ? rawDate.toDate() : new Date(rawDate);
+                let date = dateObj.toDateString();
+                let time = dateObj.toLocaleTimeString();
                 html.push('<span class="dt-time">' + date + '<br> ' + time + '</span>');
             } else {
                 html.push('');
             }
 
-            var vendorId = val.id;
+            var vendorId = val.firestoreId || val.id;
             var url = '{{ route('vendors.items', ':id') }}';
             url1 = url.replace(":id", vendorId);
-            html.push((val.items > 0 ? '<a  href="' + url1 + '">' + val.items + '</a>' : val.items));
+            html.push((val.items > 0 ? '<a href="' + url1 + '">' + val.items + '</a>' : val.items));
 
             var url = '{{ route('vendors.orders', ':id') }}';
             url2 = url.replace(":id", vendorId);
-            html.push((val.orders > 0 ? '<a  href="' + url2 + '">' + val.orders + '</a>' : val.orders));
+            html.push((val.orders > 0 ? '<a href="' + url2 + '">' + val.orders + '</a>' : val.orders));
 
             var active = val.isActive;
             return html;
@@ -528,19 +561,25 @@
         $("#is_active").click(function () {
             $("#storeTable .is_open").prop('checked', $(this).prop('checked'));
         });
-                    if (confirm("{{ trans('lang.selected_delete_alert') }}")) {
-                        jQuery("#data-table_processing").show();
-                        $('#storeTable .is_open:checked').each(async function () {
-                            var dataId = $(this).attr('dataId');
-                            const result = await syncToDjango('vendors/' + dataId + '/', 'DELETE');
-                            if (result && result.status) {
-                                console.log('Deleted vendor:', dataId);
-                            }
-                        });
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 2000);
-                    }
+        $("#deleteAll").click(function () {
+            if ($('#storeTable .is_open:checked').length) {
+                if (confirm("{{ trans('lang.selected_delete_alert') }}")) {
+                    jQuery("#data-table_processing").show();
+                    var toDelete = [];
+                    $('#storeTable .is_open:checked').each(function () {
+                        toDelete.push($(this).attr('dataId'));
+                    });
+                    (async function() {
+                        for (var storeId of toDelete) {
+                            await database.collection('vendors').doc(storeId).delete().catch(e => {});
+                        }
+                        window.location.reload();
+                    })();
+                }
+            } else {
+                alert("{{ trans('lang.select_delete_alert') }}");
+            }
+        });
         async function deleteStoreData(storeId) {
             await database.collection('users').where('vendorID', '==', storeId).where('role', '==', 'vendor').get().then(async function (userssanpshots) {
                 if (userssanpshots.docs.length > 0) {
@@ -671,26 +710,12 @@
             var id = this.id;
             if (confirm("{{ trans('lang.delete_alert') }}")) {
                 jQuery("#data-table_processing").show();
-                const result = await syncToDjango('vendors/' + id + '/', 'DELETE');
-                if (result && result.status) {
+                await database.collection('vendors').doc(id).delete().catch(e => {});
+                await deleteStoreData(id);
+                setTimeout(function () {
                     window.location.reload();
-                } else {
-                    alert('Error deleting vendor');
-                    jQuery("#data-table_processing").hide();
-                }
+                }, 3000);
             }
-        });
-                .then(() => {
-                    return deleteStoreData(id);
-                })
-                .then(() => {
-                    setTimeout(function () {
-                        window.location.reload();
-                    }, 7000);
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
         });
 
         $(document).on("click", "a[name='vendor-clone']", async function (e) {
