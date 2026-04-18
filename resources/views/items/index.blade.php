@@ -330,87 +330,90 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                ajax: async function (data, callback, settings) {
-                    try {
-                        const start = data.start;
-                        const length = data.length;
-                        const searchValue = data.search.value.toLowerCase();
-                        const page = Math.floor(start / length) + 1;
+                searchDelay: 500,
+                ajax: function (data, callback, settings) {
+                    (async function() {
+                        try {
+                            const start = data.start || 0;
+                            const length = data.length || 10;
+                            const searchValue = (data.search.value || '').trim();
+                            const page = Math.floor(start / length) + 1;
 
-                        let url = `products/?page=${page}&page_size=${length}`;
-                        if (searchValue) url += `&search=${searchValue}`;
-                        const selectedCategory = $('.category_selector').val() || '';
-                        const selectedSection = $('.section_selector').val() || '';
+                            let url = `products/?page=${page}&page_size=${length}`;
+                            if (searchValue) url += `&search=${encodeURIComponent(searchValue)}`;
+                            const selectedCategory = $('.category_selector').val() || '';
+                            const selectedSection = $('.section_selector').val() || '';
 
-                        if (vendorID) url += `&vendor=${vendorID}`;
-                        if (selectedCategory) url += `&category=${selectedCategory}`;
-                        else if (categoryID) url += `&category=${categoryID}`;
-                        
-                        // Try both section and section_id or ensure the correct one is used
-                        if (selectedSection) {
-                            url += `&section=${selectedSection}`;
-                        } else if (section_id && !selectedCategory && !categoryID) {
-                            url += `&section=${section_id}`;
-                        }
+                            if (vendorID) url += `&vendor=${vendorID}`;
+                            if (selectedCategory) url += `&category=${selectedCategory}`;
+                            else if (categoryID) url += `&category=${categoryID}`;
+                            
+                            // Try both section and section_id or ensure the correct one is used
+                            if (selectedSection) {
+                                url += `&section=${selectedSection}`;
+                            } else if (section_id && !selectedCategory && !categoryID) {
+                                url += `&section=${section_id}`;
+                            }
 
-                        const response = await syncToDjango(url, 'GET');
+                            const response = await syncToDjango(url, 'GET');
 
-                        // Support both wrapped response and direct DRF response
-                        const responseData = (response && response.results !== undefined)
-                            ? response
-                            : (response && response.data && response.data.results !== undefined ? response.data : null);
+                            // Support both wrapped response and direct DRF response
+                            const responseData = (response && response.results !== undefined)
+                                ? response
+                                : (response && response.data && response.data.results !== undefined ? response.data : null);
 
-                        if (!responseData) {
-                            console.error("No valid response data found:", response);
+                            if (!responseData) {
+                                console.error("No valid response data found:", response);
+                                callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
+                                return;
+                            }
+
+                            let totalRecords = responseData.count || responseData.total_items || responseData.total || responseData.total_records || 0;
+                            const results = responseData.results || [];
+                            
+                            // If API uses CursorPagination (no total count), we must provide a fallback for DataTables
+                            if (!totalRecords && results.length > 0) {
+                                if (responseData.next) {
+                                    totalRecords = start + length + 1;
+                                } else {
+                                    totalRecords = start + results.length;
+                                }
+                            }
+                            
+                            $('.total_count').text(totalRecords);
+
+                            let records = [];
+                            if (results) {
+                                for (const item of results) {
+                                    // Normalize fields for buildHTML compatibility
+                                    item.publish = item.hasOwnProperty('is_publish') ? item.is_publish : (item.publish === 'Yes' || item.publish === true);
+                                    item.photo = item.image || item.photo || ''; 
+                                    item.foodName = item.name || item.title || '';
+                                    item.finalPrice = parseFloat(item.price) || 0;
+                                    item.sku = item.sku || item.item_sku || item.code || '';
+                                    item.vendor = item.vendor || item.vendor_id || '';
+                                    item.store = item.vendor_name || item.vendor_title || ''; 
+                                    
+                                    const rawCat = item.category_name || item.category_title || '';
+                                    const catId = item.category || item.category_id || '';
+                                    item.category = rawCat || categoryNameMap[catId] || catId || 'N/A';
+                                    
+                                    var htmlRows = await buildHTML(item);
+                                    records.push(htmlRows);
+                                }
+                            }
+
+                            callback({
+                                draw: data.draw,
+                                recordsTotal: totalRecords,
+                                recordsFiltered: totalRecords,
+                                data: records
+                            });
+                        } catch (e) {
+                            console.error("DataTable Ajax Error:", e);
                             callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
-                            return;
                         }
-
-                        let totalRecords = responseData.count || responseData.total_items || responseData.total || responseData.total_records || 0;
-                        const results = responseData.results || [];
-                        
-                        // If API uses CursorPagination (no total count), we must provide a fallback for DataTables
-                        if (!totalRecords && results.length > 0) {
-                            if (responseData.next) {
-                                totalRecords = start + length + 1;
-                            } else {
-                                totalRecords = start + results.length;
-                            }
-                        }
-                        
-                        $('.total_count').text(totalRecords);
-
-                        let records = [];
-                        if (results) {
-                            for (const item of results) {
-                                // Normalize fields for buildHTML compatibility
-                                item.publish = item.hasOwnProperty('is_publish') ? item.is_publish : (item.publish === 'Yes' || item.publish === true);
-                                item.photo = item.image || item.photo || ''; 
-                                item.foodName = item.name || item.title || '';
-                                item.finalPrice = parseFloat(item.price) || 0;
-                                item.sku = item.sku || item.item_sku || item.code || '';
-                                item.vendor = item.vendor || item.vendor_id || '';
-                                item.store = item.vendor_name || item.vendor_title || ''; 
-                                
-                                const rawCat = item.category_name || item.category_title || '';
-                                const catId = item.category || item.category_id || '';
-                                item.category = rawCat || categoryNameMap[catId] || catId || 'N/A';
-                                
-                                var htmlRows = await buildHTML(item);
-                                records.push(htmlRows);
-                            }
-                        }
-
-                        callback({
-                            draw: data.draw,
-                            recordsTotal: totalRecords,
-                            recordsFiltered: totalRecords,
-                            data: records
-                        });
-                    } catch (e) {
-                        console.error("DataTable Ajax Error:", e);
-                        callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
-                    }
+                    })();
                 },
                 order: (checkDeletePermission) ? [1, 'asc'] : [0, 'asc'],
                 columnDefs: [
@@ -426,6 +429,12 @@
                 buttons: [], // Simplified for now
                 initComplete: function () {
                     $(".dataTables_filter").append($(".dt-buttons").detach());
+                    $('.dataTables_filter input')
+                        .attr('placeholder', 'Search...')
+                        .attr('autocomplete', 'off');
+                    $('.dataTables_filter label').contents().filter(function() {
+                        return this.nodeType === 3;
+                    }).remove();
                 }
             });
 
