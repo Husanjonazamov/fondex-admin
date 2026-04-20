@@ -135,6 +135,13 @@
                     return { status: false, message: `HTTP ${response.status}: ${errorText}` };
                 }
                 
+                if (response.status === 204 || response.headers.get('content-length') === '0') {
+                    return { status: true };
+                }
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    return { status: true };
+                }
                 const result = await response.json();
                 console.log(`[API Response] ${method} ${url} ->`, result);
                 return result;

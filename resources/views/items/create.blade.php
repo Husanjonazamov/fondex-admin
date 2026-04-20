@@ -713,39 +713,6 @@
                     }
                 }
             });
-                                        'is_publish': itemPublish,
-                                        'category': category,
-                                        'vendor': set_vendor_id,
-                                        'section': section_id,
-                                        'discount_price': discount,
-                                        'photos_json': [photo]
-                                    });
-                                    if (reataurantIDDirec) {
-                                        window.location.href =
-                                            "{{ route('vendors.items', $id) }}";
-                                    } else {
-                                        window.location.href =
-                                            '{{ route('items') }}';
-                                    }
-                                });
-                        }).catch(err => {
-                            jQuery("#data-table_processing").hide();
-                            $(".error_top").show();
-                            $(".error_top").html("");
-                            $(".error_top").append("<p>" + err + "</p>");
-                            window.scrollTo(0, 0);
-                        });
-                    }).catch(err => {
-                        jQuery("#data-table_processing").hide();
-                        $(".error_top").show();
-                        $(".error_top").html("");
-                        $(".error_top").append("<p>" + err + "</p>");
-                        window.scrollTo(0, 0);
-                    });
-                }
-
-            })
-        })
         var storageRef = firebase.storage().ref('images');
         function handleFileSelect(evt) {
             var f = evt.target.files[0];
