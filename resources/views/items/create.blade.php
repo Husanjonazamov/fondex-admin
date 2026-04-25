@@ -306,6 +306,7 @@
         var addOnesTitle = [];
         var addOnesPrice = [];
         var categories_list = [];
+        var categoriesLoadPromise = Promise.resolve();
         var brand_list = [];
         var attributes_list = [];
         var vendor_list = [];
@@ -460,11 +461,32 @@
 
             jQuery("#data-table_processing").show();
 
+            // Load categories first (handle empty section_id)
+            var catQuery = section_id
+                ? database.collection('vendor_categories').where('section_id', '==', section_id).where('publish', '==', true)
+                : database.collection('vendor_categories').where('publish', '==', true);
+            categoriesLoadPromise = catQuery.get().then(function (snapshots) {
+                snapshots.docs.forEach(function (listval) {
+                    categories_list.push(listval.data());
+                });
+            });
+
+            function applyVendorSection(sectionData) {
+                if (!sectionData) return;
+                if (sectionData.serviceTypeFlag == "ecommerce-service" || sectionData.serviceTypeFlag == "delivery-service") {
+                    $("#attributes_div").show();
+                    $("#item_attribute_chosen").css({ 'width': '100%' });
+                }
+                if (sectionData.serviceTypeFlag == "ecommerce-service") {
+                    $("#is_digital_div").show();
+                }
+            }
+
             var vendorQuery = section_id
                 ? database.collection('vendors').where('section_id', '==', section_id).orderBy('title').where('title', '!=', '')
                 : database.collection('vendors').orderBy('title').where('title', '!=', '');
             vendorQuery.get().then(async function (snapshots) {
-
+                var preSelectedFound = false;
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
                     vendor_list.push(data);
@@ -475,41 +497,24 @@
                         .text(data.title));
 
                     if (reataurantIDDirec == data.id) {
-
+                        preSelectedFound = true;
                         vendor_section_id = data.section_id;
                         localStorage.setItem('vendor_section_id', vendor_section_id);
-
                         $(".vendor_name_heading").html(data.title);
-                        var section_info = $.map(sections_list, function (section, i) {
-                            if (section.id == data.section_id) {
-                                return section;
-                            }
-                        });
-                        if (section_info.length > 0 && (section_info[0].serviceTypeFlag == "ecommerce-service" || section_info[0].serviceTypeFlag == "delivery-service")) {
-                            $("#attributes_div").show();
-                            $("#item_attribute_chosen").css({
-                                'width': '100%'
+
+                        var vSectionId = data.section_id;
+                        var section_info = sections_list.filter(function(s) { return s.id == vSectionId; });
+                        if (section_info.length > 0) {
+                            applyVendorSection(section_info[0]);
+                        } else if (vSectionId) {
+                            database.collection('sections').doc(vSectionId).get().then(function(sDoc) {
+                                if (sDoc.exists) applyVendorSection(sDoc.data());
                             });
                         }
-                        if (section_info.length > 0 && (section_info[0].serviceTypeFlag == "ecommerce-service")) {
-                            $("#is_digital_div").show();
-                        }
-                    }
-                    if (reataurantIDDirec && reataurantIDDirec !== '') {
-                        console.log('Pre-selected vendor ID:', reataurantIDDirec);
-                        change_categories(reataurantIDDirec);
-                        // Also set the vendor name in heading
-                        $(".vendor_name_heading").html($('#item_vendor option[value="' + reataurantIDDirec + '"]').text());
-                    }
-                })
-            });
 
-            var vendorsCatRef = database.collection('vendor_categories').where('section_id', '==', section_id);
-            vendorsCatRef.where('publish', '==', true).get().then(async function (snapshots) {
-                snapshots.docs.forEach((listval) => {
-                    var data = listval.data();
-                    categories_list.push(data);
-                })
+                        change_categories(reataurantIDDirec);
+                    }
+                });
             });
 
             var brandRef = database.collection('brands').where('sectionId', '==', section_id);
@@ -949,33 +954,34 @@
             change_categories(selected_vendor);
         });
 
-        function change_categories(selected_vendor) {
+        async function change_categories(selected_vendor) {
+            await categoriesLoadPromise;
             database.collection('vendors').doc(selected_vendor).get().then(async function (snapshot) {
                 if (snapshot.exists) {
                     var data = snapshot.data();
-                    // var categoryIDs = [];
-                    // categoryIDs = data.categoryID;
                     var categoryIDs = data.categoryID || [];
                     $('#item_category').empty();
                     $('#item_category').append($("<option></option>")
-                        .attr("value", "").text("{{ trans('lang.select_category') }}")); //new line added
-                    var matched = 0; //new line added
+                        .attr("value", "").text("{{ trans('lang.select_category') }}"));
+                    var matched = 0;
+                    // show all categories if vendor has no categoryID filter
+                    var showAll = categoryIDs.length === 0;
                     categories_list.forEach((val) => {
-                        if (categoryIDs.includes(val.id)) {
+                        if (showAll || categoryIDs.includes(val.id)) {
                             $('#item_category').append($("<option></option>")
                                 .attr("value", val.id)
                                 .attr("section_id", val.section_id)
                                 .text(val.title));
-                            matched++; //new line added
+                            matched++;
                         }
-                    })
+                    });
                     if (matched === 0) {
                         $('#item_category').append($("<option disabled></option>")
                             .text("{{ trans('lang.no_categories_found') }}"));
-                    } //new line added
+                    }
                     $('#item_category').trigger('change');
                 }
-            })
+            });
         }
 
         function selectAttribute() {

@@ -303,6 +303,7 @@
         var ref_sections = database.collection('sections');
         var storage = firebase.storage();
         var categories_list = [];
+        var categoriesLoadPromise = Promise.resolve();
         var brand_list = [];
         var attributes_list = [];
         var vendor_list = [];
@@ -469,11 +470,10 @@
                 })
             });
 
-            database.collection('vendor_categories').where('publish', '==', true).get().then(async function (snapshots) {
-                snapshots.docs.forEach((listval) => {
-                    var data = listval.data();
-                    categories_list.push(data);
-                })
+            categoriesLoadPromise = database.collection('vendor_categories').where('publish', '==', true).get().then(function (snapshots) {
+                snapshots.docs.forEach(function (listval) {
+                    categories_list.push(listval.data());
+                });
             });
 
             var brandRef = database.collection('brands').where('sectionId', '==', section_id);
@@ -1083,25 +1083,26 @@
         });
 
         async function change_categories(selected_vendor, selected_category = null) {
-            await database.collection('vendors').doc(selected_vendor).get().then(async function (snapshot) {
-                if (snapshot.exists) {
-                    var data = snapshot.data();
-                    var categoryIDs = [];
-                    categoryIDs = data.categoryID;
-                    $('#item_category').empty();
-                    categories_list.forEach((val) => {
-                        if (categoryIDs.includes(val.id)) {
-                            $('#item_category').append($("<option></option>")
-                                .attr("value", val.id)
-                                .attr("section_id", val.section_id)
-                                .text(val.title));
-                        }
-                    })
-                    if (selected_category) {
-                        $('#item_category').val(selected_category);
+            await categoriesLoadPromise;
+            const snapshot = await database.collection('vendors').doc(selected_vendor).get();
+            if (snapshot.exists) {
+                var data = snapshot.data();
+                var categoryIDs = data.categoryID || [];
+                var showAll = categoryIDs.length === 0;
+                $('#item_category').empty();
+                $('#item_category').append($("<option></option>").attr("value", "").text("{{ trans('lang.select_category') }}"));
+                categories_list.forEach((val) => {
+                    if (showAll || categoryIDs.includes(val.id)) {
+                        $('#item_category').append($("<option></option>")
+                            .attr("value", val.id)
+                            .attr("section_id", val.section_id)
+                            .text(val.title));
                     }
+                });
+                if (selected_category) {
+                    $('#item_category').val(selected_category);
                 }
-            })
+            }
         }
 
         function selectAttribute(item_attribute = '') {
