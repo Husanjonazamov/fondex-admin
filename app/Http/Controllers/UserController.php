@@ -210,17 +210,24 @@ class UserController extends Controller
     public function deleteAdminUsers($id)
     {
         $id = json_decode($id);
+        $currentUserId = Auth::id();
 
         if (is_array($id)) {
-
-            for ($i = 0; $i < count($id); $i++) {
-                $users = User::find($id[$i]);
-                $users->delete();
+            foreach ($id as $userId) {
+                if ($userId == $currentUserId) continue;
+                $user = User::find($userId);
+                if ($user) $user->delete();
             }
-
         } else {
+            if ($id == $currentUserId) {
+                return redirect()->back()->with('message', 'O\'zingizni o\'chira olmaysiz.');
+            }
+            $totalAdmins = User::count();
+            if ($totalAdmins <= 1) {
+                return redirect()->back()->with('message', 'Yagona admin o\'chirilmaydi.');
+            }
             $user = User::find($id);
-            $user->delete();
+            if ($user) $user->delete();
         }
 
         return redirect()->back();

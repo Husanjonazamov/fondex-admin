@@ -353,10 +353,11 @@
         });
 
         var sectionData = '';
-        var sectionRef = database.collection('sections').doc(section_id);
-        sectionRef.get().then(async function (snapshots) {
-            sectionData = snapshots.data();
-            if (sectionData.adminCommision.enable == true) {
+        var sectionRef = section_id ? database.collection('sections').doc(section_id) : null;
+        if (sectionRef) sectionRef.get().then(async function (snapshots) {
+            sectionData = snapshots.exists ? snapshots.data() : null;
+            if (!sectionData) return;
+            if (sectionData.adminCommision && sectionData.adminCommision.enable == true) {
                 commissionModel = true;
             }
             if (sectionData.serviceTypeFlag == "ecommerce-service") {
@@ -459,7 +460,10 @@
 
             jQuery("#data-table_processing").show();
 
-            database.collection('vendors').where('section_id', '==', section_id).orderBy('title').where('title', '!=', '').get().then(async function (snapshots) {
+            var vendorQuery = section_id
+                ? database.collection('vendors').where('section_id', '==', section_id).orderBy('title').where('title', '!=', '')
+                : database.collection('vendors').orderBy('title').where('title', '!=', '');
+            vendorQuery.get().then(async function (snapshots) {
 
                 snapshots.docs.forEach((listval) => {
                     var data = listval.data();
