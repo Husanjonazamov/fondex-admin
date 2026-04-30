@@ -470,11 +470,38 @@
                 })
             });
 
-            categoriesLoadPromise = database.collection('vendor_categories').where('publish', '==', true).get().then(function (snapshots) {
-                snapshots.docs.forEach(function (listval) {
-                    categories_list.push(listval.data());
-                });
-            });
+            // Load categories: Firebase first, fallback to Django API
+            categoriesLoadPromise = (async function() {
+                try {
+                    var snapshots = await database.collection('vendor_categories').where('publish', '==', true).get();
+                    if (!snapshots.empty) {
+                        snapshots.docs.forEach(function (listval) {
+                            var data = listval.data();
+                            if (!data.id) data.id = listval.id;
+                            categories_list.push(data);
+                        });
+                        return;
+                    }
+                } catch(e) {
+                    console.warn('Firebase categories failed, trying Django API:', e);
+                }
+                // Fallback: Django API
+                try {
+                    var response = await syncToDjango('vendor_categories/?page=1&page_size=1000', 'GET');
+                    var catData = (response && response.status && response.data) ? response.data : response;
+                    if (catData && catData.results) {
+                        catData.results.forEach(function(cat) {
+                            categories_list.push({
+                                id: cat.firestore_id || String(cat.id),
+                                title: cat.title || cat.name || '',
+                                section_id: cat.section_id || ''
+                            });
+                        });
+                    }
+                } catch(e) {
+                    console.error('Django API categories also failed:', e);
+                }
+            })();
 
             var brandRef = database.collection('brands').where('sectionId', '==', section_id);
             brandRef.get().then(async function (snapshots) {
@@ -660,64 +687,65 @@
                     try {
                         const IMG_ARRAY = await storeImageData();
                         await storeVariantImageData();
-                        const photo = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : "";
-                        const photos_json = IMG_ARRAY;
+                        // photo (outer var) has existing image — use it as fallback if no new uploads
+                        const mainPhoto = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : photo;
+                        const photos_json = IMG_ARRAY.length > 0 ? IMG_ARRAY : (photo ? [photo] : []);
 
                         // Variants processing
                         var attributes = [];
                         var variants = [];
-                        
+
                         if ($('#attributes').length > 0 && $('#attributes').val()) {
-                            attributes = JSON.parse($('#attributes').val());
+                            try { attributes = JSON.parse($('#attributes').val()); } catch(e) {}
                         }
-                        
+
                         if ($('#variants').length > 0 && $('#variants').val()) {
-                            var variantSkus = JSON.parse($('#variants').val());
-                            variantSkus.forEach(sku => {
-                                var variantPrice = $('#price_' + sku).val();
-                                var variantQty = $('#qty_' + sku).val();
-                                var variantImage = $('#variant_' + sku + '_url').val() || null;
-                                
-                                var variantAttrData = [];
-                                // Each sku is like "Red-Large" or just "23"
-                                var options = sku.split('-');
-                                attributes.forEach((attr, idx) => {
-                                    variantAttrData.push({
-                                        'attribute_id': attr.attribute_id,
-                                        'attribute_options': [options[idx]]
+                            try {
+                                var variantSkus = JSON.parse($('#variants').val());
+                                variantSkus.forEach(function(sku) {
+                                    var variantPrice = $('#price_' + sku).val();
+                                    var variantQty = $('#qty_' + sku).val();
+                                    var variantImage = $('#variant_' + sku + '_url').val() || null;
+                                    var variantAttrData = [];
+                                    var options = String(sku).split('-');
+                                    attributes.forEach(function(attr, idx) {
+                                        variantAttrData.push({
+                                            'attribute_id': attr.attribute_id,
+                                            'attribute_options': [options[idx] || '']
+                                        });
+                                    });
+                                    variants.push({
+                                        'price': variantPrice,
+                                        'sku': sku,
+                                        'quantity': parseInt(variantQty) || 0,
+                                        'image': variantImage,
+                                        'attribute_data': variantAttrData
                                     });
                                 });
-
-                                variants.push({
-                                    'price': variantPrice,
-                                    'sku': sku,
-                                    'quantity': parseInt(variantQty),
-                                    'image': variantImage,
-                                    'attribute_data': variantAttrData
-                                });
-                            });
+                            } catch(e) { console.warn('Variants parse error:', e); }
                         }
 
-                        const result = await syncToDjango(`products/${vendor_id}/`, 'PATCH', {
+                        var payload = {
                             'name': name,
                             'description': description,
                             'price': price,
-                            'discount_price': discount,
-                            'quantity': parseInt(item_quantity),
+                            'discount_price': discount || '0',
+                            'quantity': parseInt(item_quantity) || 0,
                             'vendor': set_vendor_id,
                             'category': category,
                             'section': section_id || getCookie('section_id'),
-                            'image': photo,
-                            'photos_json': photos_json,
                             'is_publish': itemPublish,
-                            'calories': $(".item_calories").val(),
-                            'grams': $(".item_grams").val(),
-                            'proteins': $(".item_proteins").val(),
-                            'fats': $(".item_fats").val(),
-                            'nonveg': $(".item_nonveg").is(":checked"),
-                            'takeawayOption': $(".item_take_away_option").is(":checked"),
+                            'attribute_count': attributes.length,
                             'variants': variants
-                        });
+                        };
+                        if (mainPhoto) payload['image'] = mainPhoto;
+                        if (photos_json.length > 0) payload['photos_json'] = photos_json;
+                        if ($(".item_calories").val()) payload['calories'] = $(".item_calories").val();
+                        if ($(".item_grams").val()) payload['grams'] = $(".item_grams").val();
+                        if ($(".item_proteins").val()) payload['proteins'] = $(".item_proteins").val();
+                        if ($(".item_fats").val()) payload['fats'] = $(".item_fats").val();
+
+                        const result = await syncToDjango(`products/${vendor_id}/`, 'PATCH', payload);
 
                         if (result && result.status) {
                             <?php if (isset($_GET['eid']) && $_GET['eid'] != '') { ?>
@@ -726,7 +754,9 @@
                                 window.location.href = "{!! route('items') !!}";
                             <?php } ?>
                         } else {
-                            throw new Error(result ? result.message : 'Unknown error');
+                            var errMsg = result ? result.message : 'Unknown error';
+                            if (typeof errMsg === 'object') errMsg = JSON.stringify(errMsg);
+                            throw new Error(errMsg);
                         }
                     } catch (error) {
                         jQuery("#data-table_processing").hide();

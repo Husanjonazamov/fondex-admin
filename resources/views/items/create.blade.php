@@ -461,15 +461,43 @@
 
             jQuery("#data-table_processing").show();
 
-            // Load categories first (handle empty section_id)
-            var catQuery = section_id
-                ? database.collection('vendor_categories').where('section_id', '==', section_id).where('publish', '==', true)
-                : database.collection('vendor_categories').where('publish', '==', true);
-            categoriesLoadPromise = catQuery.get().then(function (snapshots) {
-                snapshots.docs.forEach(function (listval) {
-                    categories_list.push(listval.data());
-                });
-            });
+            // Load categories: Firebase first, fallback to Django API
+            categoriesLoadPromise = (async function() {
+                try {
+                    var catQuery = section_id
+                        ? database.collection('vendor_categories').where('section_id', '==', section_id).where('publish', '==', true)
+                        : database.collection('vendor_categories').where('publish', '==', true);
+                    var snapshots = await catQuery.get();
+                    if (!snapshots.empty) {
+                        snapshots.docs.forEach(function (listval) {
+                            var data = listval.data();
+                            if (!data.id) data.id = listval.id;
+                            categories_list.push(data);
+                        });
+                        return;
+                    }
+                } catch(e) {
+                    console.warn('Firebase categories failed, trying Django API:', e);
+                }
+                // Fallback: Django API
+                try {
+                    var url = 'vendor_categories/?page=1&page_size=1000';
+                    if (section_id) url += '&section=' + section_id;
+                    var response = await syncToDjango(url, 'GET');
+                    var catData = (response && response.status && response.data) ? response.data : response;
+                    if (catData && catData.results) {
+                        catData.results.forEach(function(cat) {
+                            categories_list.push({
+                                id: cat.firestore_id || String(cat.id),
+                                title: cat.title || cat.name || '',
+                                section_id: cat.section_id || ''
+                            });
+                        });
+                    }
+                } catch(e) {
+                    console.error('Django API categories also failed:', e);
+                }
+            })();
 
             function applyVendorSection(sectionData) {
                 if (!sectionData) return;
@@ -686,25 +714,54 @@
                     try {
                         const DigitalImg = await storeDigitalImageData();
                         const IMG_ARRAY = await storeProductImageData();
-                        const photo = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : "";
+                        const mainPhoto = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : "";
 
-                        // Map attributes and variants for API if needed
-                        // For now, keeping it simple or matching what syncToDjango needs
-                        
-                        const result = await syncToDjango('products/', 'POST', {
+                        // Attributes & variants
+                        var attrList = [];
+                        var variantList = [];
+                        if ($('#attributes').val()) {
+                            try { attrList = JSON.parse($('#attributes').val()); } catch(e) {}
+                        }
+                        if ($('#variants').val()) {
+                            try {
+                                var skus = JSON.parse($('#variants').val());
+                                skus.forEach(function(sku) {
+                                    var variantAttrData = [];
+                                    var options = String(sku).split('-');
+                                    attrList.forEach(function(attr, idx) {
+                                        variantAttrData.push({
+                                            'attribute_id': attr.attribute_id,
+                                            'attribute_options': [options[idx] || '']
+                                        });
+                                    });
+                                    variantList.push({
+                                        'price': $('#price_' + sku).val() || price,
+                                        'sku': sku,
+                                        'quantity': parseInt($('#qty_' + sku).val()) || parseInt(item_quantity) || 0,
+                                        'image': $('#variant_' + sku + '_url').val() || null,
+                                        'attribute_data': variantAttrData
+                                    });
+                                });
+                            } catch(e) {}
+                        }
+
+                        var payload = {
                             'name': name,
                             'description': description,
                             'price': price,
-                            'discount_price': discount,
-                            'quantity': parseInt(item_quantity),
+                            'discount_price': discount || '0',
+                            'quantity': parseInt(item_quantity) || 0,
                             'vendor': set_vendor_id,
                             'category': category,
                             'section': section_id,
-                            'image': photo,
                             'is_publish': itemPublish,
                             'is_digital': is_digital_product,
-                            // Add other fields as needed by the new API
-                        });
+                            'attribute_count': attrList.length,
+                            'variants': variantList
+                        };
+                        if (mainPhoto) payload['image'] = mainPhoto;
+
+                        const result = await syncToDjango('products/', 'POST', payload);
 
                         if (result && result.status) {
                             <?php if ($id != '') { ?>
@@ -713,7 +770,9 @@
                                 window.location.href = "{!! route('items') !!}";
                             <?php } ?>
                         } else {
-                            throw new Error(result ? result.message : 'Unknown error');
+                            var errMsg = result ? result.message : 'Unknown error';
+                            if (typeof errMsg === 'object') errMsg = JSON.stringify(errMsg);
+                            throw new Error(errMsg);
                         }
                     } catch (error) {
                         jQuery("#data-table_processing").hide();

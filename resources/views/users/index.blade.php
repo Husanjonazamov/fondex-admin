@@ -494,15 +494,19 @@
         var id = this.id;
         if (confirm("{{trans('lang.delete_alert')}}")) {
             jQuery("#data-table_processing").show();
-            await deleteDocumentWithImage('users', id, 'profilePictureURL');
-            await deleteUserData(id);
+            // Soft delete: faqat Django API da o'chiradi, Firebase Auth va Firestore saqlanib qoladi
+            try {
+                await syncToDjango('users/users/' + id + '/', 'DELETE');
+            } catch(err) {
+                console.error('Soft delete failed:', err);
+            }
             window.location.reload();
         }
     });
 
     $(document).on("click", "a[name='user-hard-delete']", async function (e) {
         var id = this.id;
-        if (confirm("ARE YOU SURE? This will PERMANENTLY delete the user from ALL systems (Database, Firebase Auth, Firestore, Django). This cannot be undone.")) {
+        if (confirm("ARE YOU SURE? This will PERMANENTLY delete the user from ALL systems (Firestore, Firebase Auth, Django). This cannot be undone.")) {
             jQuery("#data-table_processing").show();
             await deleteDocumentWithImage('users', id, 'profilePictureURL');
             await deleteUserData(id);
