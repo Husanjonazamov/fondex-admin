@@ -15,4 +15,4 @@ if (!firebaseConfig.apiKey) {
 } else {
     firebase.initializeApp(firebaseConfig);
     console.log("Firebase initialized successfully for project:", firebaseConfig.projectId);
-}   user
+}

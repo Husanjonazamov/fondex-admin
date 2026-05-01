@@ -121,6 +121,8 @@ Route::middleware(['permission:fleet-drivers,fleet.drivers.view'])->group(functi
 Route::middleware(['permission:coupons,coupons'])->group(function () {
     Route::get('/coupon/{id}', [App\Http\Controllers\CouponController::class, 'index'])->name('vendors.coupons');
 });
+Route::get('/items/categories/select-list', [App\Http\Controllers\CategoryController::class, 'listForSelect'])->name('items.categories.select-list');
+Route::get('/items/vendors/select-list', [App\Http\Controllers\CategoryController::class, 'vendorsForSelect'])->name('items.vendors.select-list');
 Route::middleware(['permission:items,items'])->group(function () {
     Route::get('/items/{id}', [App\Http\Controllers\FoodController::class, 'index'])->name('vendors.items');
 });

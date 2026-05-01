@@ -3470,9 +3470,10 @@ return [
 'select_country_code' => 'Пожалуйста, выберите код страны',
 'commission' => 'Комиссия',
 'base_plan' => 'Базовый план',
-
+'no_categories_found' => 'Категории не найдены',
+'target_languages' => 'Языки перевода',
+'translate_category' => 'Перевести категорию',
 
 ];
 
 ?>
-

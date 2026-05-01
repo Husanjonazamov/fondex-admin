@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
 class CategoryController extends Controller
 {   
 
@@ -25,6 +28,40 @@ class CategoryController extends Controller
         return view('categories.create');
     }
 
+    public function listForSelect(Request $request)
+    {
+        $query = [
+            'page' => 1,
+            'page_size' => 1000,
+        ];
+
+        if ($request->filled('section')) {
+            $query['section'] = $request->input('section');
+        }
+
+        $response = Http::acceptJson()
+            ->timeout(15)
+            ->get('https://storage.fondex.uz/api/categories/', $query);
+
+        return response()->json($response->json(), $response->status());
+    }
+
+    public function vendorsForSelect(Request $request)
+    {
+        $query = [
+            'page' => 1,
+            'page_size' => 1000,
+        ];
+
+        if ($request->filled('section')) {
+            $query['section'] = $request->input('section');
+        }
+
+        $response = Http::acceptJson()
+            ->timeout(15)
+            ->get('https://storage.fondex.uz/api/vendors/', $query);
+
+        return response()->json($response->json(), $response->status());
+    }
+
 }
-
-

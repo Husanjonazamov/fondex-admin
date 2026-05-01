@@ -205,6 +205,7 @@ foreach ($countries as $keycountry => $valuecountry) {
     var photo = "";
     var fileName = "";
     var oldImageFile = '';
+    var currentUserData = {};
     var placeholderImage = '';
     var placeholder = database.collection('settings').doc('placeHolderImage');
 
@@ -247,6 +248,7 @@ foreach ($countries as $keycountry => $valuecountry) {
             jQuery("#data-table_processing").hide();
             if (!snapshots.empty) {
                 var user = snapshots.docs[0].data();
+                currentUserData = user || {};
                 $(".user_first_name").val(user.firstName);
                 $(".user_last_name").val(user.lastName);
                 $(".user_email").val(shortEmail(user.email)).prop('disabled',true);
@@ -316,7 +318,7 @@ foreach ($countries as $keycountry => $valuecountry) {
                     // 1. Delete Firestore document and image
                     await deleteDocumentWithImage('users', id, 'profilePictureURL');
                     // 2. Delete from MySQL, Firebase Auth, Wallet, etc.
-                    await deleteUserData(id);
+                    await deleteUserData(id, currentUserData);
                     
                     alert("User deleted successfully.");
                     window.location.href = '{{ route("users")}}';

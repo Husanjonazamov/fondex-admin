@@ -91,10 +91,13 @@
         async function syncToDjango(endpoint, method, data = null) {
             try {
                 const url = endpoint.startsWith('http') ? endpoint : `${BACKEND_API_URL}/${endpoint.startsWith('/') ? endpoint.substring(1) : endpoint}`;
+                const isFormData = (typeof FormData !== 'undefined') && data instanceof FormData;
                 const headers = {
-                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 };
+                if (!isFormData) {
+                    headers['Content-Type'] = 'application/json';
+                }
                 
                 if (!url.includes('storage.fondex.uz')) {
                     headers['X-CSRF-TOKEN'] = CSRF_TOKEN;
@@ -120,7 +123,7 @@
                     headers: headers
                 };
                 if (data && method !== 'GET') {
-                    options.body = JSON.stringify(data);
+                    options.body = isFormData ? data : JSON.stringify(data);
                 }
                 console.log(`[API Call] ${method} ${url}`, { ...options }); 
                 const response = await fetch(url, options);
@@ -600,7 +603,23 @@
             }
         };
 
-        const deleteUserData = async (userId) => {
+        const deleteFirestoreQuery = async (collectionName, field, value) => {
+            if (!value) return 0;
+            try {
+                const snapshot = await database.collection(collectionName).where(field, '==', value).get();
+                if (snapshot.empty) return 0;
+                await Promise.all(snapshot.docs.map(doc => doc.ref.delete()));
+                return snapshot.docs.length;
+            } catch (err) {
+                console.error(`Error deleting ${collectionName} by ${field}:`, err);
+                return 0;
+            }
+        };
+
+        const deleteUserData = async (userId, userData = {}) => {
+            const email = userData.email || '';
+            const phone = userData.phoneNumber || userData.phone || '';
+
             // 1. Delete user wallet data from Firestore
             try {
                 const snapshotsItem = await database.collection('wallet').where('user_id', '==', userId).get();
@@ -613,6 +632,17 @@
                 console.error('Error deleting wallet data:', err);
             }
 
+            // Delete Firestore user remnants by UID, email, and phone so registration can reuse them.
+            try {
+                await deleteFirestoreQuery('users', 'id', userId);
+                await deleteFirestoreQuery('users', 'email', email);
+                await deleteFirestoreQuery('users', 'phoneNumber', phone);
+                await deleteFirestoreQuery('wallet', 'email', email);
+                await deleteFirestoreQuery('wallet', 'phoneNumber', phone);
+            } catch (err) {
+                console.error('Firestore user cleanup failed:', err);
+            }
+
             // 2. Delete from external MySQL if exists
             try {
                 const versionSnap = await database.collection('settings').doc("Version").get();
@@ -623,7 +653,7 @@
                         url: siteurl,
                         method: 'POST',
                         contentType: "application/json; charset=utf-8",
-                        data: JSON.stringify({ "uuid": userId })
+                        data: JSON.stringify({ "uuid": userId, "email": email, "phone": phone })
                     });
                     console.log('User deleted from external MySQL');
                 }
@@ -638,7 +668,9 @@
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        id: userId
+                        id: userId,
+                        email: email,
+                        phone: phone
                     }
                 });
                 console.log('User deleted from local MySQL');
@@ -653,7 +685,7 @@
                     url: 'https://us-central1-' + projectId + '.cloudfunctions.net/deleteUser',
                     method: 'POST',
                     contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify({ "data": { "uid": userId } })
+                    data: JSON.stringify({ "data": { "uid": userId, "email": email, "phone": phone } })
                 });
                 console.log('User deleted from Firebase Authentication');
             } catch (err) {
@@ -662,7 +694,10 @@
 
             // 5. Sync to Django
             try {
-                await syncToDjango('users/users/hard-delete/' + userId + '/', 'DELETE');
+                await syncToDjango('users/users/hard-delete/' + userId + '/', 'DELETE', {
+                    email: email,
+                    phone: phone
+                });
                 console.log('User deleted from Django');
             } catch (err) {
                 console.log('Django delete failed (skipping):', err);

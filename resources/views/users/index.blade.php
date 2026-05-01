@@ -506,10 +506,19 @@
 
     $(document).on("click", "a[name='user-hard-delete']", async function (e) {
         var id = this.id;
+        var userData = {};
         if (confirm("ARE YOU SURE? This will PERMANENTLY delete the user from ALL systems (Firestore, Firebase Auth, Django). This cannot be undone.")) {
             jQuery("#data-table_processing").show();
+            try {
+                var userDoc = await database.collection('users').doc(id).get();
+                if (userDoc.exists) {
+                    userData = userDoc.data() || {};
+                }
+            } catch (err) {
+                console.error('Failed to fetch user before hard delete:', err);
+            }
             await deleteDocumentWithImage('users', id, 'profilePictureURL');
-            await deleteUserData(id);
+            await deleteUserData(id, userData);
             window.location.reload();
         }
     });

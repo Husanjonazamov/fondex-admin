@@ -2266,5 +2266,8 @@ return [
     'choose_humbling_gif_image' => 'Choose humbling GIF/Image',
     'select_story_video' => 'Select Story Video',
     'no_reviews_found' => 'No Reviews Found',
+    'no_categories_found' => 'No categories found',
+    'target_languages' => 'Target Languages',
+    'translate_category' => 'Translate Category',
 ];
 ?>

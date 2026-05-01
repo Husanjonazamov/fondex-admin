@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use PaypalPayoutsSDK\Core\PayPalHttpClient;
 use PaypalPayoutsSDK\Core\SandboxEnvironment;
@@ -235,17 +236,47 @@ class UserController extends Controller
 
     public function hardDelete(Request $request)
     {
-        $id = $request->id;
-        $user = User::where('id', $id)->first();
-        if ($user) {
+        $id = $request->input('id');
+        $email = $request->input('email');
+        $phone = $request->input('phone');
+
+        $query = User::query();
+        $query->where(function ($q) use ($id, $email, $phone) {
+            if ($id && is_numeric($id)) {
+                $q->orWhere('id', $id);
+            }
+            if ($email && Schema::hasColumn('users', 'email')) {
+                $q->orWhere('email', $email);
+            }
+            if ($id && Schema::hasColumn('users', 'uid')) {
+                $q->orWhere('uid', $id);
+            }
+            if ($id && Schema::hasColumn('users', 'uuid')) {
+                $q->orWhere('uuid', $id);
+            }
+            if ($id && Schema::hasColumn('users', 'firebase_uid')) {
+                $q->orWhere('firebase_uid', $id);
+            }
+            if ($phone && Schema::hasColumn('users', 'phone')) {
+                $q->orWhere('phone', $phone);
+            }
+            if ($phone && Schema::hasColumn('users', 'phoneNumber')) {
+                $q->orWhere('phoneNumber', $phone);
+            }
+        });
+
+        $users = $query->get();
+        foreach ($users as $user) {
             $user->delete();
-            return response()->json(['status' => true, 'message' => 'User deleted from database successfully']);
         }
-        
-        // If not found by ID, try searching by custom UUID (firebase UID) if applicable
-        // But the local User model seems to use auto-increment IDs.
-        
-        return response()->json(['status' => false, 'message' => 'User not found in local database']);
+
+        return response()->json([
+            'status' => true,
+            'deleted_count' => $users->count(),
+            'message' => $users->count() > 0
+                ? 'User deleted from local database successfully'
+                : 'No matching local database user found',
+        ]);
     }
 
     public function shortEmail($email, $mask = "**********") {

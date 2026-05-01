@@ -3470,9 +3470,11 @@ return [
 'service_not_available'=>'Xizmat mavjud emas',
 'select_country_code' => "Iltimos, mamlakat kodini tanlang",
 'commission'=>"Komissiya",
-'base_plan'=>"Asosiy reja"
+'base_plan'=>"Asosiy reja",
+'no_categories_found' => 'Category topilmadi',
+'target_languages' => 'Tarjima tillari',
+'translate_category' => 'Category tarjima qilish'
 
 ];
 
 ?>
-

@@ -2255,6 +2255,9 @@ return [
     'choose_humbling_gif_image' => 'اختر صورة أو ملف GIF مؤثر',
     'select_story_video' => 'اختر فيديو للقصّة',
     'no_reviews_found' => 'لم يتم العثور على أي مراجعات',
+    'no_categories_found' => 'لم يتم العثور على فئات',
+    'target_languages' => 'لغات الترجمة',
+    'translate_category' => 'ترجمة الفئة',
 
 ];
 ?>

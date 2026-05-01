@@ -116,6 +116,7 @@
         var placeholderImage = '';
         var ref_sections = database.collection('sections');
         let selected_gender = "";
+        var categoryRows = {};
 
         $(document).ready(function () {
             var inx = parseInt(offest) * parseInt(pagesize);
@@ -276,6 +277,7 @@
             var html = [];
             newdate = '';
             var id = val.id;
+            categoryRows[id] = val;
 
             var route1 = '{{route("categories.edit", ":id")}}';
 
@@ -316,6 +318,7 @@
             var action = '';
 
             action = action + '<span class="action-btn"><a href="' + route1 + '" data-toggle="tooltip" title="{{trans("lang.edit")}}"><i class="mdi mdi-lead-pencil"></i></a>';
+            action = action + '<a href="javascript:void(0)" onclick="translateCategory(\'' + id + '\')" data-toggle="tooltip" title="{{trans("lang.translate_category")}}"><i class="mdi mdi-translate"></i></a>';
 
             if (checkDeletePermission) {
 
@@ -329,6 +332,72 @@
 
             return html;
 
+        }
+
+        async function translateCategory(id) {
+            var category = categoryRows[id] || {};
+            var targetInput = prompt('{{trans("lang.target_languages")}}', 'uz,ru,en');
+            if (!targetInput) return;
+            var targetLanguages = targetInput.split(',').map(function(lang) {
+                return lang.trim();
+            }).filter(Boolean);
+            if (targetLanguages.length === 0) return;
+
+            jQuery("#data-table_processing").show();
+            try {
+                var response = await syncToDjango('categories/' + id + '/translate/', 'POST', {
+                    target_languages: targetLanguages
+                });
+                if (response && response.status) {
+                    window.location.reload();
+                    return;
+                }
+
+                var translations = category.translations || {};
+                for (var i = 0; i < targetLanguages.length; i++) {
+                    var lang = targetLanguages[i];
+                    translations[lang] = translations[lang] || {};
+                    translations[lang].title = await translateCategoryText(category.title || '', lang);
+                    translations[lang].description = await translateCategoryText(category.description || '', lang);
+                }
+
+                response = await syncToDjango('categories/' + id + '/', 'PATCH', {
+                    translations: translations
+                });
+                if (response && response.status) {
+                    window.location.reload();
+                    return;
+                }
+                throw new Error(response && response.message ? formatCategoryApiError(response.message) : 'Translate failed');
+            } catch (error) {
+                jQuery("#data-table_processing").hide();
+                alert(error.message || error);
+            }
+        }
+
+        async function translateCategoryText(text, targetLanguage) {
+            if (!text) return '';
+            var endpoints = ['translate/', 'translations/translate/', 'categories/translate/'];
+            for (var i = 0; i < endpoints.length; i++) {
+                try {
+                    var response = await syncToDjango(endpoints[i], 'POST', {
+                        text: text,
+                        source_language: 'auto',
+                        target_language: targetLanguage
+                    });
+                    var data = response && response.data ? response.data : response;
+                    var translated = data && (data.translated_text || data.translation || data.text || data.result);
+                    if (translated) return translated;
+                } catch (e) {
+                    console.warn('Translate endpoint failed:', endpoints[i], e);
+                }
+            }
+            return text;
+        }
+
+        function formatCategoryApiError(message) {
+            if (typeof message === 'object') return JSON.stringify(message);
+            return String(message || 'Translate failed');
         }
 
 
