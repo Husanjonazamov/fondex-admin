@@ -835,9 +835,9 @@
                             try {
                                 var variantSkus = JSON.parse($('#variants').val());
                                 variantSkus.forEach(function(sku) {
-                                    var variantPrice = $('#price_' + sku).val();
-                                    var variantQty = $('#qty_' + sku).val();
-                                    var variantImage = $('#variant_' + sku + '_url').val() || null;
+                                    var variantPrice = $('[id="price_' + sku + '"]').val();
+                                    var variantQty = $('[id="qty_' + sku + '"]').val();
+                                    var variantImage = $('[id="variant_' + sku + '_url"]').val() || null;
                                     var variantAttrData = [];
                                     var options = String(sku).split('-');
                                     attributes.forEach(function(attr, idx) {

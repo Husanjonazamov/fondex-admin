@@ -834,10 +834,10 @@
                                         });
                                     });
                                     variantList.push({
-                                        'price': $('#price_' + sku).val() || price,
+                                        'price': $('[id="price_' + sku + '"]').val() || price,
                                         'sku': sku,
-                                        'quantity': parseInt($('#qty_' + sku).val()) || parseInt(item_quantity) || 0,
-                                        'image': $('#variant_' + sku + '_url').val() || null,
+                                        'quantity': parseInt($('[id="qty_' + sku + '"]').val()) || parseInt(item_quantity) || 0,
+                                        'image': $('[id="variant_' + sku + '_url"]').val() || null,
                                         'attribute_data': variantAttrData
                                     });
                                 });
@@ -1242,12 +1242,12 @@
                         html += '<tr>';
                         html += '<td><label for="" class="control-label">' + variant + '</label></td>';
                         html += '<td>';
-                        var check_variant_price = $('#price_' + variant).val() ? $('#price_' + variant).val() : 1;
+                        var check_variant_price = $('[id="price_' + variant + '"]').val() ? $('[id="price_' + variant + '"]').val() : 1;
                         html += '<input type="number" id="price_' + variant + '" value="' + check_variant_price +
                             '" min="0" class="form-control">';
                         html += '</td>';
                         html += '<td>';
-                        var check_variant_qty = $('#price_' + variant).val() ? $('#price_' + variant).val() : -1;
+                        var check_variant_qty = $('[id="qty_' + variant + '"]').val() ? $('[id="qty_' + variant + '"]').val() : -1;
                         html += '<input type="number" id="qty_' + variant + '" value="' + check_variant_qty +
                             '" min="-1" class="form-control">';
                         html += '</td>';
