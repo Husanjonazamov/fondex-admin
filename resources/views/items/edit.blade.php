@@ -45,7 +45,7 @@
                             <div class="form-group row width-50">
                                 <label class="col-3 control-label">{{ trans('lang.item_price') }}</label>
                                 <div class="col-7">
-                                    <input type="text" class="form-control item_price" required>
+                                    <input type="number" step="0.01" min="0" class="form-control item_price" required>
                                     <div class="form-text text-muted">
                                         {{ trans('lang.item_price_help') }}
                                     </div>
@@ -782,7 +782,7 @@
             $(".edit-form-btn").click(async function () {
 
                 var name = $(".item_name").val();
-                var price = $(".item_price").val();
+                var price = normalizePriceInput($(".item_price").val());
                 var item_quantity = $(".item_quantity").val();
                 var set_vendor_id = $("#item_vendor option:selected").val();
                 var category = $("#item_category option:selected").val();
@@ -790,10 +790,33 @@
                 var brand = $("#brand option:selected").val();
                 var description = $("#item_description").val();
                 var itemPublish = $(".item_publish").is(":checked");
-                var discount = $(".item_discount").val();
+                var discount = normalizePriceInput($(".item_discount").val() || '0');
 
                 if (name == '') {
                     $(".error_top").show().empty().append($("<p></p>").text(@json(trans('lang.enter_item_name_error'))));
+                    window.scrollTo(0, 0);
+                } else if (price == '') {
+                    $(".error_top").show().empty().append($("<p></p>").text(@json(trans('lang.enter_item_price_error'))));
+                    window.scrollTo(0, 0);
+                } else if (parseFloat(price) <= 0) {
+                    $(".error_top").show().empty().append($("<p></p>").text(@json(trans('lang.enter_positive_price_error'))));
+                    window.scrollTo(0, 0);
+                } else if (item_quantity == '' || parseInt(item_quantity) < -1) {
+                    $(".error_top").show().empty();
+                    if (item_quantity == '') {
+                        $(".error_top").append($("<p></p>").text(@json(trans('lang.enter_item_quantity_error'))));
+                    } else {
+                        $(".error_top").append($("<p></p>").text(@json(trans('lang.invalid_item_quantity_error'))));
+                    }
+                    window.scrollTo(0, 0);
+                } else if (set_vendor_id == '') {
+                    $(".error_top").show().empty().append($("<p></p>").text(@json(trans('lang.select_vendor_error'))));
+                    window.scrollTo(0, 0);
+                } else if (category == '') {
+                    $(".error_top").show().empty().append($("<p></p>").text(@json(trans('lang.select_item_category_error'))));
+                    window.scrollTo(0, 0);
+                } else if (discount !== '' && parseFloat(price) < parseFloat(discount)) {
+                    $(".error_top").show().empty().append($("<p></p>").text(@json(trans('lang.price_should_not_less_then_discount_error'))));
                     window.scrollTo(0, 0);
                 } else {
                     jQuery("#data-table_processing").show();
@@ -835,7 +858,7 @@
                             try {
                                 var variantSkus = JSON.parse($('#variants').val());
                                 variantSkus.forEach(function(sku) {
-                                    var variantPrice = $('[id="price_' + sku + '"]').val();
+                                    var variantPrice = normalizePriceInput($('[id="price_' + sku + '"]').val());
                                     var variantQty = $('[id="qty_' + sku + '"]').val();
                                     var variantImage = $('[id="variant_' + sku + '_url"]').val() || null;
                                     var variantAttrData = [];
@@ -1453,6 +1476,33 @@
                     return result;
                 }
             }
+        }
+
+        function normalizePriceInput(value) {
+            if (value === undefined || value === null) return '';
+            value = String(value).trim().replace(/\s+/g, '');
+            if (value === '') return '';
+
+            if (value.indexOf(',') > -1 && value.indexOf('.') > -1) {
+                value = value.replace(/,/g, '');
+            } else if (value.indexOf(',') > -1) {
+                var commaParts = value.split(',');
+                value = commaParts.length === 2 && commaParts[1].length <= 2
+                    ? commaParts[0] + '.' + commaParts[1]
+                    : value.replace(/,/g, '');
+            }
+
+            if (!/^\d+(\.\d+)?$/.test(value)) return '';
+
+            var parts = value.split('.');
+            var integerPart = parts[0].replace(/^0+(?=\d)/, '') || '0';
+            var decimalPart = parts[1] || '';
+
+            if (decimalPart.replace(/0+$/, '') === '') {
+                return integerPart;
+            }
+
+            return integerPart + '.' + decimalPart.substring(0, 2);
         }
 
         function uniqid(prefix = "", random = false) {
