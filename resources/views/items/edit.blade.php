@@ -858,9 +858,10 @@
                             try {
                                 var variantSkus = JSON.parse($('#variants').val());
                                 variantSkus.forEach(function(sku) {
-                                    var variantPrice = normalizePriceInput($('[id="price_' + sku + '"]').val());
-                                    var variantQty = $('[id="qty_' + sku + '"]').val();
-                                    var variantImage = $('[id="variant_' + sku + '_url"]').val() || null;
+                                    var skuKey = variantDomKey(sku);
+                                    var variantPrice = normalizePriceInput($('[id="price_' + skuKey + '"]').val());
+                                    var variantQty = $('[id="qty_' + skuKey + '"]').val();
+                                    var variantImage = $('[id="variant_' + skuKey + '_url"]').val() || null;
                                     var variantAttrData = [];
                                     var options = String(sku).split('-');
                                     attributes.forEach(function(attr, idx) {
@@ -1387,7 +1388,9 @@
                     if (attribute_options) {
                         var attribute_options = attribute_options.split(',');
                         attribute_options = $.map(attribute_options, function (value) {
-                            return value.trim();
+                            return String(value || '').trim();
+                        }).filter(function(value) {
+                            return value !== '';
                         });
                         attributeSet.push(attribute_options);
                         attributes.push({
@@ -1411,6 +1414,7 @@
                     html += '</thead>';
                     html += '<tbody>';
                     $.each(variants, function (index, variant) {
+                        var variantKey = variantDomKey(variant);
                         var variant_price = 1;
                         var variant_qty = 1;
                         var variant_image = variant_image_url = '';
@@ -1426,7 +1430,7 @@
                                 variant_price = variant_info[0].variant_price;
                                 variant_qty = variant_info[0].variant_quantity;
                                 if (variant_info[0].variant_image) {
-                                    variant_image = '<img class="rounded" style="width:50px" src="' + variant_info[0].variant_image + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'" alt="image"><i class="mdi mdi-delete" data-variant="' + variant + '"></i>';
+                                    variant_image = '<img class="rounded" style="width:50px" src="' + variant_info[0].variant_image + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'" alt="image"><i class="mdi mdi-delete" data-variant="' + variantKey + '"></i>';
                                     variant_image_url = variant_info[0].variant_image;
                                 }
                             }
@@ -1434,21 +1438,21 @@
                         html += '<tr>';
                         html += '<td><label for="" class="control-label">' + variant + '</label></td>';
                         html += '<td>';
-                        html += '<input type="number" id="price_' + variant + '" value="' + variant_price + '" min="0" class="form-control">';
+                        html += '<input type="text" inputmode="decimal" id="price_' + variantKey + '" value="' + variant_price + '" class="form-control">';
                         html += '</td>';
                         html += '<td>';
-                        html += '<input type="number" id="qty_' + variant + '" value="' + variant_qty + '" min="-1" class="form-control">';
+                        html += '<input type="number" id="qty_' + variantKey + '" value="' + variant_qty + '" min="-1" class="form-control">';
                         html += '</td>';
                         html += '<td>';
                         html += '<div class="variant-image">';
                         html += '<div class="upload">';
-                        html += '<div class="image" id="variant_' + variant + '_image">' + variant_image + '</div>';
-                        html += '<div class="icon"><i class="mdi mdi-cloud-upload" data-variant="' + variant + '"></i></div>';
+                        html += '<div class="image" id="variant_' + variantKey + '_image">' + variant_image + '</div>';
+                        html += '<div class="icon"><i class="mdi mdi-cloud-upload" data-variant="' + variantKey + '"></i></div>';
                         html += '</div>';
-                        html += '<div id="variant_' + variant + '_process"></div>';
+                        html += '<div id="variant_' + variantKey + '_process"></div>';
                         html += '<div class="input-file">';
-                        html += '<input type="file" id="file_' + variant + '" onChange="handleVariantFileSelect(event,\'' + variant + '\')" class="form-control" style="display:none;">';
-                        html += '<input type="hidden" id="variant_' + variant + '_url" value="' + variant_image_url + '">';
+                        html += '<input type="file" id="file_' + variantKey + '" onChange="handleVariantFileSelect(event,\'' + variantKey + '\')" class="form-control" style="display:none;">';
+                        html += '<input type="hidden" id="variant_' + variantKey + '_url" value="' + variant_image_url + '">';
                         html += '</div>';
                         html += '</div>';
                         html += '</td>';
@@ -1491,6 +1495,9 @@
                     ? commaParts[0] + '.' + commaParts[1]
                     : value.replace(/,/g, '');
             }
+            if (/^\d{1,3}([.,]\d{3})+$/.test(value)) {
+                value = value.replace(/[.,]/g, '');
+            }
 
             if (!/^\d+(\.\d+)?$/.test(value)) return '';
 
@@ -1503,6 +1510,10 @@
             }
 
             return integerPart + '.' + decimalPart.substring(0, 2);
+        }
+
+        function variantDomKey(value) {
+            return 'v_' + encodeURIComponent(String(value || '').trim()).replace(/[^a-zA-Z0-9]/g, '_');
         }
 
         function uniqid(prefix = "", random = false) {

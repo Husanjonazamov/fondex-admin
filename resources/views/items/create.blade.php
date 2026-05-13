@@ -824,6 +824,7 @@
                             try {
                                 var skus = JSON.parse($('#variants').val());
                                 skus.forEach(function(sku) {
+                                    var skuKey = variantDomKey(sku);
                                     var variantAttrData = [];
                                     var options = String(sku).split('-');
                                     attrList.forEach(function(attr, idx) {
@@ -834,10 +835,10 @@
                                         });
                                     });
                                     variantList.push({
-                                        'price': $('[id="price_' + sku + '"]').val() || price,
+                                        'price': normalizePriceInput($('[id="price_' + skuKey + '"]').val()) || price,
                                         'sku': sku,
-                                        'quantity': parseInt($('[id="qty_' + sku + '"]').val()) || parseInt(item_quantity) || 0,
-                                        'image': $('[id="variant_' + sku + '_url"]').val() || null,
+                                        'quantity': parseInt($('[id="qty_' + skuKey + '"]').val()) || parseInt(item_quantity) || 0,
+                                        'image': $('[id="variant_' + skuKey + '_url"]').val() || null,
                                         'attribute_data': variantAttrData
                                     });
                                 });
@@ -1215,7 +1216,9 @@
                     if (attribute_options) {
                         var attribute_options = attribute_options.split(',');
                         attribute_options = $.map(attribute_options, function (value) {
-                            return value.trim();
+                            return String(value || '').trim();
+                        }).filter(function(value) {
+                            return value !== '';
                         });
                         attributeSet.push(attribute_options);
                         attributes.push({
@@ -1239,31 +1242,32 @@
                     html += '</thead>';
                     html += '<tbody>';
                     $.each(variants, function (index, variant) {
+                        var variantKey = variantDomKey(variant);
                         html += '<tr>';
                         html += '<td><label for="" class="control-label">' + variant + '</label></td>';
                         html += '<td>';
-                        var check_variant_price = $('[id="price_' + variant + '"]').val() ? $('[id="price_' + variant + '"]').val() : 1;
-                        html += '<input type="number" id="price_' + variant + '" value="' + check_variant_price +
-                            '" min="0" class="form-control">';
+                        var check_variant_price = $('[id="price_' + variantKey + '"]').val() ? $('[id="price_' + variantKey + '"]').val() : 1;
+                        html += '<input type="text" inputmode="decimal" id="price_' + variantKey + '" value="' + check_variant_price +
+                            '" class="form-control">';
                         html += '</td>';
                         html += '<td>';
-                        var check_variant_qty = $('[id="qty_' + variant + '"]').val() ? $('[id="qty_' + variant + '"]').val() : -1;
-                        html += '<input type="number" id="qty_' + variant + '" value="' + check_variant_qty +
+                        var check_variant_qty = $('[id="qty_' + variantKey + '"]').val() ? $('[id="qty_' + variantKey + '"]').val() : -1;
+                        html += '<input type="number" id="qty_' + variantKey + '" value="' + check_variant_qty +
                             '" min="-1" class="form-control">';
                         html += '</td>';
                         html += '<td>';
                         html += '<div class="variant-image">';
                         html += '<div class="upload">';
-                        html += '<div class="image" id="variant_' + variant + '_image"></div>';
-                        html += '<div class="icon"><i class="mdi mdi-cloud-upload" data-variant="' + variant +
+                        html += '<div class="image" id="variant_' + variantKey + '_image"></div>';
+                        html += '<div class="icon"><i class="mdi mdi-cloud-upload" data-variant="' + variantKey +
                             '"></i></div>';
                         html += '</div>';
-                        html += '<div id="variant_' + variant + '_process"></div>';
+                        html += '<div id="variant_' + variantKey + '_process"></div>';
                         html += '<div class="input-file">';
-                        html += '<input type="file" id="file_' + variant +
-                            '" onChange="handleVariantFileSelect(event,\'' + variant +
+                        html += '<input type="file" id="file_' + variantKey +
+                            '" onChange="handleVariantFileSelect(event,\'' + variantKey +
                             '\')" class="form-control" style="display:none;">';
-                        html += '<input type="hidden" id="variant_' + variant + '_url" value="">';
+                        html += '<input type="hidden" id="variant_' + variantKey + '_url" value="">';
                         html += '</div>';
                         html += '</div>';
                         html += '</td>';
@@ -1291,6 +1295,40 @@
                 }
             }
         }
+        function normalizePriceInput(value) {
+            if (value === undefined || value === null) return '';
+            value = String(value).trim().replace(/\s+/g, '');
+            if (value === '') return '';
+
+            if (value.indexOf(',') > -1 && value.indexOf('.') > -1) {
+                value = value.replace(/,/g, '');
+            } else if (value.indexOf(',') > -1) {
+                var commaParts = value.split(',');
+                value = commaParts.length === 2 && commaParts[1].length <= 2
+                    ? commaParts[0] + '.' + commaParts[1]
+                    : value.replace(/,/g, '');
+            }
+            if (/^\d{1,3}([.,]\d{3})+$/.test(value)) {
+                value = value.replace(/[.,]/g, '');
+            }
+
+            if (!/^\d+(\.\d+)?$/.test(value)) return '';
+
+            var parts = value.split('.');
+            var integerPart = parts[0].replace(/^0+(?=\d)/, '') || '0';
+            var decimalPart = parts[1] || '';
+
+            if (decimalPart.replace(/0+$/, '') === '') {
+                return integerPart;
+            }
+
+            return integerPart + '.' + decimalPart.substring(0, 2);
+        }
+
+        function variantDomKey(value) {
+            return 'v_' + encodeURIComponent(String(value || '').trim()).replace(/[^a-zA-Z0-9]/g, '_');
+        }
+
         function uniqid(prefix = "", random = false) {
             const sec = Date.now() * 1000 + Math.random() * 1000;
             const id = sec.toString(16).replace(/\./g, "").padEnd(14, "0");
