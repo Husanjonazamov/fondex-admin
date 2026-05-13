@@ -677,7 +677,7 @@
             $(".save-form-btn").click(async function () {
 
                 var name = $(".item_name").val();
-                var price = $(".item_price").val();
+                var price = normalizePriceInput($(".item_price").val());
                 var item_quantity = $(".item_quantity").val();
                 var set_vendor_id = vendor_id ? vendor_id : $("#item_vendor option:selected").val();
                 var category = $("#item_category").val();
@@ -696,7 +696,7 @@
                 var nonveg = $(".item_nonveg").is(":checked");
                 var veg = !nonveg;
                 var itemTakeaway = $(".item_take_away_option").is(":checked");
-                var discount = $(".item_discount").val();
+                var discount = normalizePriceInput($(".item_discount").val() || '0');
                 var is_digital_product = $("#is_digital_product").is(":checked");
 
                 if (discount == '') {
@@ -730,7 +730,7 @@
                     $(".error_top").html("");
                     $(".error_top").append($("<p></p>").text(@json(trans('lang.enter_item_price_error'))));
                     window.scrollTo(0, 0);
-                } else if (price <= 0) {
+                } else if (parseFloat(price) <= 0) {
                     $(".error_top").show();
                     $(".error_top").html("");
                     $(".error_top").append($("<p></p>").text(@json(trans('lang.enter_positive_price_error'))));
@@ -759,7 +759,7 @@
                     $(".error_top").html("");
                     $(".error_top").append($("<p></p>").text(@json(trans('lang.select_brand_error'))));
                     window.scrollTo(0, 0);
-                } else if (parseInt(price) < parseInt(discount)) {
+                } else if (parseFloat(price) < parseFloat(discount)) {
                     $(".error_top").show();
                     $(".error_top").html("");
                     $(".error_top").append($("<p></p>").text(@json(trans('lang.price_should_not_less_then_discount_error'))));
