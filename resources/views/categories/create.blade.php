@@ -190,6 +190,30 @@
                         const result = await syncToDjango('categories/', 'POST', formData);
 
                         if (result && result.status) {
+                            // Also save to Firebase so mobile apps see the new category
+                            try {
+                                var firestorePhoto = (result.data && result.data.photo) ? result.data.photo : '';
+                                if (!firestorePhoto && photo) {
+                                    if (/^data:image\//i.test(photo)) {
+                                        firestorePhoto = await uploadCategoryImageToFirebase(photo);
+                                    } else {
+                                        firestorePhoto = photo;
+                                    }
+                                }
+                                await database.collection('vendor_categories').doc(id_category).set({
+                                    'id': id_category,
+                                    'title': title,
+                                    'description': description,
+                                    'photo': firestorePhoto,
+                                    'order': parseInt(category_length),
+                                    'section_id': section_id,
+                                    'review_attributes': review_attributes,
+                                    'publish': itemPublish,
+                                    'show_in_homepage': show_in_homepage
+                                });
+                            } catch (fsError) {
+                                console.error('Firestore sync error:', fsError);
+                            }
                             window.location.href = '{{ route("categories")}}';
                         } else {
                             throw new Error(result ? result.message : 'Unknown error');
@@ -247,6 +271,11 @@
                 $("#category_image").val('');
             }
         });
+        async function uploadCategoryImageToFirebase(base64str) {
+            var name = fileName || ('category_' + id_category + '_' + Number(new Date()) + '.jpg');
+            var snapshot = await storageRef.child(name).putString(base64str, 'data_url');
+            return await snapshot.ref.getDownloadURL();
+        }
         function base64ToBlob(base64) {
             var match = /^data:(image\/[a-z]+);base64,(.+)$/i.exec(base64);
             var mime = match ? match[1] : 'image/jpeg';

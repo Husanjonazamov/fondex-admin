@@ -72,7 +72,7 @@
 
       var id = "<?php echo $id; ?>";
       var database = firebase.firestore();
-      var ref = database.collection('rides').where("id", "==", id);
+      var ref = database.collection('cab_booking_orders').where("id", "==", id);
       var photo = "";
       var vendorOwnerId = "";
       var vendorOwnerOnline = false;

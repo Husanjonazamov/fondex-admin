@@ -39,7 +39,7 @@ async function scheduleRide() {
     console.log('orderAcceptRejectDuration',orderAcceptRejectDuration);
     console.log('currentTimestamp',admin.firestore.Timestamp.now());
     
-	const querySnapshot = await firestore.collection('rides').where('scheduleDateTime', '<=', admin.firestore.Timestamp.now()).get();
+	const querySnapshot = await firestore.collection('cab_booking_orders').where('scheduleDateTime', '<=', admin.firestore.Timestamp.now()).get();
     
     if(querySnapshot.size > 0) {
 
@@ -179,17 +179,17 @@ async function scheduleRide() {
                                             }
 
                                             // We update the order status
-                                            firestore.collection('rides').doc(orderData.id).update({
+                                            firestore.collection('cab_booking_orders').doc(orderData.id).update({
                                                 status: "Driver Pending"
                                             }).then(async function (result) {
                                                 // After update the order status get new updated status
-                                                 firestore.collection("rides").doc(orderData.id).get().then((querySnapshot) => {	
+                                                 firestore.collection("cab_booking_orders").doc(orderData.id).get().then((querySnapshot) => {	
                                                     var newOrderData = querySnapshot.data();
                                                     // Check if driver is accepting the order within defined time or not
                                                     if(orderAcceptRejectDuration > 0 && newOrderData.status === "Driver Pending"){
                                                         setTimeout(function(){ 
                                                             // Re-check order status after time limit exceed before find out other driver
-                                                            firestore.collection("rides").doc(orderData.id).get().then((querySnapshot) => {
+                                                            firestore.collection("cab_booking_orders").doc(orderData.id).get().then((querySnapshot) => {
                                                                 var newOrderData2 = querySnapshot.data();
                                                                 // If order status is driver pending then and only we will find new driver and current driver will add to rejected list
                                                                 if(newOrderData2.status === "Driver Pending"){
@@ -198,7 +198,7 @@ async function scheduleRide() {
                                                                     });
                                                                     // Current driver is adding to rejected list so they will not receive order again and update status to find new driver
                                                                     rejectedByDrivers.push(driver.id);
-                                                                    firestore.collection('rides').doc(orderData.id).update({
+                                                                    firestore.collection('cab_booking_orders').doc(orderData.id).update({
                                                                         'status': 'Order Accepted',
                                                                         'rejectedByDrivers': rejectedByDrivers
                                                                     })

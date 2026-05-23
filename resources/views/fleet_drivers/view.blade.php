@@ -313,7 +313,7 @@
                             var url = "{{route('drivers.rides','driverId')}}";
                             url = url.replace('driverId', dirver.id);
                             $('.service_type_orders').html('<a href="' + url + '"><i class="ri-shopping-bag-line"></i> {{trans('lang.order_plural')}}</a>');
-                            await database.collection('rides').where('driverID', '==', dirver.id).get().then(async function (orderSnapshots) {
+                            await database.collection('cab_booking_orders').where('driverID', '==', dirver.id).get().then(async function (orderSnapshots) {
                                     count_order_complete = orderSnapshots.docs.length;
                                     $('.total_orders').html(count_order_complete);
                             });

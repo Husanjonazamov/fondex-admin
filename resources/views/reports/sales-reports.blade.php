@@ -1003,7 +1003,7 @@
 
 
                 if (serviceType == 'cab-service') {
-                    ordersRef = database.collection('rides').where('status', 'in', ["Order Completed"]).orderBy('createdAt', 'desc');
+                    ordersRef = database.collection('cab_booking_orders').where('status', 'in', ["Order Completed"]).orderBy('createdAt', 'desc');
                     headerArray = ['Order ID', 'From', 'To', 'Driver Name', 'Driver Email', 'Driver Phone', 'Vehicle Name', 'Vehicle Make', 'Vehicle Number', 'User Name', 'User Email', 'User Phone', 'Date', 'Payment Method', 'Total', 'Admin Commission'];
                     if (driver == "") {
                         ordersRef = ordersRef.where('driver.serviceType', '==', serviceType)

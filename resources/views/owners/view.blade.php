@@ -315,7 +315,7 @@
 
                             if (driverdata.serviceType == "cab-service") {
 
-                                const ordersSnapshot = await database.collection('rides').where('driverId', '==', driverdata.id).get();
+                                const ordersSnapshot = await database.collection('cab_booking_orders').where('driverId', '==', driverdata.id).get();
                                 totalOrders += ordersSnapshot.docs.length;
 
                             } else if (driverdata.serviceType == "rental-service") {

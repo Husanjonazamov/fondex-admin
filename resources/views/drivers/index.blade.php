@@ -501,7 +501,7 @@ async function getDocumentStatusIcon(driverId) {
 
                 if (type == "cab-service") {
 
-                    await database.collection('rides').where('driverId', '==', driver).get().then(async function(orderSnapshots) {
+                    await database.collection('cab_booking_orders').where('driverId', '==', driver).get().then(async function(orderSnapshots) {
                         count_order_complete = orderSnapshots.docs.length;
 
                     });

@@ -450,7 +450,7 @@
             const append_listrecent_order = document.getElementById('append_list_recent_rides');
             append_listrecent_order.innerHTML = '';
 
-            ref = db.collection('rides').where('sectionId', '==', active_id).where('status', 'in', ["Order Placed", "Order Accepted", "Driver Pending", "Driver Accepted", "Order Shipped", "In Transit"]);
+            ref = db.collection('cab_booking_orders').where('sectionId', '==', active_id).where('status', 'in', ["Order Placed", "Order Accepted", "Driver Pending", "Driver Accepted", "Order Shipped", "In Transit"]);
 
           
             ref = ref.orderBy('createdAt', 'desc');
@@ -549,7 +549,7 @@
             }
 
             // 🔹 Current period query
-            let ridesQuery = db.collection('rides').where('sectionId', '==', active_id).where('status', '==', "Order Completed");
+            let ridesQuery = db.collection('cab_booking_orders').where('sectionId', '==', active_id).where('status', '==', "Order Completed");
             if (startTS && endTS) {
                 ridesQuery = ridesQuery.where('createdAt', '>=', startTS).where('createdAt', '<=', endTS);
             }
@@ -591,7 +591,7 @@
 
             // 🔹 Previous period query
             if (lastStartTS && lastEndTS) {
-                let lastQuery = db.collection('rides').where('sectionId', '==', active_id).where('status', '==', "Order Completed")
+                let lastQuery = db.collection('cab_booking_orders').where('sectionId', '==', active_id).where('status', '==', "Order Completed")
                     .where('createdAt', '>=', lastStartTS)
                     .where('createdAt', '<=', lastEndTS);
 
@@ -738,7 +738,7 @@
             };
 
             const promises = Object.entries(statuses).map(([key, statusArray]) => {
-                let query = db.collection('rides').where('sectionId', '==', active_id)
+                let query = db.collection('cab_booking_orders').where('sectionId', '==', active_id)
                     .where('status', 'in', statusArray);
                 if (startTS && endTS) {
                     query = query.where('createdAt', '>=', startTS)
@@ -898,7 +898,7 @@
             return html;
         }
         async function getCustomerRideCount(customerId) {
-            const ridesSnapshot = await db.collection('rides')
+            const ridesSnapshot = await db.collection('cab_booking_orders')
                 .where('authorID', '==', customerId)
                 .get();
             return ridesSnapshot.size;
@@ -906,7 +906,7 @@
 
         async function getDriverRideCount(driverId) {
             // Count all rides where driverId == this driver's id
-            const ridesSnapshot = await db.collection('rides')
+            const ridesSnapshot = await db.collection('cab_booking_orders')
                 .where('driverId', '==', driverId)
                 .get();
             return ridesSnapshot.size;
@@ -1152,17 +1152,17 @@
             // 🔹 Fetch current & last data together
             Promise.all([
                 // All-time data
-                db.collection('rides').where('sectionId', '==', active_id).orderBy('createdAt','desc').get(),
+                db.collection('cab_booking_orders').where('sectionId', '==', active_id).orderBy('createdAt','desc').get(),
                 db.collection('users').where("role", "==", "customer").orderBy("createdAt").get(),
                 db.collection('users').where("role", "==", "driver").where('sectionId', '==', active_id).where('isOwner','==',false).orderBy("createdAt").get(),
 
                 // Current period
-                db.collection('rides').where('sectionId', '==', active_id).where('createdAt', '>=', startThisTS).where('createdAt', '<=', endThisTS).get(),
+                db.collection('cab_booking_orders').where('sectionId', '==', active_id).where('createdAt', '>=', startThisTS).where('createdAt', '<=', endThisTS).get(),
                 db.collection('users').where("role", "==", "customer").where('createdAt', '>=', startThisTS).where('createdAt', '<=', endThisTS).orderBy("createdAt").get(),
                 db.collection('users').where("role", "==", "driver").where('sectionId', '==', active_id).where('isOwner','==',false).where('createdAt', '>=', startThisTS).where('createdAt', '<=', endThisTS).orderBy("createdAt").get(),
 
                 // Last period (if applicable)
-                startLastTS ? db.collection('rides').where('sectionId', '==', active_id).where('createdAt', '>=', startLastTS).where('createdAt', '<=', endLastTS).get() : Promise.resolve({ docs: [] }),
+                startLastTS ? db.collection('cab_booking_orders').where('sectionId', '==', active_id).where('createdAt', '>=', startLastTS).where('createdAt', '<=', endLastTS).get() : Promise.resolve({ docs: [] }),
                 startLastTS ? db.collection('users').where("role", "==", "customer").where('createdAt', '>=', startLastTS).where('createdAt', '<=', endLastTS).orderBy("createdAt").get() : Promise.resolve({ docs: [] }),
                 startLastTS ? db.collection('users').where("role", "==", "driver").where('sectionId', '==', active_id).where('isOwner','==',false).where('createdAt', '>=', startLastTS).where('createdAt', '<=', endLastTS).orderBy("createdAt").get() : Promise.resolve({ docs: [] }),
             ])

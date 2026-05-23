@@ -163,7 +163,7 @@
 
                 try {
                     // Fetch the ride (order) to get its sectionId
-                    var rideSnap = await database.collection('rides').doc(val.orderId).get();
+                    var rideSnap = await database.collection('cab_booking_orders').doc(val.orderId).get();
 
                     if (rideSnap.exists) {
                         var rideData = rideSnap.data();

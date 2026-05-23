@@ -247,7 +247,7 @@
 
             var orders_drivers = [];
 
-            database.collection('rides').where('sectionId','==', section_id).where('status', '==', 'In Transit').get().then(async function (snapshots) {
+            database.collection('cab_booking_orders').where('sectionId','==', section_id).where('status', '==', 'In Transit').get().then(async function (snapshots) {
 
                 if (snapshots.docs.length > 0) {
 

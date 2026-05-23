@@ -82,7 +82,7 @@
     var user_number = [];
     var ref = database.collection('SOS');
     var placeholderImage = '';
-    var rideRef = database.collection('rides');
+    var rideRef = database.collection('cab_booking_orders');
 
     $(document).ready(function () {
 
@@ -302,7 +302,7 @@
 
      async function rideDetails(ride) {
 
-        var rideDetails = await database.collection('rides').doc(ride).get();
+        var rideDetails = await database.collection('cab_booking_orders').doc(ride).get();
         if (rideDetails.data()) {
             return rideDetails.data();
         } else {

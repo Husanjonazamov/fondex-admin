@@ -410,19 +410,43 @@
             
             jQuery("#data-table_processing").show();
             const result = await syncToDjango(`categories/${id}/`, 'PATCH', { 'is_publish': ischeck });
+
+            if (result && result.status) {
+                // Also update Firebase so mobile apps stay in sync
+                try {
+                    const snap = await database.collection('vendor_categories').where('id', '==', id).get();
+                    if (!snap.empty) {
+                        await snap.docs[0].ref.update({ 'publish': ischeck });
+                    }
+                } catch (fsError) {
+                    console.error('Firestore sync error:', fsError);
+                }
+            }
             jQuery("#data-table_processing").hide();
-            
+
             if (!result || !result.status) {
                 $(this).prop('checked', !ischeck);
                 alert(result ? result.message : 'Error updating status');
             }
         });
 
+        async function deleteCategoryFromFirebase(id) {
+            try {
+                const snap = await database.collection('vendor_categories').where('id', '==', id).get();
+                await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+            } catch (fsError) {
+                console.error('Firestore delete error:', fsError);
+            }
+        }
+
         $(document).on("click", "a[name='category-delete']", async function (e) {
             var id = this.id;
             if (confirm("{{trans('lang.delete_alert')}}")) {
                 jQuery("#data-table_processing").show();
                 const result = await syncToDjango(`categories/${id}/`, 'DELETE');
+                if (result && result.status) {
+                    await deleteCategoryFromFirebase(id);
+                }
                 jQuery("#data-table_processing").hide();
                 if (result && result.status) {
                     window.location.reload();
@@ -439,7 +463,11 @@
                     var promises = [];
                     $('#categoryTable .is_open:checked').each(function () {
                         var dataId = $(this).attr('dataId');
-                        promises.push(syncToDjango(`categories/${dataId}/`, 'DELETE'));
+                        promises.push(syncToDjango(`categories/${dataId}/`, 'DELETE').then(function (result) {
+                            if (result && result.status) {
+                                return deleteCategoryFromFirebase(dataId);
+                            }
+                        }));
                     });
                     
                     Promise.all(promises).then(() => {

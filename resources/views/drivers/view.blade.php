@@ -324,7 +324,7 @@
                         url = url.replace('driverId', dirver.id);
                         $('.service_type_orders').html('<a href="' + url + '"><i class="ri-shopping-bag-line"></i> {{trans('lang.order_plural')}}</a>');
 
-                        const ordersSnapshot = await database.collection('rides').where('driverId', '==', dirver.id).get();
+                        const ordersSnapshot = await database.collection('cab_booking_orders').where('driverId', '==', dirver.id).get();
                         totalOrders += ordersSnapshot.docs.length;
 
                     } else if (dirver.serviceType == "rental-service") {

@@ -541,7 +541,7 @@ $(document).ready(function(){
 
    if (ride.orderId) {
 
-     var driver = database.collection('rides').where("id","==",ride.orderId);
+     var driver = database.collection('cab_booking_orders').where("id","==",ride.orderId);
 
      driver.get().then( async function(snapshotsnew){
 

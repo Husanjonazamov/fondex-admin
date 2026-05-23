@@ -212,6 +212,32 @@
                         const result = await syncToDjango(`categories/${id}/`, 'PATCH', formData);
 
                         if (result && result.status) {
+                            // Also update Firebase so mobile apps stay in sync
+                            try {
+                                var firestorePhoto = photo || '';
+                                if (/^data:image\//i.test(firestorePhoto)) {
+                                    firestorePhoto = (result.data && result.data.photo) ? result.data.photo : await uploadCategoryImageToFirebase(firestorePhoto);
+                                }
+                                var payload = {
+                                    'id': id,
+                                    'title': title,
+                                    'description': description,
+                                    'photo': firestorePhoto,
+                                    'review_attributes': review_attributes,
+                                    'publish': itemPublish,
+                                    'show_in_homepage': show_in_homepage
+                                };
+                                var snap = await database.collection('vendor_categories').where('id', '==', id).get();
+                                if (!snap.empty) {
+                                    await snap.docs[0].ref.update(payload);
+                                } else {
+                                    payload.section_id = section_id;
+                                    payload.order = parseInt(order) || 0;
+                                    await database.collection('vendor_categories').doc(id).set(payload);
+                                }
+                            } catch (fsError) {
+                                console.error('Firestore sync error:', fsError);
+                            }
                             window.location.href = '{{ route("categories")}}';
                         } else {
                             throw new Error(result ? result.message : 'Unknown error');
@@ -269,6 +295,11 @@
                 $("#category_image").val('');
             }
         });
+        async function uploadCategoryImageToFirebase(base64str) {
+            var name = fileName || ('category_' + id + '_' + Number(new Date()) + '.jpg');
+            var snapshot = await storageRef.child(name).putString(base64str, 'data_url');
+            return await snapshot.ref.getDownloadURL();
+        }
         function base64ToBlob(base64) {
             var match = /^data:(image\/[a-z]+);base64,(.+)$/i.exec(base64);
             var mime = match ? match[1] : 'image/jpeg';

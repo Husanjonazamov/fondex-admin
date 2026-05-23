@@ -228,12 +228,12 @@
         getDriverInfo(id);
         var wallet_route = "{{route('users.walletstransaction','id')}}";
         $(".wallet_transaction").attr("href", wallet_route.replace('id', 'driverID='+id));
-        var ref = database.collection('rides').where('driverId', '==', id).orderBy('createdAt', 'desc');
+        var ref = database.collection('cab_booking_orders').where('driverId', '==', id).orderBy('createdAt', 'desc');
     } else if (sosId != '') {
-        var ref = database.collection('rides').where('id', '==', sosId).orderBy('createdAt', 'desc');
+        var ref = database.collection('cab_booking_orders').where('id', '==', sosId).orderBy('createdAt', 'desc');
     } else {
         console.log('inside else');
-        var ref = database.collection('rides').orderBy('createdAt', 'desc');
+        var ref = database.collection('cab_booking_orders').orderBy('createdAt', 'desc');
     }
 
     if(section_id){
@@ -318,22 +318,22 @@
     $(document).ready(function () {
 
 
-        database.collection('rides').where('sectionId', '==', section_id).orderBy('createdAt','desc').get().then((snapshot) => {
+        database.collection('cab_booking_orders').where('sectionId', '==', section_id).orderBy('createdAt','desc').get().then((snapshot) => {
             jQuery("#order_count").empty();
             jQuery("#order_count").text(snapshot.docs.length);
         });
 
-        database.collection('rides').where('sectionId', '==', section_id).where('status', 'in', ["Order Placed"]).get().then((snapshot) => {
+        database.collection('cab_booking_orders').where('sectionId', '==', section_id).where('status', 'in', ["Order Placed"]).get().then((snapshot) => {
             jQuery("#placed_count").empty();
             jQuery("#placed_count").text(snapshot.docs.length);
         });
 
-        database.collection('rides').where('sectionId', '==', section_id).where('status', 'in', ["Order Accepted"]).get().then((snapshot) => {
+        database.collection('cab_booking_orders').where('sectionId', '==', section_id).where('status', 'in', ["Order Accepted"]).get().then((snapshot) => {
             jQuery("#accepted_count").empty();
             jQuery("#accepted_count").text(snapshot.docs.length);
         });
 
-        database.collection('rides').where('sectionId', '==', section_id).where('status', 'in', ["Order Completed"]).get().then((snapshot) => {
+        database.collection('cab_booking_orders').where('sectionId', '==', section_id).where('status', 'in', ["Order Completed"]).get().then((snapshot) => {
             jQuery("#order_completed").empty();
             jQuery("#order_completed").text(snapshot.docs.length);
         });
@@ -628,7 +628,7 @@ initComplete: function() {
         alldriver.get().then(async function (snapshotsdriver) {
 
             snapshotsdriver.docs.forEach((listval) => {
-                database.collection('rides').where('driverId', '==', listval.id).where("status", "in", ["Order Completed"]).get().then(async function (orderSnapshots) {
+                database.collection('cab_booking_orders').where('driverId', '==', listval.id).where("status", "in", ["Order Completed"]).get().then(async function (orderSnapshots) {
                     var count_order_complete = orderSnapshots.docs.length;
                     database.collection('users').doc(listval.id).update({'orderCompleted': count_order_complete}).then(function (result) {
 
@@ -657,13 +657,13 @@ initComplete: function() {
                 'for="is_open_' + id + '" ></label></td>');
         <?php }?>
         html.push('<td><a href="'+route1+'" class="redirecttopage" data-toggle="tooltip" data-bs-original-title="' + val.id + '">' + (val.id.length > 8 ? val.id.substring(0, 8) + '...' : val.id) + '</a></td>');
-        html.push('<td><a href="'+customer_view+'" class="redirecttopage">' + val.userName + '</a></td>');
+        html.push('<td><a href="'+customer_view+'" class="redirecttopage">' + (val.userName || '') + '</a></td>');
         if ('<?php echo $id; ?>' == "") {
             if (val.hasOwnProperty("driver")) {
                 var driverId = val.driver.id;
                 var diverRoute = '{{route("drivers.view",":id")}}';
                 diverRoute = diverRoute.replace(':id', driverId);
-                html.push('<td><a href="'+diverRoute+'" class="redirecttopage">'+ val.driverName + '</a></td>');
+                html.push('<td><a href="'+diverRoute+'" class="redirecttopage">'+ (val.driverName || '') + '</a></td>');
             } else {
                 html.push('<td></td>');
             }
@@ -673,7 +673,8 @@ initComplete: function() {
         } else {
             html.push('<td></td>');
         }
-        html.push('<td ><a href="' + route1 + '" data-toggle="tooltip" data-bs-original-title="' + val.destinationLocationName + '">' + (val.destinationLocationName.length > 8 ? val.destinationLocationName.substring(0, 8) + '...' : val.destinationLocationName) + '</a></td>');
+        var destName = val.destinationLocationName || '';
+        html.push('<td ><a href="' + route1 + '" data-toggle="tooltip" data-bs-original-title="' + destName + '">' + (destName.length > 8 ? destName.substring(0, 8) + '...' : destName) + '</a></td>');
 
         html.push('<td>' + val.total_price + '</td>');
         var date = '';
@@ -694,8 +695,10 @@ initComplete: function() {
             html.push('<td><span class="badge badge-success">Order Completed</span></td>');
         } else if (val.status == 'Order Rejected') {
             html.push('<td><span class="badge badge-danger">Order Rejected</span></td>');
+        } else if (val.status == 'Order Cancelled') {
+            html.push('<td><span class="badge badge-danger">Order Cancelled</span></td>');
         } else {
-            html.push('<td><span class="badge badge-danger">Pending</span></td>');
+            html.push('<td><span class="badge badge-warning">' + (val.status || 'Pending') + '</span></td>');
         }
         var action = '';
         action = action + '<span class="action-btn"><a href="' + route1 + '" data-toggle="tooltip" data-bs-original-title="{{ trans('lang.edit') }}"><i class="mdi mdi-lead-pencil"></i></a>';
@@ -729,7 +732,7 @@ initComplete: function() {
 
     $(document).on("click", "a[name='driver-delete']", function (e) {
         var id = this.id;
-        database.collection('rides').doc(id).delete().then(function () {
+        database.collection('cab_booking_orders').doc(id).delete().then(function () {
             window.location.reload();
         });
 
@@ -748,7 +751,7 @@ initComplete: function() {
                 jQuery("#data-table_processing").show();
                 $('#example24 .is_open:checked').each(function () {
                     var dataId = $(this).attr('dataId');
-                    database.collection('rides').doc(dataId).delete().then(function () {
+                    database.collection('cab_booking_orders').doc(dataId).delete().then(function () {
                         setTimeout(function () {
                             window.location.reload();
                         }, 5000);

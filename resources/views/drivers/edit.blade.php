@@ -752,7 +752,7 @@
             if (type == "cab-service") {
                 url = "{{route('drivers.rides', 'driverId')}}";
                 url = url.replace('driverId', id);
-                await database.collection('rides').where('driverID', '==', id).get().then(async function (orderSnapshots) {
+                await database.collection('cab_booking_orders').where('driverId', '==', id).get().then(async function (orderSnapshots) {
                     count_order_complete = orderSnapshots.docs.length;
                 });
                 order_text = "{{trans('lang.rides')}}";

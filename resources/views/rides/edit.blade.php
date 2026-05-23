@@ -306,7 +306,7 @@
     var tip_amount = 0;
     var vendorname = '';
     var database = firebase.firestore();
-    var ref = database.collection('rides').where("id", "==", id);
+    var ref = database.collection('cab_booking_orders').where("id", "==", id);
     var append_procucts_list = '';
     var append_procucts_total = '';
     var total_price = 0;
@@ -704,7 +704,7 @@ $("#billing_line2").text(localityText);
             ref.get().then(async function (snapshotsride) {
 
                 snapshotsride.docs.forEach((listval) => {
-                    database.collection('rides').where('id', '==', listval.id).where("status", "in", ["Order Completed"]).get().then(async function (orderSnapshots) {
+                    database.collection('cab_booking_orders').where('id', '==', listval.id).where("status", "in", ["Order Completed"]).get().then(async function (orderSnapshots) {
                         var count_order_complete = orderSnapshots.docs.length;
                     });
 
@@ -720,7 +720,7 @@ $("#billing_line2").text(localityText);
             var clientName = $(".client_name").val();
             var orderStatus = $("#order_status").val();
             if (old_order_status != orderStatus) {
-                database.collection('rides').doc(id).update({'status': orderStatus}).then(async function (result) {
+                database.collection('cab_booking_orders').doc(id).update({'status': orderStatus}).then(async function (result) {
 
                     if (orderStatus == "Order Completed") {
                         manname = customername;
@@ -761,7 +761,7 @@ $("#billing_line2").text(localityText);
                                 })
                             }
 
-                            await database.collection('rides').doc(id).update({'payment_shared': true}).then(async function (result) {
+                            await database.collection('cab_booking_orders').doc(id).update({'payment_shared': true}).then(async function (result) {
                             });
                         }
 

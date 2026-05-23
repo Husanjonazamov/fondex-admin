@@ -181,8 +181,8 @@
 
                     if (ownedDriverIds.length > 0) {
                         if (ownedDriverIds.length <= 10) {
-                           rideRef = database.collection('rides')
-                                .where('driverID', 'in', ownedDriverIds)
+                           rideRef = database.collection('cab_booking_orders')
+                                .where('driverId', 'in', ownedDriverIds)
                                 .orderBy('createdAt', 'desc');
                         } else {
                             const rideDocs = [];
@@ -190,8 +190,8 @@
 
                             for (let i = 0; i < ownedDriverIds.length; i += chunkSize) {
                                 const chunk = ownedDriverIds.slice(i, i + chunkSize);
-                                const chunkSnap = await database.collection('rides')
-                                    .where('driverID', 'in', chunk)
+                                const chunkSnap = await database.collection('cab_booking_orders')
+                                    .where('driverId', 'in', chunk)
                                     .orderBy('createdAt', 'desc')
                                     .get();
                                 rideDocs.push(...chunkSnap.docs);
@@ -199,20 +199,20 @@
                             rideRef = { get: async () => ({ docs: rideDocs }) };
                         }
                     } else {
-                        rideRef = database.collection('rides')
-                            .where('driverID', '==', id)
+                        rideRef = database.collection('cab_booking_orders')
+                            .where('driverId', '==', id)
                             .orderBy('createdAt', 'desc');
                     }
                 } catch (error) {
                     console.error("Error fetching owned drivers:", error);
                     // fallback query
-                    rideRef = database.collection('rides')
-                        .where('driverID', '==', id)
+                    rideRef = database.collection('cab_booking_orders')
+                        .where('driverId', '==', id)
                         .orderBy('createdAt', 'desc');
                 }
             } else {
                 // Admin view – show all rides
-                rideRef = database.collection('rides').orderBy('createdAt', 'desc');
+                rideRef = database.collection('cab_booking_orders').orderBy('createdAt', 'desc');
             }
 
             // Continue initializing your table after ref is ready
@@ -342,7 +342,7 @@
         alldriver.get().then(async function (snapshotsdriver) {
 
             snapshotsdriver.docs.forEach((listval) => {
-                database.collection('rides').where('driverID', '==', listval.id).where("status", "in", ["Order Completed"]).get().then(async function (orderSnapshots) {
+                database.collection('cab_booking_orders').where('driverId', '==', listval.id).where("status", "in", ["Order Completed"]).get().then(async function (orderSnapshots) {
                     var count_order_complete = orderSnapshots.docs.length;
                     database.collection('users').doc(listval.id).update({'orderCompleted': count_order_complete}).then(function (result) {
 
@@ -443,7 +443,7 @@
 
     $(document).on("click", "a[name='driver-delete']", function (e) {
         var id = this.id;
-        database.collection('rides').doc(id).delete().then(function () {
+        database.collection('cab_booking_orders').doc(id).delete().then(function () {
             window.location.reload();
         });
 
@@ -462,7 +462,7 @@
                 jQuery("#data-table_processing").show();
                 $('#example24 .is_open:checked').each(function () {
                     var dataId = $(this).attr('dataId');
-                    database.collection('rides').doc(dataId).delete().then(function () {
+                    database.collection('cab_booking_orders').doc(dataId).delete().then(function () {
                         setTimeout(function () {
                             window.location.reload();
                         }, 5000);
