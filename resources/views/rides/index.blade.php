@@ -447,10 +447,30 @@
                             total_price = currentCurrency + "" + parseFloat(total_price).toFixed(2);
                         }
                         childData.total_price = total_price ? total_price : 0.00;
-                        var userName = childData.author ? childData.author.firstName : '';
-                        childData.userName = userName ? userName : '';
-                        var driverName = childData.driver ? childData.driver.firstName : '';
-                        childData.driverName = driverName ? driverName : '';
+                        var userName = childData.author ? (childData.author.firstName || '') : '';
+                        if (!userName && childData.author && childData.author.id) {
+                            try {
+                                var userSnap = await database.collection('users').doc(childData.author.id).get();
+                                if (userSnap.exists) {
+                                    var userData = userSnap.data();
+                                    userName = (userData.firstName || '') + ' ' + (userData.lastName || '');
+                                    userName = userName.trim();
+                                }
+                            } catch(e) {}
+                        }
+                        childData.userName = userName;
+                        var driverName = childData.driver ? (childData.driver.firstName || '') : '';
+                        if (!driverName && childData.driver && childData.driver.id) {
+                            try {
+                                var driverSnap = await database.collection('users').doc(childData.driver.id).get();
+                                if (driverSnap.exists) {
+                                    var driverData = driverSnap.data();
+                                    driverName = (driverData.firstName || '') + ' ' + (driverData.lastName || '');
+                                    driverName = driverName.trim();
+                                }
+                            } catch(e) {}
+                        }
+                        childData.driverName = driverName;
                         if (searchValue) {
                             var date = '';
                             var time = '';
@@ -626,7 +646,7 @@ initComplete: function() {
 
         newdate = '';
         var id = val.id;
-        var user_id = val.author.id;
+        var user_id = (val.author && val.author.id) ? val.author.id : '';
         var route1 = '{{route("rides.edit",":id")}}';
         route1 = route1.replace(':id', id);
         var customer_view = '{{route("users.view",":id")}}';

@@ -965,7 +965,7 @@
                 var route = '<?php echo route("rides.edit", ":id"); ?>';
                 route = route.replace(':id', val.id);
 
-                var user_id = val.author.id;
+                var user_id = (val.author && val.author.id) ? val.author.id : '';
                 var customer_view = '{{route("users.edit", ":id")}}';
                 customer_view = customer_view.replace(':id', user_id);
                 var user_view = '{{route("users.view", ":id")}}';
@@ -981,7 +981,7 @@
                     html = html + '<td></td>';
                 }
 
-                if (val.hasOwnProperty("author")) {
+                if (val.hasOwnProperty("author") && val.author && val.author.firstName) {
                     html = html + '<td data-url="' + user_view + '" class="redirecttopage">' + val.author.firstName + '</td>';
                 } else {
                     html = html + '<td></td>';
