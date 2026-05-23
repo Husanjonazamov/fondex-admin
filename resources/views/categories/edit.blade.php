@@ -195,19 +195,21 @@
                 } else {
                     jQuery("#data-table_processing").show();
                     try {
-                        let imageUrl = photo;
-                        if (photo && photo !== catImageFile) {
-                            imageUrl = await storeImageData();
+                        const formData = new FormData();
+                        formData.append('title', title);
+                        formData.append('description', description);
+                        formData.append('is_publish', itemPublish ? 'true' : 'false');
+                        formData.append('show_in_homepage', show_in_homepage ? 'true' : 'false');
+                        review_attributes.forEach(function (ra) {
+                            formData.append('review_attributes', ra);
+                        });
+                        if (photo && photo !== catImageFile && /^data:image\//i.test(photo)) {
+                            const blob = base64ToBlob(photo);
+                            const ext = (blob.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+                            formData.append('photo', blob, 'category_' + Date.now() + '.' + ext);
                         }
 
-                        const result = await syncToDjango(`categories/${id}/`, 'PATCH', {
-                            'title': title,
-                            'description': description,
-                            'photo': imageUrl || '',
-                            'review_attributes': review_attributes,
-                            'is_publish': itemPublish,
-                            'show_in_homepage': show_in_homepage,
-                        });
+                        const result = await syncToDjango(`categories/${id}/`, 'PATCH', formData);
 
                         if (result && result.status) {
                             window.location.href = '{{ route("categories")}}';
@@ -267,36 +269,17 @@
                 $("#category_image").val('');
             }
         });
-        async function storeImageData() {
-            var newPhoto = '';
-            try {
-                if (catImageFile != "" && photo != catImageFile) {
-                    var catOldImageUrlRef = await storage.refFromURL(catImageFile);
-                    imageBucket = catOldImageUrlRef.bucket;
-                    var envBucket = "<?php echo env('FIREBASE_STORAGE_BUCKET'); ?>";
-                    if (imageBucket == envBucket) {
-                        await catOldImageUrlRef.delete().then(() => {
-                            console.log("Old file deleted!")
-                        }).catch((error) => {
-                            console.log("ERR File delete ===", error);
-                        });
-                    } else {
-                        console.log('Bucket not matched');
-                    }
-                }
-                if (photo != catImageFile) {
-                    photo = photo.replace(/^data:image\/[a-z]+;base64,/, "")
-                    var uploadTask = await storageRef.child(fileName).putString(photo, 'base64', { contentType: 'image/jpg' });
-                    var downloadURL = await uploadTask.ref.getDownloadURL();
-                    newPhoto = downloadURL;
-                    photo = downloadURL;
-                } else {
-                    newPhoto = photo;
-                }
-            } catch (error) {
-                console.log("ERR ===", error);
+        function base64ToBlob(base64) {
+            var match = /^data:(image\/[a-z]+);base64,(.+)$/i.exec(base64);
+            var mime = match ? match[1] : 'image/jpeg';
+            var data = match ? match[2] : base64.replace(/^data:image\/[a-z]+;base64,/, '');
+            var binary = atob(data);
+            var len = binary.length;
+            var bytes = new Uint8Array(len);
+            for (var i = 0; i < len; i++) {
+                bytes[i] = binary.charCodeAt(i);
             }
-            return newPhoto;
+            return new Blob([bytes], { type: mime });
         }
     </script>
 @endsection

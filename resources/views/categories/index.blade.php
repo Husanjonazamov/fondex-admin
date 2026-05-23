@@ -276,7 +276,7 @@
 
             var html = [];
             newdate = '';
-            var id = val.id;
+            var id = val.firestore_id || val.id;
             categoryRows[id] = val;
 
             var route1 = '{{route("categories.edit", ":id")}}';
@@ -293,11 +293,11 @@
             itemsUrl = itemsUrl.replace("id", val.firestore_id);
 
             if (val.photo == '') {
-                html.push('<td><a href="' + itemsUrl + '"><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image"></a> <a href="' + itemsUrl + '" class="left_space">' + val.title + '</a>');
+                html.push('<td><a href="' + itemsUrl + '"><img class="rounded" style="width:50px" src="' + placeholderImage + '" alt="image"></a> <a href="' + route1 + '" class="left_space">' + val.title + '</a>');
 
             } else {
 
-                html.push('<td><a href="' + itemsUrl + '"><img class="rounded" style="width:50px" src="' + val.photo + '" alt="image" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></a> <a href="' + itemsUrl + '" class="left_space">' + val.title + '</a>');
+                html.push('<td><a href="' + itemsUrl + '"><img class="rounded" style="width:50px" src="' + val.photo + '" alt="image" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></a> <a href="' + route1 + '" class="left_space">' + val.title + '</a>');
 
             }
 
@@ -307,11 +307,11 @@
 
             if (val.publish) {
 
-                html.push('<td><label class="switch"><input type="checkbox" checked id="' + val.id + '" name="isSwitch"><span class="slider round"></span></label></td>');
+                html.push('<td><label class="switch"><input type="checkbox" checked id="' + id + '" name="isSwitch"><span class="slider round"></span></label></td>');
 
             } else {
 
-                html.push('<td><label class="switch"><input type="checkbox" id="' + val.id + '" name="isSwitch"><span class="slider round"></span></label></td>');
+                html.push('<td><label class="switch"><input type="checkbox" id="' + id + '" name="isSwitch"><span class="slider round"></span></label></td>');
 
             }
 
@@ -322,7 +322,7 @@
 
             if (checkDeletePermission) {
 
-                action = action + '<a id="' + val.id + '" name="category-delete" class="delete-btn" href="javascript:void(0)" data-toggle="tooltip" title="{{trans("lang.delete")}}"><i class="mdi mdi-delete"></i></a>';
+                action = action + '<a id="' + id + '" name="category-delete" class="delete-btn" href="javascript:void(0)" data-toggle="tooltip" title="{{trans("lang.delete")}}"><i class="mdi mdi-delete"></i></a>';
 
             }
 
