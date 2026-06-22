@@ -1179,8 +1179,17 @@
             var id = $(this).attr('data-id');
             var photo_remove = $(this).attr('data-img');
             var status = $(this).attr('data-status');
-            if (status == "old") {
-                photosToDelete.push(firebase.storage().refFromURL(photo_remove));
+            // Only Firebase-hosted images can be deleted from Firebase storage.
+            // Old images now also come from the Django backend (media/storage URLs);
+            // refFromURL() throws on those, which previously aborted this handler so
+            // the thumbnail was never removed. Guard + try/catch so removal always works.
+            if (status == "old" && typeof photo_remove === 'string'
+                && photo_remove.indexOf('firebasestorage.googleapis.com') > -1) {
+                try {
+                    photosToDelete.push(firebase.storage().refFromURL(photo_remove));
+                } catch (err) {
+                    console.log('Skipping Firebase delete for non-Firebase image:', err);
+                }
             }
             $("#photo_" + id).remove();
             index = photos.indexOf(photo_remove);

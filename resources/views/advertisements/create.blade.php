@@ -255,6 +255,43 @@
         var refVendor = database.collection('vendors');
         var storageRef = firebase.storage().ref('images');
         var storageVideoRef = firebase.storage().ref('videos');
+
+        // Advertisement migration to our own DB (Django).
+        // STEP 1 (safe / dual-write): every new ad is mirrored to our DB while
+        // Firestore stays the source of truth the mobile app reads. The mirror is
+        // non-blocking — a DB failure never breaks ad creation. Once the read
+        // surfaces (admin list/edit/view + mobile app) are switched to the Django
+        // API, the Firestore write below can be removed for a full cutover.
+        // `f` is the exact Firestore payload (camelCase); we map it to our DB fields.
+        function saveAd(id, f) {
+            syncToDjango('advertisements/', 'POST', {
+                'firestore_id': id,
+                'title': f.title,
+                'description': f.description,
+                'cover_image': f.coverImage,
+                'profile_image': f.profileImage,
+                'video': f.video,
+                'vendor': f.vendorId,
+                'priority': f.priority,
+                'type': f.type,
+                'show_rating': f.showRating,
+                'show_review': f.showReview,
+                'start_date': f.startDate ? f.startDate.toDate().toISOString() : null,
+                'end_date': f.endDate ? f.endDate.toDate().toISOString() : null,
+                'status': 'approved',
+                'payment_status': true,
+                'is_paused': null
+            }).then(function(res) {
+                if (!res || res.status === false) {
+                    console.error('Advertisement DB mirror failed:', res && res.message);
+                }
+            }).catch(function(err) {
+                console.error('Advertisement DB mirror error:', err);
+            });
+            // Firestore write — source of truth for the mobile app until full cutover.
+            return database.collection('advertisements').doc(id).set(f);
+        }
+
         var section_id = getCookie('section_id') || '';
         var restaurant = '';
 
@@ -578,7 +615,7 @@
                         videoFile = videoData;
                     }
                     Promise.all(promises).then(() => {
-                        database.collection('advertisements').doc(id).set({
+                        saveAd(id, {
                             'id': id,
                             'title': title,
                             'description': description,
@@ -625,7 +662,7 @@
                                     coverIMG = null;
                                     profileIMG = null;
                                 }
-                                database.collection('advertisements').doc(id).set({
+                                saveAd(id, {
                                     'id': id,
                                     'title': title,
                                     'description': description,

@@ -491,6 +491,10 @@
 
         $(document).on("click", ".do_not_delete", async function (e) {
             var id = $(this).attr('id');
+            // "Barchasi" (select all) header link is handled separately by #deleteAll below.
+            if (id === 'deleteAll') {
+                return;
+            }
             if (confirm("{{trans('lang.delete_alert')}}")) {
                 const res = await syncToDjango(`products/${id}/`, 'DELETE');
                 if (res.status) {
@@ -499,6 +503,36 @@
                     alert("Error deleting item: " + res.message);
                 }
             }
+        });
+
+        // Select-all checkbox in the table header toggles every row checkbox.
+        $(document).on("change", "#is_active", function () {
+            $("#itemTable .is_open").prop('checked', $(this).prop('checked'));
+        });
+
+        // Bulk delete: remove every checked product, then reload.
+        $(document).on("click", "#deleteAll", async function (e) {
+            var $checked = $('#itemTable .is_open:checked');
+            if (!$checked.length) {
+                alert("{{ trans('lang.select_delete_alert') }}");
+                return;
+            }
+            if (!confirm("{{ trans('lang.selected_delete_alert') }}")) {
+                return;
+            }
+            jQuery("#data-table_processing").show();
+            var ids = $checked.map(function () { return $(this).attr('dataId'); }).get();
+            var failed = [];
+            for (const id of ids) {
+                const res = await syncToDjango(`products/${id}/`, 'DELETE');
+                if (!res || !res.status) {
+                    failed.push(id);
+                }
+            }
+            if (failed.length) {
+                alert("Error deleting " + failed.length + " item(s).");
+            }
+            window.location.reload();
         });
 
     </script>
