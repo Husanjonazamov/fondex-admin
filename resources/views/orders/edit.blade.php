@@ -233,6 +233,10 @@
                                                     <p><strong>{{ trans('lang.phone') }}:</strong>
                                                         <span id="billing_phone"></span>
                                                     </p>
+                                                    <p id="billing_location_wrap" style="display:none;"><strong>Lat / Lon:</strong>
+                                                        <span id="billing_location"></span>
+                                                        <a id="billing_location_map" href="#" target="_blank" rel="noopener" class="ml-2">🗺</a>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -916,6 +920,16 @@
                 }
 
                 $("#billing_line2").text(billingAddressstring);
+
+                // Customer location (Lat / Lon) — top-level fields, with address.location as fallback
+                var addrLoc = (order.address && order.address.location) ? order.address.location : {};
+                var custLat = (order.latitude != null && order.latitude !== '') ? order.latitude : addrLoc.latitude;
+                var custLng = (order.longitude != null && order.longitude !== '') ? order.longitude : addrLoc.longitude;
+                if (custLat != null && custLat !== '' && custLng != null && custLng !== '') {
+                    $("#billing_location").text(custLat + ', ' + custLng);
+                    $("#billing_location_map").attr('href', 'https://www.google.com/maps?q=' + custLat + ',' + custLng);
+                    $("#billing_location_wrap").show();
+                }
 
                 if (order.author.hasOwnProperty('phoneNumber')) {
                     if (order.author.phoneNumber.includes('+')) {

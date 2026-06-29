@@ -668,11 +668,9 @@ initComplete: function() {
                 html.push('<td></td>');
             }
         }
-        if (val.hasOwnProperty('rideType')) {
-            html.push('<td>' + val.rideType + '</td>');
-        } else {
-            html.push('<td></td>');
-        }
+        // rideType is always "ride"; the actual tariff (Comfort / Start / ...) lives in vehicleType.name
+        var rideTariff = (val.vehicleType && val.vehicleType.name) ? val.vehicleType.name : (val.rideType || '');
+        html.push('<td>' + rideTariff + '</td>');
         var destName = val.destinationLocationName || '';
         html.push('<td ><a href="' + route1 + '" data-toggle="tooltip" data-bs-original-title="' + destName + '">' + (destName.length > 8 ? destName.substring(0, 8) + '...' : destName) + '</a></td>');
 
