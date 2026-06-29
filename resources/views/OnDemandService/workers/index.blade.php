@@ -185,11 +185,11 @@
         if (status) {
             ref = (status == "active") ? ref.where('active', '==', true) : ref.where('active', '==', false);
         }
-        if(id!=''){           
-            ref = ref.where('providerId','==',id).orderBy('createdAt', 'desc');
-        }else{
-            ref = ref.orderBy('createdAt', 'desc');
+        if(id!=''){
+            ref = ref.where('providerId','==',id);
         }
+        // orderBy('createdAt') removed — where(active/providerId) + orderBy needs a composite
+        // index that doesn't exist. The workers table sorts client-side.
         if ($('#daterange span').html() != '{{trans("lang.select_range")}}' && daterangepicker) {
             var from = moment(daterangepicker.startDate).toDate();
             var to = moment(daterangepicker.endDate).toDate();
@@ -208,7 +208,8 @@
         $(".wallet_transaction").attr("href", wallet_route.replace('id', 'providerID='+id));
 
          $('.tabDiv').show();
-         ref = database.collection('providers_workers').where('providerId','==',id).orderBy('createdAt', 'desc');
+         // orderBy removed — where(providerId) + orderBy needs a missing composite index.
+         ref = database.collection('providers_workers').where('providerId','==',id);
     }else{
          $('.tabDiv').hide();
          ref = database.collection('providers_workers').orderBy('createdAt', 'desc');

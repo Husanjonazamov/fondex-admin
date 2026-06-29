@@ -841,15 +841,15 @@
 
                     $('.tabDiv').show();
 
-                    var newBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', '==', 'Order Placed').where('provider.author', '==', id).orderBy('createdAt', 'desc');
+                    var newBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', '==', 'Order Placed').where('provider.author', '==', id);
 
                     var todayBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('newScheduleDateTime', '>=', startTimestamp).where('newScheduleDateTime', '<=', endTimestamp).where('status', 'in', ['Order Accepted', 'Order Assigned', 'Order Ongoing']).where('provider.author', '==', id);
 
                     var upcomingBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', 'in', ['Order Accepted', 'Order Assigned']).where('newScheduleDateTime', '>=', endTimestamp).where('provider.author', '==', id);
 
-                    var completedBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', '==', 'Order Completed').where('provider.author', '==', id).orderBy('createdAt', 'desc');
+                    var completedBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', '==', 'Order Completed').where('provider.author', '==', id);
 
-                    var cancelBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', 'in', ['Order Cancelled', 'Order Rejected']).where('provider.author', '==', id).orderBy('createdAt', 'desc');
+                    var cancelBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', 'in', ['Order Cancelled', 'Order Rejected']).where('provider.author', '==', id);
 
 
 
@@ -857,15 +857,15 @@
 
                     $('.tabDiv').hide();
 
-                    var newBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', '==', 'Order Placed').orderBy('createdAt', 'desc');
+                    var newBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', '==', 'Order Placed');
 
                     var todayBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('newScheduleDateTime', '>=', startTimestamp).where('newScheduleDateTime', '<=', endTimestamp).where('status', 'in', ['Order Accepted', 'Order Assigned', 'Order Ongoing']);
 
                     var upcomingBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', 'in', ['Order Accepted', 'Order Assigned']).where('newScheduleDateTime', '>=', endTimestamp);
 
-                    var completedBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', '==', 'Order Completed').orderBy('createdAt', 'desc');
+                    var completedBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', '==', 'Order Completed');
 
-                    var cancelBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', 'in', ['Order Cancelled', 'Order Rejected']).orderBy('createdAt', 'desc');
+                    var cancelBookingRef = database.collection('provider_orders').where('sectionId', '==', active_id).where('status', 'in', ['Order Cancelled', 'Order Rejected']);
 
                 }
 

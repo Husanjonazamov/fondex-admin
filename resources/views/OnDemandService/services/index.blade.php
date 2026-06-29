@@ -167,13 +167,17 @@
             var wallet_route = "{{route('users.walletstransaction','id')}}";
             $(".wallet_transaction").attr("href", wallet_route.replace('id', 'providerID=' + id));
             $('.tabDiv').show();
-            var ref = database.collection('providers_services').where('sectionId', '==', section_id).where('author', '==', id).orderBy('createdAt', 'desc');
+            // orderBy('createdAt') removed — where(sectionId)+where(author)+orderBy needs a composite
+            // index that doesn't exist, which returned 0 rows. The table sorts client-side anyway.
+            var ref = database.collection('providers_services').where('sectionId', '==', section_id).where('author', '==', id);
 
         } else {
             $('.tabDiv').show();
-            var ref = database.collection('providers_services').where('sectionId', '==', section_id).orderBy('createdAt', 'desc');
+            // orderBy('createdAt') removed — where(sectionId)+orderBy needs a missing composite index
+            // (this made the services list show "Yozuv topilmadi"). Client-side sorting handles order.
+            var ref = database.collection('providers_services').where('sectionId', '==', section_id);
 
-        }       
+        }
 
         var currentCurrency = '';
         var currencyAtRight = false;
