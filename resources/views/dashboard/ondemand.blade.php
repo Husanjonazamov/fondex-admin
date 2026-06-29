@@ -456,9 +456,8 @@
             append_list_services.innerHTML = '';
             ref = db.collection('providers_services')
                 .where('sectionId', '==', active_id);
-          
-            ref = ref.orderBy('reviewsCount', 'desc'); 
-
+            // orderBy('reviewsCount') removed — it required a composite index that doesn't exist,
+            // which made this query (and the whole dashboard list load) fail.
             snapshots = await ref.limit(10).get();
             html = buildServicesHTML(snapshots);
             append_list_services.innerHTML = html;
@@ -468,7 +467,8 @@
             ref = db.collection('provider_orders')
                 .where('sectionId', '==', active_id)
                 .where('status', 'in', ["Order Placed", "Order Accepted", "Order Assigned", "Order Ongoing", "Order Completed", "Order Cancelled"]);
-            ref = ref.orderBy('createdAt', 'desc');
+            // orderBy('createdAt') removed — status-IN + orderBy required a composite index that
+            // doesn't exist. Sort client-side after fetch instead so the list still loads.
             snapshots = await ref.limit(10).get();
             html = buildOrderHTML(snapshots);
             append_list_recent_order.innerHTML = html;
@@ -552,8 +552,9 @@
                 }  */
                     
                 if (startTS && endTS) query = query.where('createdAt', '>=', startTS).where('createdAt', '<=', endTS);
-                query = query.orderBy('createdAt', 'desc');
-                return query.get().then(snapshot => ({ key, count: snapshot.docs.length }));
+                // orderBy removed — this only counts docs, and sectionId + status-IN + orderBy
+                // needs a composite index (which doesn't exist) and broke the status overview.
+                return query.get().then(snapshot => ({ key, count: snapshot.docs.length })).catch(() => ({ key, count: 0 }));
             });
 
             const results = await Promise.all(promises);
@@ -697,7 +698,7 @@
                 db.collection('provider_orders').where('sectionId', '==', active_id).get(),
                 db.collection('providers_services').where('sectionId', '==', active_id).get(),
                 db.collection('providers_workers').orderBy("createdAt").get(),
-                db.collection('users').where("role", "==", "provider").where('section_id', 'in', [active_id, '']).orderBy('createdAt', 'desc').get(),
+                db.collection('users').where("role", "==", "provider").where('section_id', 'in', [active_id, '']).get(),
 
                 // Current period
                 db.collection('provider_orders').where('sectionId', '==', active_id).where('createdAt', '>=', startThisTS).where('createdAt', '<=', endThisTS).get(),
@@ -710,7 +711,7 @@
                 startLastTS ? db.collection('providers_services').where('sectionId', '==', active_id).where("role", "==", "customer").where('createdAt', '>=', startLastTS).where('createdAt', '<=', endLastTS).orderBy("createdAt").get() : Promise.resolve({ docs: [] }),
                 startLastTS ? db.collection('providers_workers').where('createdAt', '>=', startLastTS).where('createdAt', '<=', endLastTS).orderBy("createdAt").get() : Promise.resolve({ docs: [] }),
                 startLastTS ? db.collection('users').where("role", "==", "provider").where('section_id', 'in', [active_id, '']).where('createdAt', '>=', startLastTS).where('createdAt', '<=', endLastTS).orderBy('createdAt', 'desc').get() : Promise.resolve({ docs: [] }),
-            ])
+            ].map(p => p.catch(() => ({ docs: [] }))))  // resilient: a missing-index query yields empty instead of hanging the whole dashboard
                 .then(([allOrders, allService, allWorker, allUsers,
                     ordersCurr, serviceCurr, workerCurr, usersCurr,
                     ordersLast, serviceLast, workerLast, usersLast]) => {
@@ -817,9 +818,9 @@
 
             if (startTS && endTS){
                 ordersQuery = ordersQuery.where('createdAt', '>=', startTS).where('createdAt', '<=', endTS);
-            } 
-                
-            ordersQuery = ordersQuery.orderBy('createdAt', 'desc');
+            }
+            // orderBy removed — earnings are summed (order irrelevant) and status + sectionId +
+            // orderBy required a missing composite index that broke the earnings cards.
             const snapshot = await ordersQuery.get();
 
             snapshot.docs.forEach(doc => {
