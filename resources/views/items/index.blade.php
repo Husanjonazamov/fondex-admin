@@ -226,12 +226,30 @@
 
         var placeholderImage = '';
         var categoryNameMap = {};
+        var vendorNameMap = {};
+        var vendorNameMapPromise = loadVendorNameMap();
         database.collection('settings').doc('placeHolderImage').get().then(async function (snapshotsimage) {
             if (snapshotsimage.exists) {
                 var placeholderImageData = snapshotsimage.data();
                 placeholderImage = placeholderImageData.image;
             }
         });
+
+        async function loadVendorNameMap() {
+            try {
+                const vendorResponse = await syncToDjango('vendors/?page=1&page_size=500', 'GET');
+                const vendorData = (vendorResponse && vendorResponse.status && vendorResponse.data) ? vendorResponse.data : (vendorResponse && vendorResponse.results ? vendorResponse : null);
+                if (vendorData && vendorData.results) {
+                    vendorData.results.forEach(function(vendor) {
+                        var title = vendor.title || vendor.name || vendor.storeName || '';
+                        if (vendor.firestore_id) vendorNameMap[vendor.firestore_id] = title;
+                        if (vendor.id) vendorNameMap[vendor.id] = title;
+                    });
+                }
+            } catch (e) {
+                console.error("Vendor map load error:", e);
+            }
+        }
 
         (async function loadFilters() {
             // Load Sections (Storages)
@@ -383,6 +401,7 @@
                             $('.total_count').text(totalRecords);
 
                             let records = [];
+                            await vendorNameMapPromise;
                             if (results) {
                                 for (const item of results) {
                                     // Normalize fields for buildHTML compatibility
@@ -391,8 +410,9 @@
                                     item.foodName = item.name || item.title || '';
                                     item.finalPrice = parseFloat(item.price) || 0;
                                     item.sku = item.sku || item.item_sku || item.code || '';
-                                    item.vendor = item.vendor || item.vendor_id || '';
-                                    item.store = item.vendor_name || item.vendor_title || ''; 
+                                    const vendorInfo = normalizeVendorInfo(item);
+                                    item.vendor = vendorInfo.id;
+                                    item.store = vendorInfo.name;
                                     
                                     const rawCat = item.category_name || item.category_title || '';
                                     const catId = item.category || item.category_id || '';
@@ -443,6 +463,30 @@
             });
         });
 
+        function normalizeVendorInfo(item) {
+            const vendor = item.vendor || item.vendor_id || item.store || item.store_id || item.restaurant || null;
+            const vendorObject = (vendor && typeof vendor === 'object') ? vendor : null;
+            const id = item.vendor_id ||
+                item.vendorID ||
+                item.store_id ||
+                item.restaurant_id ||
+                (vendorObject ? (vendorObject.firestore_id || vendorObject.uid || vendorObject.id) : vendor) ||
+                '';
+            const name = item.vendor_name ||
+                item.vendor_title ||
+                item.store_name ||
+                item.store_title ||
+                item.restaurant_name ||
+                item.restaurant_title ||
+                (vendorObject ? (vendorObject.title || vendorObject.name || vendorObject.storeName || vendorObject.display_name) : '') ||
+                vendorNameMap[id] ||
+                '';
+            return {
+                id: id || '',
+                name: name || '-'
+            };
+        }
+
         async function buildHTML(val) {
             var html = [];
             if (checkDeletePermission) {
@@ -467,7 +511,11 @@
             if (vendorID == '') {
                 var vendor_route = '{{route("stores.view", ":id")}}';
                 vendor_route = vendor_route.replace(':id', val.vendor);
-                html.push('<td><a href="' + vendor_route + '">' + val.store + '</a></td>');
+                if (val.vendor) {
+                    html.push('<td><a href="' + vendor_route + '">' + val.store + '</a></td>');
+                } else {
+                    html.push('<td>' + val.store + '</td>');
+                }
             }
 
             html.push('<td>' + val.category + '</td>');

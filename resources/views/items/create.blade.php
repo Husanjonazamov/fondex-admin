@@ -810,9 +810,6 @@
                     try {
                         var productImageDataUrl = photos.length > 0 && photos[0].indexOf('data:') === 0 ? photos[0] : '';
                         var productImageFilename = product_image_filename.length > 0 ? product_image_filename[0] : 'product.jpg';
-                        const DigitalImg = await storeDigitalImageData();
-                        const IMG_ARRAY = await storeProductImageData();
-                        const mainPhoto = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : "";
 
                         // Attributes & variants
                         var attrList = [];
@@ -859,7 +856,6 @@
                             'attribute_count': attrList.length,
                             'variants': variantList
                         };
-                        if (mainPhoto) payload['photos_json'] = IMG_ARRAY;
 
                         var requestPayload = buildProductFormData(payload, productImageDataUrl, productImageFilename);
 
@@ -900,21 +896,11 @@
                     var filename = (f.name).replace(/C:\\fakepath\\/i, '')
                     var timestamp = Number(new Date());
                     var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
-                    var uploadTask = storageRef.child(filename).put(theFile);
-                    uploadTask.on('state_changed', function (snapshot) {
-                        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        jQuery("#uploding_image").text("Image is uploading...");
-                    }, function (error) {
-                    }, function () {
-                        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                            jQuery("#uploding_image").text("Upload is completed");
-                            photo = downloadURL;
-                            $(".item_image").empty()
-                            $(".item_image").append(
-                                '<img class="rounded" style="width:50px" src="' + photo +
-                                '" alt="image">');
-                        });
-                    });
+                    photo = filePayload;
+                    $(".item_image").empty()
+                    $(".item_image").append(
+                        '<img class="rounded" style="width:50px" src="' + photo +
+                        '" alt="image">');
                 };
             })(f);
             reader.readAsDataURL(f);
@@ -933,28 +919,17 @@
                     var filename = (f.name).replace(/C:\\fakepath\\/i, '')
                     var timestamp = Number(new Date());
                     var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
-                    var uploadTask = storageRef.child(filename).put(theFile);
-                    uploadTask.on('state_changed', function (snapshot) {
-                        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        $('.product_image').find(".uploding_image_photos").text(
-                            "Image is uploading...");
-                    }, function (error) {
-                    }, function () {
-                        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                            jQuery("#uploding_image").text("Upload is completed");
-                            if (downloadURL) {
-                                productImagesCount++;
-                                photos_html = '<span class="image-item" id="photo_' +
-                                    productImagesCount +
-                                    '"><span class="remove-btn" data-id="' +
-                                    productImagesCount + '" data-img="' + downloadURL +
-                                    '"><i class="fa fa-remove"></i></span><img width="100px" id="" height="auto" src="' +
-                                    downloadURL + '"></span>';
-                                $(".product_image").append(photos_html);
-                                photos.push(downloadURL);
-                            }
-                        });
-                    });
+                    filename = normalizeImageFilename(filename, filePayload);
+                    product_image_filename.push(filename);
+                    productImagesCount++;
+                    photos_html = '<span class="image-item" id="photo_' +
+                        productImagesCount +
+                        '"><span class="remove-btn" data-id="' +
+                        productImagesCount + '" data-img="' + filePayload +
+                        '"><i class="fa fa-remove"></i></span><img width="100px" id="" height="auto" src="' +
+                        filePayload + '"></span>';
+                    $(".product_image").append(photos_html);
+                    photos.push(filePayload);
                 };
             })(f);
             reader.readAsDataURL(f);
@@ -1414,57 +1389,15 @@
             }
         });
         async function storeProductImageData() {
-            var newPhoto = [];
-            if (photos.length > 0) {
-                await Promise.all(photos.map(async (productPhoto, index) => {
-                    productPhoto = productPhoto.replace(/^data:image\/[a-z]+;base64,/, "");
-                    var uploadTask = await storageRef.child(product_image_filename[index]).putString(
-                        productPhoto, 'base64', {
-                        contentType: 'image/jpg'
-                    });
-                    var downloadURL = await uploadTask.ref.getDownloadURL();
-                    newPhoto.push(downloadURL);
-                }));
-            }
-            return newPhoto;
+            return photos.filter(function(productPhoto) {
+                return productPhoto && productPhoto.indexOf('data:') !== 0;
+            });
         }
         async function storeDigitalImageData() {
-            var newPhoto = '';
-            try {
-                if (digital_product_file != '') {
-                    digital_product_file = digital_product_file.replace(/^data:image\/[a-z]+;base64,/, "")
-                    if (digital_product_ext == 'zip' || digital_product_ext == "pdf") {
-                        var uploadTask = await storageRef.child(digital_product_file_name).put(digital_product_file);
-                    } else {
-                        var uploadTask = await storageRef.child(digital_product_file_name).putString(
-                            digital_product_file, 'base64', {
-                            contentType: 'image/jpg'
-                        });
-                    }
-                    var downloadURL = await uploadTask.ref.getDownloadURL();
-                    newPhoto = downloadURL;
-                    digital_product_file = downloadURL;
-                }
-            } catch (error) {
-                console.log("ERR ===", error);
-            }
-            return newPhoto;
+            return '';
         }
         async function storeVariantImageData() {
-            var newPhoto = [];
-            if (variant_photos.length > 0) {
-                await Promise.all(variant_photos.map(async (variantPhoto, index) => {
-                    variantPhoto = variantPhoto.replace(/^data:image\/[a-z]+;base64,/, "");
-                    var uploadTask = await storageRef.child(variant_filename[index]).putString(
-                        variantPhoto, 'base64', {
-                        contentType: 'image/jpg'
-                    });
-                    var downloadURL = await uploadTask.ref.getDownloadURL();
-                    $('[id="variant_' + variant_vIds[index] + '_url"]').val(downloadURL);
-                    newPhoto.push(downloadURL);
-                }));
-            }
-            return newPhoto;
+            return [];
         }
     </script>
 @endsection

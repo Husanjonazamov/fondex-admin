@@ -823,11 +823,11 @@
                     try {
                         var productImageDataUrl = new_added_photos.length > 0 && new_added_photos[0].indexOf('data:') === 0 ? new_added_photos[0] : '';
                         var productImageFilename = new_added_photos_filename.length > 0 ? new_added_photos_filename[0] : 'product.jpg';
-                        const IMG_ARRAY = await storeImageData();
-                        await storeVariantImageData();
+                        const retainedPhotos = photos.filter(function(img) {
+                            return img && img.indexOf('data:') !== 0;
+                        });
                         // photo (outer var) has existing image — use it as fallback if no new uploads
-                        const mainPhoto = IMG_ARRAY.length > 0 ? IMG_ARRAY[0] : photo;
-                        const photos_json = IMG_ARRAY.length > 0 ? IMG_ARRAY : (photo ? [photo] : []);
+                        const photos_json = retainedPhotos.length > 0 ? retainedPhotos : (photo ? [photo] : []);
 
                         function getCurrentAttributes() {
                             var currentAttributes = [];
@@ -941,19 +941,9 @@
                     var filename = (f.name).replace(/C:\\fakepath\\/i, '')
                     var timestamp = Number(new Date());
                     var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
-                    var uploadTask = storageRef.child(filename).put(theFile);
-                    uploadTask.on('state_changed', function (snapshot) {
-                        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        jQuery("#uploding_image").text("Image is uploading...");
-                    }, function (error) {
-                    }, function () {
-                        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                            jQuery("#uploding_image").text("Upload is completed");
-                            photo = downloadURL;
-                            $(".item_image").empty()
-                            $(".item_image").append('<img class="rounded" style="width:50px" src="' + photo + '" alt="image" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'">');
-                        });
-                    });
+                    photo = filePayload;
+                    $(".item_image").empty()
+                    $(".item_image").append('<img class="rounded" style="width:50px" src="' + photo + '" alt="image" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'">');
                 };
             })(f);
             reader.readAsDataURL(f);
@@ -984,17 +974,6 @@
         }
         async function storeVariantImageData() {
             var newPhoto = [];
-            if (variant_photos.length > 0) {
-                await Promise.all(variant_photos.map(async (variantPhoto, index) => {
-                    variantPhoto = variantPhoto.replace(/^data:image\/[a-z]+;base64,/, "");
-                    var uploadTask = await storageRef.child(variant_filename[index]).putString(variantPhoto, 'base64', {
-                        contentType: 'image/jpg'
-                    });
-                    var downloadURL = await uploadTask.ref.getDownloadURL();
-                    $('[id="variant_' + variant_vIds[index] + '_url"]').val(downloadURL);
-                    newPhoto.push(downloadURL);
-                }));
-            }
             if (variantImageToDelete.length > 0) {
                 await Promise.all(variantImageToDelete.map(async (delImage) => {
                     var delImageUrlRef = await storage.refFromURL(delImage);
@@ -1026,22 +1005,12 @@
                     var filename = (f.name).replace(/C:\\fakepath\\/i, '')
                     var timestamp = Number(new Date());
                     var filename = filename.split('.')[0] + "_" + timestamp + '.' + ext;
-                    var uploadTask = storageRef.child(filename).put(theFile);
-                    uploadTask.on('state_changed', function (snapshot) {
-                        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        $('.product_image').find(".uploding_image_photos").text("Image is uploading...");
-                    }, function (error) {
-                    }, function () {
-                        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                            jQuery("#uploding_image").text("Upload is completed");
-                            if (downloadURL) {
-                                productImagesCount++;
-                                photos_html = '<span class="image-item" id="photo_' + productImagesCount + '"><span class="remove-btn" data-id="' + productImagesCount + '" data-img="' + downloadURL + '"><i class="fa fa-remove"></i></span><img class="rounded" width="50px" id="" height="auto" src="' + downloadURL + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>'
-                                $(".product_image").append(photos_html);
-                                photos.push(downloadURL);
-                            }
-                        });
-                    });
+                    filename = normalizeImageFilename(filename, filePayload);
+                    productImagesCount++;
+                    photos_html = '<span class="image-item" id="photo_' + productImagesCount + '"><span class="remove-btn" data-id="' + productImagesCount + '" data-img="' + filePayload + '" data-status="new"><i class="fa fa-remove"></i></span><img class="rounded" width="50px" id="" height="auto" src="' + filePayload + '" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></span>'
+                    $(".product_image").append(photos_html);
+                    new_added_photos.push(filePayload);
+                    new_added_photos_filename.push(filename);
                 };
             })(f);
             reader.readAsDataURL(f);
@@ -1090,41 +1059,7 @@
             reader.readAsDataURL(f);
         }
         async function storeDigitalImageData() {
-            var newPhoto = '';
-            try {
-                if (digital_product_file != '') {
-                    if (digital_product_old_file != "" && digital_product_file != digital_product_old_file) {
-                        var oldImageUrlRef = await storage.refFromURL(digital_product_old_file);
-                        imageBucket = oldImageUrlRef.bucket;
-                        var envBucket = "<?php echo env('FIREBASE_STORAGE_BUCKET'); ?>";
-                        if (imageBucket == envBucket) {
-                            await oldImageUrlRef.delete().then(() => {
-                                console.log("Old file deleted!")
-                            }).catch((error) => {
-                                console.log("ERR File delete ===", error);
-                            });
-                        } else {
-                            console.log('Bucket not matched');
-                        }
-                    }
-                    if (digital_product_file != digital_product_old_file) {
-                        digital_product_file = digital_product_file.replace(/^data:image\/[a-z]+;base64,/, "");
-                        if (digital_product_ext == 'zip' || digital_product_ext == "pdf") {
-                            var uploadTask = await storageRef.child(digital_product_file_name).put(digital_product_file);
-                        } else {
-                            var uploadTask = await storageRef.child(digital_product_file_name).putString(digital_product_file, 'base64', {
-                                contentType: 'image/jpg'
-                            });
-                        }
-                        var downloadURL = await uploadTask.ref.getDownloadURL();
-                        newPhoto = downloadURL;
-                        digital_product_file = downloadURL;
-                    }
-                }
-            } catch (error) {
-                console.log("ERR ===", error);
-            }
-            return newPhoto;
+            return '';
         }
         $("#product_image").resizeImg({
             callback: function (base64str) {
@@ -1144,20 +1079,9 @@
             }
         });
         async function storeImageData() {
-            var newPhoto = [];
-            if (photos.length > 0) {
-                newPhoto = photos;
-            }
-            if (new_added_photos.length > 0) {
-                await Promise.all(new_added_photos.map(async (foodPhoto, index) => {
-                    foodPhoto = foodPhoto.replace(/^data:image\/[a-z]+;base64,/, "");
-                    var uploadTask = await storageRef.child(new_added_photos_filename[index]).putString(foodPhoto, 'base64', {
-                        contentType: 'image/jpg'
-                    });
-                    var downloadURL = await uploadTask.ref.getDownloadURL();
-                    newPhoto.push(downloadURL);
-                }));
-            }
+            var newPhoto = photos.filter(function(foodPhoto) {
+                return foodPhoto && foodPhoto.indexOf('data:') !== 0;
+            });
             if (photosToDelete.length > 0) {
                 await Promise.all(photosToDelete.map(async (delImage) => {
                     imageBucket = delImage.bucket;
