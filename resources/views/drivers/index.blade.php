@@ -38,6 +38,15 @@
                             </div>
                             <div class="d-flex top-title-right align-self-center">
                                 <div class="select-box pl-3">
+                                    <select class="form-control service_type_selector filteredRecords">
+                                        <option value="" selected>{{ trans('lang.service_type') }}</option>
+                                        <option value="cab-service">Taxi</option>
+                                        <option value="delivery-service">Courier</option>
+                                        <option value="ecommerce-service">Ecommerce Courier</option>
+                                        <option value="parcel_delivery">Parcel Courier</option>
+                                    </select>
+                                </div>
+                                <div class="select-box pl-3">
                                     <select class="form-control status_selector filteredRecords">
                                         <option value="" selected>{{ trans('lang.status') }}</option>
                                         <option value="active">{{ trans('lang.active') }}</option>
@@ -80,6 +89,7 @@
                                                     <?php } ?>
                                                     <th>{{ trans('lang.actions') }}</th>
                                                     <th>{{ trans('lang.driver_info') }}</th>
+                                                    <th>{{ trans('lang.service_type') }}</th>
                                                     <th>{{ trans('lang.active') }}</th>
                                                     <th>{{ trans('lang.driver_online') }}</th>
                                                     <th>{{ trans('lang.date') }}</th>
@@ -128,9 +138,37 @@
             var append_list = '';
             var serviceRef = database.collection('services');
             var alldriver = database.collection('users').where('role', '==', 'driver');
+            var serviceNameMap = {
+                'cab-service': 'Taxi',
+                'delivery-service': 'Courier',
+                'ecommerce-service': 'Ecommerce Courier',
+                'parcel_delivery': 'Parcel Courier',
+                'rental-service': 'Rental'
+            };
+
+            serviceRef.get().then(function(snapshot) {
+                snapshot.docs.forEach(function(doc) {
+                    var data = doc.data();
+                    if (data.flag) {
+                        serviceNameMap[data.flag] = data.name || serviceNameMap[data.flag] || data.flag;
+                    }
+                });
+            });
+
+            function formatServiceTypeLabel(serviceType) {
+                if (!serviceType) {
+                    return '-';
+                }
+                return serviceNameMap[serviceType] || serviceType.replace(/[-_]/g, ' ');
+            }
 
             $(document).ready(function() {
 
+                // Adminda tanlangan bo'lim (Taxi/Delivery/...) bo'yicha ro'yxatni
+                // boshidanoq ajratib ko'rsatish — filtr qo'lda o'zgartirilsa ham ishlayveradi.
+                if (sectionType && $('.service_type_selector option[value="' + sectionType + '"]').length) {
+                    $('.service_type_selector').val(sectionType);
+                }
 
                 jQuery("#data-table_processing").show();
 
@@ -182,9 +220,11 @@
                         const searchValue = data.search.value.toLowerCase();
                         const orderColumnIndex = data.order[0].column;
                         const orderDirection = data.order[0].dir;
+                        const selectedServiceType = $('.service_type_selector').val() || '';
+                        const selectedStatus = $('.status_selector').val() || '';
                         
                         // Define sortable fields mapping
-                        const orderableColumns = (checkDeletePermission) ? ['', 'actions', 'name', 'active', 'isActive', 'createdAt', 'totalOrders'] : ['actions', 'name', 'active', 'isActive', 'createdAt', 'totalOrders'];
+                        const orderableColumns = (checkDeletePermission) ? ['', 'actions', 'name', 'serviceName', 'active', 'isActive', 'createdAt', 'totalOrders'] : ['actions', 'name', 'serviceName', 'active', 'isActive', 'createdAt', 'totalOrders'];
                         const orderByField = orderableColumns[orderColumnIndex];
 
                         if (searchValue.length >= 3 || searchValue.length === 0) {
@@ -207,14 +247,18 @@
                                 childData.lastName = childData.lastName || '';
                                 childData.name = (childData.firstName + ' ' + childData.lastName).toLowerCase();
                                 childData.email = (childData.email || '').toLowerCase();
+                                childData.serviceName = formatServiceTypeLabel(childData.serviceType);
                                 
                                 // Mapping for status filters if present in current UI (though select boxes are for Active/Inactive)
                                 var isMatch = true;
                                 if (searchValue) {
-                                    if (!childData.name.includes(searchValue) && !childData.email.includes(searchValue) && !(childData.phoneNumber && childData.phoneNumber.includes(searchValue))) {
+                                    if (!childData.name.includes(searchValue) && !childData.email.includes(searchValue) && !childData.serviceName.toLowerCase().includes(searchValue) && !(childData.phoneNumber && childData.phoneNumber.includes(searchValue))) {
                                         isMatch = false;
                                     }
                                 }
+                                if (selectedServiceType && childData.serviceType !== selectedServiceType) isMatch = false;
+                                if (selectedStatus == 'active' && childData.active !== true) isMatch = false;
+                                if (selectedStatus == 'inactive' && childData.active === true) isMatch = false;
                                 
                                 if (type == 'pending' && childData.isDocumentVerify !== false) isMatch = false;
                                 if (type == 'approved' && childData.isDocumentVerify !== true) isMatch = false;
@@ -258,6 +302,7 @@
                                 driver.active = driver.active || false;
                                 driver.isActive = driver.isActive || false; // online status fallback
                                 driver.totalOrders = driver.orderCompleted || 0;
+                                driver.serviceName = formatServiceTypeLabel(driver.serviceType);
                                 
                                 var htmlRows = await buildHTML(driver);
                                 records.push(htmlRows);
@@ -272,17 +317,17 @@
                             });
                         });
                     },
-                    order: (checkDeletePermission) ? [5, 'desc'] : [4, 'desc'],
+                    order: (checkDeletePermission) ? [6, 'desc'] : [5, 'desc'],
                     columnDefs: [{
                             orderable: false,
-                            targets: (checkDeletePermission) ? [0, 1, 3, 4, 5, 6] : [0, 2, 3, 5, 6],
+                            targets: (checkDeletePermission) ? [0, 1, 4, 5, 7] : [0, 3, 4, 6],
                         },
                         {
                             type: 'date',
                             render: function(data) {
                                 return data;
                             },
-                            targets: (checkDeletePermission) ? [5] : [4],
+                            targets: (checkDeletePermission) ? [6] : [5],
                         }
 
                     ],
@@ -347,6 +392,11 @@
                         table.search('').draw();
                     }
                 }, 300));
+
+                $('.filteredRecords').on('change', function() {
+                    $('#data-table_processing').show();
+                    table.ajax.reload();
+                });
 
                 alldriver.get().then(async function(snapshotsdriver) {
                     console.log("Total drivers in Firestore:", snapshotsdriver.size);
@@ -445,6 +495,8 @@ async function getDocumentStatusIcon(driverId) {
                     }
                     html.push('<td><img class="rounded" style="width:50px" src="' + photo + '" alt="image" onerror="this.onerror=null;this.src=\'' + placeholderImage + '\'"></td>' + '<a data-url="' + driverView + '" href="' + driverView + '" class="redirecttopage left_space">' + val.firstName + ' ' + val.lastName + '</a>' + verified);
                 }
+
+                html.push('<td>' + formatServiceTypeLabel(val.serviceType) + '</td>');
 
                 if (val.active == true) {
                     html.push('<td><label class="switch"><input type="checkbox" checked id="' + val.id + '" name="isActive"><span class="slider round"></span></label></td>');
